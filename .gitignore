@@ -34,3 +34,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+*.env
+**/.env
+
+**/.pyc
+**/__pycache__/
+
+# Ignore all files under the specified directory
+scripts/batch-ingestion/sportradar-tennis-v3/sportradar_tennis_v3/*
+scripts/batch-ingestion/sportradar-tennis-v3/sportadar_tennis_v3/**
+
+# But do not ignore the directory itself
+!scripts/batch-ingestion/sportradar-tennis-v3/sportradar_tennis_v3/

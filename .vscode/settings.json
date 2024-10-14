@@ -1,0 +1,24 @@
+{
+    "cSpell.words": [
+        "aiohttp",
+        "capsys",
+        "creds",
+        "jsonlogger",
+        "levelname",
+        "mgid",
+        "mgids",
+        "msgspec"
+    ],
+    "black-formatter.args": [
+        "--config=pyproject.toml"
+    ],
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit",
+        }
+    },
+    "ruff.organizeImports": true,
+    "ruff.fixAll": true,
+}
