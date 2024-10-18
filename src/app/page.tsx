@@ -1,11 +1,13 @@
-import EnhancedSetScoreVisualization from '../components/EnhancedSetScoreVisualization';
-import ScorigamiTreeVisualization from '../components/ScorigamiTreeVisualization';
+import EnhancedSetScoreVisualization from '../archived/EnhancedSetScoreVisualization';
+import ScorigamiTreeVisualization from '../components/scorigami-tree-viz';
+import TennisScorigamiVisualization from '../archived/ScorigamiTreeVisualizationCore';
 
 export default function Home() {
   return (
     <div>
       {false && <EnhancedSetScoreVisualization />}
-      <ScorigamiTreeVisualization />
+      {true && <ScorigamiTreeVisualization />}
+      {false && <TennisScorigamiVisualization />}
     </div>
   );
 }

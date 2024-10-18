@@ -3,9 +3,10 @@ import type { Config } from 'tailwindcss';
 const config: Config = {
   darkMode: 'class',
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}', // Pages in Next.js
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}', // Your components
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}', // App-level files in Next.js
+    './src/shadcn/**/*.{js,ts,jsx,tsx,mdx}', // Custom components in shadcn folder
   ],
   theme: {
     extend: {
@@ -56,8 +57,20 @@ const config: Config = {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+      boxShadow: {
+        smooth: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        'smooth-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+      },
+      container: {
+        center: true,
+        padding: '2rem',
+        screens: {
+          '2xl': '1400px',
+        },
+      },
     },
   },
   plugins: [require('tailwindcss-animate')],
 };
+
 export default config;

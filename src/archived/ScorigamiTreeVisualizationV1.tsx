@@ -6,20 +6,20 @@ import { useTheme } from 'next-themes';
 
 const TOTAL_SETS = 5;
 const POSSIBLE_SCORES = [
-  '0-0',
-  '1-0',
-  '2-0',
-  '3-0',
-  '4-0',
-  '5-0',
   '6-0',
-  '7-0',
   '6-1',
+  '6-2',
+  '6-3',
+  '6-4',
   '7-5',
   '7-6',
-  '6-2',
-  '6-4',
-  '6-3', // Common tennis scores
+  '6-7',
+  '5-7',
+  '4-6',
+  '3-6',
+  '2-6',
+  '1-6',
+  '0-6',
 ];
 
 interface TennisMatch {
@@ -31,6 +31,7 @@ interface TennisMatch {
   scores: string[];
 }
 
+// Sample match data
 const matchesData: TennisMatch[] = [
   {
     id: 1,
@@ -48,7 +49,7 @@ const matchesData: TennisMatch[] = [
     date: '2023-01-29',
     scores: ['7-5', '6-7', '7-5', '6-4', '6-3'],
   },
-  // More matches...
+  // Add more matches as needed
 ];
 
 export default function ScorigamiTreeVisualization() {
@@ -61,39 +62,59 @@ export default function ScorigamiTreeVisualization() {
     renderRings();
   }, [selectedScore, resolvedTheme]);
 
+  // Function to render the concentric rings with score nodes
   const renderRings = () => {
-    const width = 800;
-    const height = 800;
+    const width = 1200;
+    const height = 1200;
     const radius = Math.min(width, height) / 2 - 60;
     const ringRadius = radius / TOTAL_SETS;
 
     const svg = d3.select(svgRef.current);
-    svg.selectAll('*').remove();
+    svg.selectAll('*').remove(); // Clear previous content
 
     const g = svg
       .attr('width', width)
       .attr('height', height)
       .attr('viewBox', `-400 -400 800 800`)
       .append('g')
-      .attr('transform', `translate(${0},${0})`);
+      .attr('transform', `translate(0, 0)`);
 
+    // Central "Love All" node
+    g.append('circle')
+      .attr('cx', 0)
+      .attr('cy', 0)
+      .attr('r', 30)
+      .attr('fill', resolvedTheme === 'dark' ? '#4CAF50' : '#1E90FF')
+      .style('cursor', 'default');
+
+    g.append('text')
+      .attr('x', 0)
+      .attr('y', 5)
+      .attr('text-anchor', 'middle')
+      .attr('fill', resolvedTheme === 'dark' ? '#fff' : '#333')
+      .attr('font-size', '12px')
+      .text('Love All');
+
+    // Outer rings with score nodes
     for (let setIndex = 0; setIndex < TOTAL_SETS; setIndex++) {
       const setRadius = ringRadius * (setIndex + 1);
+      const nodeSize = 16 - setIndex * 2; // Decrease node size as they move outward
 
       POSSIBLE_SCORES.forEach((score, i) => {
         const angle = (i / POSSIBLE_SCORES.length) * 2 * Math.PI;
         const x = setRadius * Math.cos(angle);
         const y = setRadius * Math.sin(angle);
 
+        // Check if the score exists in the current set of any match
         const matchExists = matchesData.some((match) => match.scores[setIndex] === score);
 
+        // Create node circle
         g.append('circle')
           .attr('cx', x)
           .attr('cy', y)
-          .attr('r', 12)
+          .attr('r', nodeSize)
           .attr('fill', matchExists ? (resolvedTheme === 'dark' ? '#4CAF50' : '#1E90FF') : '#e0e0e0')
           .attr('stroke', matchExists ? '#333' : 'none')
-          .attr('class', 'score-node')
           .style('cursor', matchExists ? 'pointer' : 'default')
           .on('click', () => {
             if (matchExists) {
@@ -102,6 +123,7 @@ export default function ScorigamiTreeVisualization() {
             }
           });
 
+        // Add score text
         g.append('text')
           .attr('x', x)
           .attr('y', y + 4)

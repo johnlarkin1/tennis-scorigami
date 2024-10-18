@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ThemeToggle } from 'components/ThemeToggle';
+import { ThemeToggle } from '@/components/theme-toggle';
 import * as d3 from 'd3';
 import { useTheme } from 'next-themes';
 

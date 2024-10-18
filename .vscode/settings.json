@@ -7,7 +7,8 @@
         "levelname",
         "mgid",
         "mgids",
-        "msgspec"
+        "msgspec",
+        "scorigami"
     ],
     "black-formatter.args": [
         "--config=pyproject.toml"
