@@ -1,25 +1,48 @@
 {
-    "cSpell.words": [
-        "aiohttp",
-        "capsys",
-        "creds",
-        "jsonlogger",
-        "levelname",
-        "mgid",
-        "mgids",
-        "msgspec",
-        "scorigami"
-    ],
-    "black-formatter.args": [
-        "--config=pyproject.toml"
-    ],
     "[python]": {
-        "editor.defaultFormatter": "charliermarsh.ruff",
-        "editor.formatOnSave": true,
-        "editor.codeActionsOnSave": {
-            "source.fixAll": "explicit",
-        }
+      "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit"
+      },
+      "editor.defaultFormatter": "charliermarsh.ruff",
+      "editor.formatOnSave": true
     },
-    "ruff.organizeImports": true,
+    "[typescript]": {
+      "editor.defaultFormatter": "denoland.vscode-deno"
+    },
+    "black-formatter.args": [
+      "--config=pyproject.toml"
+    ],
+    "cSpell.words": [
+      "aiohttp",
+      "capsys",
+      "creds",
+      "jsonlogger",
+      "levelname",
+      "mgid",
+      "mgids",
+      "msgspec",
+      "scorigami"
+    ],
+    "deno.enablePaths": [
+      "supabase/functions"
+    ],
+    "deno.lint": true,
+    "deno.unstable": [
+      "bare-node-builtins",
+      "byonm",
+      "sloppy-imports",
+      "unsafe-proto",
+      "webgpu",
+      "broadcast-channel",
+      "worker-options",
+      "cron",
+      "kv",
+      "ffi",
+      "fs",
+      "http",
+      "net"
+    ],
     "ruff.fixAll": true,
-}
+    "ruff.organizeImports": true,
+    "deno.enable": true
+  }

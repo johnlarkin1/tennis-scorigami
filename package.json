@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate-types": "npx supabase gen types --lang=typescript --project-id anrvneirjnmuurloqoie --schema public > src/supabase/database.types.ts"
   },
   "dependencies": {
     "@lucide/lab": "^0.1.2",
@@ -20,6 +21,7 @@
     "@radix-ui/react-switch": "^1.1.1",
     "@radix-ui/react-toggle": "^1.1.0",
     "@shadcn/ui": "^0.0.4",
+    "@supabase/supabase-js": "^2.45.6",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
