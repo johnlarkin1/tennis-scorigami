@@ -1,32 +1,16 @@
 'use client';
 
-import { Header } from '@/components/header';
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Tree from 'react-d3-tree';
 import { useTheme } from 'next-themes';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { POSSIBLE_SCORES, SLAMS, YEARS } from '@/constants';
 import { TreeControls } from '@/components/scorigami/tree-controls';
 import { ViewType } from '@/components/scorigami/tree-control-types';
-
-type TennisMatch = {
-  id: number;
-  player1: string;
-  player2: string;
-  set1_score: string;
-  set2_score: string;
-  set3_score: string;
-  set4_score?: string;
-  set5_score?: string;
-  tournament: string;
-  date: string;
-};
-
-type TreeNode = {
-  name: string;
-  children?: TreeNode[];
-  attributes?: Record<string, any>;
-};
+import { fetchMatches } from '@/api-utils';
+import { TreeNode } from '@/types/tree-node';
+import { Header } from './header';
+import { AggregatedMatchScore } from '@/types/set-score';
 
 const containerStyles = {
   width: '100%',
@@ -34,10 +18,10 @@ const containerStyles = {
 };
 
 export default function TennisScorigamiVisualization() {
-  const [matches, setMatches] = useState<TennisMatch[]>([]);
+  const [matches, setMatches] = useState<AggregatedMatchScore[]>([]);
   const [treeData, setTreeData] = useState<TreeNode | null>(null);
   const [selectedNodePath, setSelectedNodePath] = useState<string[]>([]);
-  const [matchesForSelectedNode, setMatchesForSelectedNode] = useState<TennisMatch[]>([]);
+  const [matchesForSelectedNode, setMatchesForSelectedNode] = useState<AggregatedMatchScore[]>([]); // Matches for the selected node
   const [filterSlam, setFilterSlam] = useState<string>('');
   const [filterYear, setFilterYear] = useState<string>('');
   const [showGradient, setShowGradient] = useState<boolean>(false);
@@ -46,8 +30,17 @@ export default function TennisScorigamiVisualization() {
   const { resolvedTheme } = useTheme();
   const treeContainer = useRef<HTMLDivElement>(null);
 
+  // Fetch aggregated match scores when the component mounts
   useEffect(() => {
-    fetchMatches().then((data) => setMatches(data));
+    const loadMatches = async () => {
+      try {
+        const data = await fetchMatches(1);
+        setMatches(data);
+      } catch (error) {
+        console.error('Error loading matches:', error);
+      }
+    };
+    loadMatches();
   }, []);
 
   useEffect(() => {
@@ -59,39 +52,20 @@ export default function TennisScorigamiVisualization() {
     }
   }, [matches, filterSlam, filterYear, showGradient]);
 
-  async function fetchMatches(): Promise<TennisMatch[]> {
-    // Replace with your actual fetch logic
-    return [
-      {
-        id: 1,
-        player1: 'Federer',
-        player2: 'Nadal',
-        set1_score: '6-4',
-        set2_score: '6-4',
-        set3_score: '6-4',
-        tournament: 'Wimbledon',
-        date: '2023-07-01',
-      },
-      // Add more data as needed
-    ];
-  }
-
-  function applyFilters(matches: TennisMatch[]): TennisMatch[] {
+  function applyFilters(matches: AggregatedMatchScore[]): AggregatedMatchScore[] {
     return matches.filter((match) => {
-      const matchYear = new Date(match.date).getFullYear().toString();
-      const matchSlam = filterSlam ? match.tournament === filterSlam : true;
+      const matchYear = new Date(match.match_start_time).getFullYear().toString();
+      const matchSlam = filterSlam ? match.event_name === filterSlam : true;
       const matchYearMatch = filterYear ? matchYear === filterYear : true;
       return matchSlam && matchYearMatch;
     });
   }
 
-  function getOccurredScores(matches: TennisMatch[]): Map<string, number> {
+  function getOccurredScores(matches: AggregatedMatchScore[]): Map<string, number> {
     const scoreCounts = new Map<string, number>();
 
     matches.forEach((match) => {
-      const scores = [match.set1_score, match.set2_score, match.set3_score, match.set4_score, match.set5_score].filter(
-        Boolean
-      ) as string[];
+      const scores = match.player_a_scores.map((aScore, i) => `${aScore}-${match.player_b_scores[i]}`).filter(Boolean); // Create score sequence
 
       for (let i = 1; i <= scores.length; i++) {
         const sequence = scores.slice(0, i).join(' ');
@@ -140,14 +114,11 @@ export default function TennisScorigamiVisualization() {
       const path = sequence.split(' ');
       setSelectedNodePath(path);
 
+      // Extract scores to compare against node path
       const matchingMatches = matches.filter((match) => {
-        const matchScores = [
-          match.set1_score,
-          match.set2_score,
-          match.set3_score,
-          match.set4_score,
-          match.set5_score,
-        ].filter(Boolean);
+        const matchScores = match.player_a_scores
+          .map((aScore, i) => `${aScore}-${match.player_b_scores[i]}`)
+          .filter(Boolean); // Create score sequence
 
         return path.every((score: string, index: number) => matchScores[index] === score);
       });
@@ -216,7 +187,6 @@ export default function TennisScorigamiVisualization() {
     <>
       <Header />
       <div className='p-4 bg-gray-100 dark:bg-gray-900 min-h-screen'>
-        {/* <h1 className='text-3xl font-bold mb-6 text-center text-gray-800 dark:text-gray-100'>Tennis Scorigami</h1> */}
         <TreeControls
           slams={SLAMS}
           years={YEARS}
@@ -254,8 +224,6 @@ export default function TennisScorigamiVisualization() {
                   rootNodeClassName='node__root'
                   branchNodeClassName='node__branch'
                   leafNodeClassName='node__leaf'
-                  // TODO: Fix this section
-                  // @ts-ignore
                   styles={{
                     links: {
                       stroke: resolvedTheme === 'dark' ? '#555' : '#ccc',
@@ -277,30 +245,29 @@ export default function TennisScorigamiVisualization() {
                 {matchesForSelectedNode.length > 0 ? (
                   <ul className='space-y-4'>
                     {matchesForSelectedNode.map((match) => (
-                      <li key={match.id} className='p-4 bg-gray-200 dark:bg-gray-700 rounded-lg'>
+                      <li key={match.match_id} className='p-4 bg-gray-200 dark:bg-gray-700 rounded-lg'>
                         <p>
                           <strong className='text-gray-700 dark:text-gray-300'>
-                            {match.player1} vs {match.player2}
+                            {match.player_a_full_name} vs {match.player_b_full_name}
                           </strong>
                         </p>
                         <p className='text-sm text-gray-600 dark:text-gray-400'>
-                          {match.tournament} - {match.date}
+                          {match.event_name} - {match.match_start_time}
                         </p>
                         <p className='mt-2'>
                           <strong>Scores:</strong>{' '}
-                          {[match.set1_score, match.set2_score, match.set3_score, match.set4_score, match.set5_score]
-                            .filter(Boolean)
-                            .map((score, index) => {
-                              const isHighlighted = selectedNodePath[index] === score;
-                              return (
-                                <span
-                                  key={index}
-                                  className={isHighlighted ? 'text-green-600 dark:text-green-400 font-bold' : ''}
-                                >
-                                  {score}{' '}
-                                </span>
-                              );
-                            })}
+                          {match.player_a_scores.map((aScore, i) => (
+                            <span
+                              key={i}
+                              className={
+                                selectedNodePath[i] === `${aScore}-${match.player_b_scores[i]}`
+                                  ? 'text-green-600 dark:text-green-400 font-bold'
+                                  : ''
+                              }
+                            >
+                              {aScore}-{match.player_b_scores[i]}{' '}
+                            </span>
+                          ))}
                         </p>
                       </li>
                     ))}
