@@ -21,7 +21,8 @@
       "mgid",
       "mgids",
       "msgspec",
-      "scorigami"
+      "scorigami",
+      "stackoverflow"
     ],
     "deno.enablePaths": [
       "supabase/functions"

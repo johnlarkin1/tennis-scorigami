@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.select-trigger {
+  @apply bg-background text-foreground border-border rounded-md px-3 py-2;
+}
+
+.select-content {
+  @apply min-w-[inherit] bg-background text-foreground border-border rounded-md;
+}
+
+.select-item-hover {
+  @apply hover:bg-gray-600;
+}

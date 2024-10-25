@@ -106,3 +106,19 @@ html {
 .node:hover text {
   font-weight: 500;
 }
+
+.card-default {
+  @apply w-full max-w-6xl mx-auto mb-6 bg-gray-800 border-gray-700 rounded-md;
+}
+
+.card-content {
+  @apply p-6;
+}
+
+.flex-center {
+  @apply flex items-center gap-4;
+}
+
+.toggle-btn-group {
+  @apply flex gap-2;
+}

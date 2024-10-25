@@ -1,24 +1,18 @@
 'use client';
 
 import * as React from 'react';
-import { Button } from '@/shadcn/components/ui/button';
 import { Select, SelectTrigger, SelectContent, SelectValue, SelectItem } from '@/shadcn/components/ui/select';
 import { Card, CardContent } from '@/shadcn/components/ui/card';
-import { Separator } from '@/shadcn/components/ui/separator';
 import { Switch } from '@/shadcn/components/ui/switch';
-import { MoveHorizontal, MoveVertical, Calendar, Paintbrush, Hash } from 'lucide-react';
-import { ViewType } from '@/components/scorigami/tree-control-types';
-import TennisBall from '@/components/tennis-ball';
-import { Toggle } from '@/shadcn/components/ui/toggle';
+import { MoveHorizontal, MoveVertical, Calendar, Paintbrush, Hash, Users } from 'lucide-react';
+import { ViewType } from '@/components/scorigami/controls/tree-control-types';
 import { ToggleButton } from '@/shadcn/components/ui/toggle-button';
+import { useAtom } from 'jotai';
+import { selectedYearAtom, selectedSexAtom, SexType } from '@/components/atoms/scorigami-options-atom';
+import { YEARS } from '@/constants';
+import { TournamentDropdown } from '@/components/scorigami/controls/tournament-dropdown';
 
 export type TreeControlsProps = {
-  slams: { value: string; label: string }[];
-  years: { value: string; label: string }[];
-  selectedSlam: string;
-  setSelectedSlam: (value: string) => void;
-  selectedYear: string;
-  setSelectedYear: (value: string) => void;
   showGradient: boolean;
   setShowGradient: (value: boolean) => void;
   showCount: boolean;
@@ -28,12 +22,6 @@ export type TreeControlsProps = {
 };
 
 export const TreeControls = ({
-  slams,
-  years,
-  selectedSlam,
-  setSelectedSlam,
-  selectedYear,
-  setSelectedYear,
   showGradient,
   setShowGradient,
   showCount,
@@ -41,8 +29,12 @@ export const TreeControls = ({
   viewType,
   setViewType,
 }: TreeControlsProps) => {
+  const years = YEARS;
+  const [selectedYear, setSelectedYear] = useAtom(selectedYearAtom);
+  const [selectedSex, setSelectedSex] = useAtom(selectedSexAtom);
+
   return (
-    <Card className='w-full max-w-6xl mx-auto mb-6 bg-gray-800 border-gray-700 rounded-md'>
+    <Card className='w-4/5 mx-auto mb-6 bg-gray-800 border-gray-700 rounded-md'>
       <CardContent className='p-6'>
         <h2 className='text-xl font-semibold'>Control Panel</h2>
         <p className='text-gray-400 mb-4 text-sm'>
@@ -91,32 +83,44 @@ export const TreeControls = ({
           </div>
 
           {/* Slam and Year Selectors */}
-          <div className='flex items-center gap-4'>
-            <Select onValueChange={setSelectedSlam} value={selectedSlam}>
-              <SelectTrigger className='bg-background text-foreground border-border rounded-md px-3 py-2 w-40'>
-                <TennisBall className='mr-2 h-4 w-4' />
-                <SelectValue placeholder='Select Slam' />
-              </SelectTrigger>
-              <SelectContent className='min-w-[inherit] bg-background text-foreground border-border rounded-md'>
-                {slams.map((slam) => (
-                  <SelectItem key={slam.value} value={slam.value} className='hover:bg-gray-600'>
-                    {slam.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className='flex items-center gap-3'>
+            {/* Tournament (Slam) Select with "All" Option */}
+            <TournamentDropdown />
 
+            {/* Year Select with "All" Option */}
             <Select onValueChange={setSelectedYear} value={selectedYear}>
-              <SelectTrigger className='bg-background text-foreground border-border rounded-md px-3 py-2 w-32'>
+              <SelectTrigger className='select-trigger'>
                 <Calendar className='mr-2 h-4 w-4' />
                 <SelectValue placeholder='Year' />
               </SelectTrigger>
               <SelectContent className='min-w-[inherit] bg-background text-foreground border-border rounded-md'>
+                <SelectItem value='All Years' className='hover:bg-gray-600'>
+                  All Years
+                </SelectItem>
                 {years.map((year) => (
                   <SelectItem key={year.value} value={year.value} className='hover:bg-gray-600'>
                     {year.label}
                   </SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+
+            {/* Gender Select */}
+            <Select onValueChange={(value) => setSelectedSex(value as SexType)} value={selectedSex}>
+              <SelectTrigger className='select-trigger'>
+                <Users className='mr-2 h-4 w-4' />
+                <SelectValue placeholder='Sex' />
+              </SelectTrigger>
+              <SelectContent className='min-w-[inherit] bg-background text-foreground border-border rounded-md'>
+                <SelectItem value='Men and Women' className='hover:bg-gray-600'>
+                  Men and Women
+                </SelectItem>
+                <SelectItem value='Men' className='hover:bg-gray-600'>
+                  Men
+                </SelectItem>
+                <SelectItem value='Women' className='hover:bg-gray-600'>
+                  Women
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>

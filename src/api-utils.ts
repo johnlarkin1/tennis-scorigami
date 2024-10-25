@@ -45,24 +45,45 @@
 // }
 
 import { AggregatedMatchScore } from "@/types/set-score";
+import { Tournament } from "./types/tournament";
+import { defaultAllTournament } from "./components/atoms/tournament-atom";
+import { SexType } from "./components/atoms/scorigami-options-atom";
+import { InitialScore } from "./types/initial-score";
 
-export async function fetchMatches(
+export const fetchMatches = async (
   setNumber: number,
-  playerAScore?: number,
-  playerBScore?: number,
-): Promise<AggregatedMatchScore[]> {
-  const url = new URL(`/api/scores/${setNumber}`, window.location.origin);
+  scoreSequence: { playerAScore: number; playerBScore: number }[], // Pass full score sequence so far
+  tournament?: Tournament,
+  eventYear?: string,
+  eventGender?: SexType,
+): Promise<AggregatedMatchScore[]> => {
+  const params = new URLSearchParams();
 
-  // If player scores are provided, add them to the query params
-  if (playerAScore) {
-    url.searchParams.set("player_a_score", playerAScore.toString());
+  // If a score sequence is provided, encode it as a stringified JSON object
+  if (scoreSequence.length > 0) {
+    params.append("score_sequence", JSON.stringify(scoreSequence));
   }
-  if (playerBScore) {
-    url.searchParams.set("player_b_score", playerBScore.toString());
+
+  // Append tournament_id if provided
+  if (tournament && tournament !== defaultAllTournament) {
+    params.append("tournament_id", tournament.tournament_id.toString());
+  }
+
+  // Append event_year if provided and valid
+  if (eventYear && !isNaN(+eventYear)) {
+    params.append("event_year", eventYear);
+  }
+
+  // Map eventGender and append only if it maps to a valid value
+  const mappedGender = eventGender ? mapSexTypeToApi(eventGender) : undefined;
+  if (mappedGender) {
+    params.append("event_gender", mappedGender);
   }
 
   try {
-    const response = await fetch(url.toString());
+    const response = await fetch(
+      `/api/scores/${setNumber}?${params.toString()}`,
+    );
     if (!response.ok) {
       throw new Error(`Error fetching matches for set ${setNumber}`);
     }
@@ -73,4 +94,62 @@ export async function fetchMatches(
     console.error("Error fetching matches:", error);
     throw new Error("Unable to fetch matches");
   }
-}
+};
+
+const mapSexTypeToApi = (sex: SexType): string | undefined => {
+  switch (sex) {
+    case "Men and Women":
+      // returning undefined will have the query parameter omitted
+      return undefined;
+    case "Men":
+      return "M";
+    case "Women":
+      return "F";
+    default:
+      return undefined;
+  }
+};
+
+export const fetchInitialScores = async (
+  tournament?: Tournament,
+  eventYear?: string,
+  eventGender?: SexType,
+): Promise<InitialScore[]> => {
+  const params = new URLSearchParams();
+
+  // Append tournament_id if provided
+  if (tournament && tournament !== defaultAllTournament) {
+    params.append("tournament_id", tournament.tournament_id.toString());
+  }
+
+  // Append event_year if provided and valid
+  if (eventYear && !isNaN(+eventYear)) {
+    params.append("event_year", eventYear);
+  }
+
+  // Map eventGender and append only if it maps to a valid value
+  const mappedGender = eventGender ? mapSexTypeToApi(eventGender) : undefined;
+  if (mappedGender) {
+    params.append("event_gender", mappedGender);
+  }
+
+  // Perform the API fetch call
+  const response = await fetch(
+    `/api/scores/initial-scores?${params.toString()}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch matches");
+  }
+  const data: InitialScore[] = await response.json();
+  return data;
+};
+
+export const fetchTournaments = async (): Promise<Tournament[]> => {
+  const response = await fetch("/api/tournaments");
+  if (!response.ok) {
+    throw new Error("Failed to fetch tournaments");
+  }
+  const data: Tournament[] = await response.json();
+  return data;
+};

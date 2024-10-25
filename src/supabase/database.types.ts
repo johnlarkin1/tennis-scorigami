@@ -46,14 +46,13 @@ export type Database = {
           event_gender: string | null
           event_id: number
           event_start_date: string | null
-          event_type_id: number
           event_year: number | null
           external_id: string | null
           length: number | null
           location: string | null
           name: string | null
           prize_money: number | null
-          surface_type_id: number
+          tournament_id: number
         }
         Insert: {
           draw_size?: number | null
@@ -61,14 +60,13 @@ export type Database = {
           event_gender?: string | null
           event_id?: number
           event_start_date?: string | null
-          event_type_id: number
           event_year?: number | null
           external_id?: string | null
           length?: number | null
           location?: string | null
           name?: string | null
           prize_money?: number | null
-          surface_type_id: number
+          tournament_id: number
         }
         Update: {
           draw_size?: number | null
@@ -76,29 +74,21 @@ export type Database = {
           event_gender?: string | null
           event_id?: number
           event_start_date?: string | null
-          event_type_id?: number
           event_year?: number | null
           external_id?: string | null
           length?: number | null
           location?: string | null
           name?: string | null
           prize_money?: number | null
-          surface_type_id?: number
+          tournament_id?: number
         }
         Relationships: [
           {
-            foreignKeyName: "event_event_type_id_fkey"
-            columns: ["event_type_id"]
+            foreignKeyName: "event_tournament_id_fkey"
+            columns: ["tournament_id"]
             isOneToOne: false
-            referencedRelation: "event_type"
-            referencedColumns: ["event_type_id"]
-          },
-          {
-            foreignKeyName: "event_surface_type_id_fkey"
-            columns: ["surface_type_id"]
-            isOneToOne: false
-            referencedRelation: "surface_type"
-            referencedColumns: ["surface_type_id"]
+            referencedRelation: "tournament"
+            referencedColumns: ["tournament_id"]
           },
         ]
       }
@@ -414,6 +404,55 @@ export type Database = {
         }
         Relationships: []
       }
+      tournament: {
+        Row: {
+          country_id: number | null
+          established_year: number | null
+          event_type_id: number | null
+          name: string
+          surface_type_id: number | null
+          tournament_id: number
+        }
+        Insert: {
+          country_id?: number | null
+          established_year?: number | null
+          event_type_id?: number | null
+          name: string
+          surface_type_id?: number | null
+          tournament_id?: number
+        }
+        Update: {
+          country_id?: number | null
+          established_year?: number | null
+          event_type_id?: number | null
+          name?: string
+          surface_type_id?: number | null
+          tournament_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "country"
+            referencedColumns: ["country_id"]
+          },
+          {
+            foreignKeyName: "tournament_event_type_id_fkey"
+            columns: ["event_type_id"]
+            isOneToOne: false
+            referencedRelation: "event_type"
+            referencedColumns: ["event_type_id"]
+          },
+          {
+            foreignKeyName: "tournament_surface_type_id_fkey"
+            columns: ["surface_type_id"]
+            isOneToOne: false
+            referencedRelation: "surface_type"
+            referencedColumns: ["surface_type_id"]
+          },
+        ]
+      }
     }
     Views: {
       match_details: {
@@ -443,7 +482,11 @@ export type Database = {
     }
     Functions: {
       get_aggregated_match_scores: {
-        Args: Record<PropertyKey, never>
+        Args: {
+          p_tournament_id?: number
+          p_event_year?: number
+          p_event_gender?: string
+        }
         Returns: {
           match_id: number
           player_a_full_name: string
@@ -455,6 +498,24 @@ export type Database = {
           player_a_scores: number[]
           player_b_scores: number[]
           match_start_time: string
+        }[]
+      }
+      get_initial_scores: {
+        Args: {
+          p_tournament_id?: number
+          p_event_year?: number
+          p_event_gender?: string
+        }
+        Returns: {
+          tournament_id: number
+          event_id: number
+          event_name: string
+          event_year: number
+          event_gender: string
+          player_a_scores: number
+          player_b_scores: number
+          player_a_tiebreak_points: number
+          player_b_tiebreak_points: number
         }[]
       }
     }

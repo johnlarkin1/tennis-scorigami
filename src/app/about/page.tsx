@@ -1,6 +1,5 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { SocialIcon } from 'react-social-icons';
 import { Header } from '@/components/header';
 
@@ -11,6 +10,9 @@ type TeamMember = {
   linkedin: string;
   email: string;
   github: string;
+  website?: string;
+  twitter?: string;
+  stackoverflow?: string;
 };
 
 type InfoCardProps = {
@@ -18,19 +20,37 @@ type InfoCardProps = {
   description: string;
 };
 
-const InfoCard: React.FC<InfoCardProps> = ({ title, description }) => (
+const InfoCard = ({ title, description }: InfoCardProps) => (
   <div className='bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300'>
     <h2 className='text-2xl font-bold mb-4 text-green-400'>{title}</h2>
     <p className='text-gray-300'>{description}</p>
   </div>
 );
 
-const TeamMemberCard: React.FC<TeamMember> = ({ name, role, image, linkedin, email, github }) => (
-  <div className='bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1'>
+const TeamMemberCard = ({
+  name,
+  role,
+  image,
+  linkedin,
+  email,
+  github,
+  website,
+  twitter,
+  stackoverflow,
+}: TeamMember) => (
+  <div
+    className='bg-gray-800 p-6 rounded-lg shadow-lg transition-all duration-300 
+                  transform hover:-translate-y-1 hover:shadow-xl
+                  focus-within:-translate-y-1 focus-within:shadow-xl
+                  hover:ring-2 hover:ring-green-400 focus-within:ring-2 focus-within:ring-green-400
+                  group'
+  >
     <div className='relative w-48 h-48 mx-auto mb-4 rounded-full overflow-hidden'>
       <Image src={image} alt={name} layout='fill' objectFit='cover' />
     </div>
-    <h3 className='text-2xl font-bold text-center mb-2'>{name}</h3>
+    <h3 className='text-2xl font-bold text-center mb-2 text-white group-hover:text-green-400 group-focus-within:text-green-400 transition-colors'>
+      {name}
+    </h3>
     <p className='text-green-400 text-center mb-4'>{role}</p>
     <div className='flex justify-center space-x-4'>
       <SocialIcon url={linkedin} style={{ height: 30, width: 30 }} target='_blank' rel='noopener noreferrer' />
@@ -42,6 +62,9 @@ const TeamMemberCard: React.FC<TeamMember> = ({ name, role, image, linkedin, ema
         target='_blank'
         rel='noopener noreferrer'
       />
+      {website && <SocialIcon url={website} network='smugmug' style={{ height: 30, width: 30 }} target='_blank' />}
+      {twitter && <SocialIcon url={twitter} style={{ height: 30, width: 30 }} target='_blank' />}
+      {stackoverflow && <SocialIcon url={stackoverflow} style={{ height: 30, width: 30 }} target='_blank' />}
     </div>
   </div>
 );
@@ -55,6 +78,9 @@ const AboutPage: React.FC = () => {
       linkedin: 'https://www.linkedin.com/in/jebhenryhead/',
       email: 'jeb.henryhead@gmail.com',
       github: 'https://github.com/henryhead',
+      website: undefined,
+      twitter: 'https://x.com/jebhenryhead',
+      stackoverflow: undefined,
     },
     {
       name: 'John Larkin',
@@ -63,6 +89,9 @@ const AboutPage: React.FC = () => {
       linkedin: 'https://www.linkedin.com/in/johnlarkin/',
       email: 'john@tennisscorigami.com',
       github: 'https://github.com/johnlarkin1',
+      website: 'https://johnlarkin1.github.io/',
+      twitter: 'https://x.com/JLarks32',
+      stackoverflow: 'https://stackoverflow.com/users/6347839/jlarks32',
     },
     {
       name: 'Sebastian Hoar',
@@ -71,6 +100,9 @@ const AboutPage: React.FC = () => {
       linkedin: 'https://www.linkedin.com/in/sebastian-hoar-a71a5b112/',
       email: 'hoar.sebastian@gmail.com',
       github: 'https://github.com/johnlarkin1',
+      website: undefined,
+      twitter: undefined,
+      stackoverflow: undefined,
     },
   ];
 
@@ -79,7 +111,7 @@ const AboutPage: React.FC = () => {
       <Header />
 
       <main className='container mx-auto px-4 py-8'>
-        <div className='relative h-[400px] mb-12 rounded-lg overflow-hidden'>
+        <div className='relative h-[500px] mb-12 rounded-lg overflow-hidden'>
           <Image
             src='/western-and-southern2.jpg'
             alt='Tennis Court'
@@ -93,7 +125,7 @@ const AboutPage: React.FC = () => {
           </div>
         </div>
 
-        <p className='text-xl mb-12 text-center max-w-3xl mx-auto'>
+        <p className='text-xl mb-12 text-center max-w-5xl mx-auto'>
           Tennis Scorigami is an innovative project that explores unique tennis match scores. Inspired by the concept of
           scorigami in other sports, this project visualizes the occurrence of rare tennis scorelines in major
           tournaments around the world.

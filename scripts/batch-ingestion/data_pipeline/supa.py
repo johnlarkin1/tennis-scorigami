@@ -13,13 +13,13 @@ from data_pipeline.api_wrappers.sports_score.util import (
     extract_place_of_birth,
     extract_weight,
 )
-from data_pipeline.config import SUPABASE_KEY, SUPABASE_URL
+from data_pipeline.config import SUPABASE_SERVICE_ROLE_KEY, SUPABASE_URL
 from data_pipeline.db_model import EventRow, MatchRow
 
 
 class SupabaseClient:
     def __init__(self):
-        self.supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+        self.supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
     # Upsert into the country table
     def upsert_country(

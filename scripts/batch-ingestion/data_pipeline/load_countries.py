@@ -1,8 +1,8 @@
 import requests
-from config import SUPABASE_KEY, SUPABASE_URL
+from config import SUPABASE_SERVICE_ROLE_KEY, SUPABASE_URL
 from supabase import Client, create_client
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 response = requests.get("https://restcountries.com/v3.1/all")
 countries = response.json()
 
