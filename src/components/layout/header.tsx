@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/shadcn/components/ui/button';
+import { Button } from '@/components/ui/button';
 
 export const Header = () => {
   return (

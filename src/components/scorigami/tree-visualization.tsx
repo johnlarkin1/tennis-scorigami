@@ -1,5 +1,6 @@
 import Tree from 'react-d3-tree';
 import { TreeNode } from '@/types/tree-node';
+import { isMatchComplete } from '../../lib/utils/scoring';
 
 export type TreeVisualizationProps = {
   treeData: TreeNode;
@@ -23,9 +24,17 @@ export const TreeVisualization = ({
       const sequence = nodeDatum.attributes?.sequence;
 
       if (nodeDatum.attributes?.isClickable && sequence) {
-        const path = sequence.split(' ');
-        onNodeClick(path); // Trigger the click handler to update selectedNodePath
-        toggleNode(); // Toggle the node expansion
+        const setScores = sequence.split(' ').filter(Boolean);
+
+        // Check for match completion before expanding
+        if (!isMatchComplete(setScores) && setScores.length < 5) {
+          onNodeClick(setScores);
+          2;
+          toggleNode();
+        } else {
+          // If match is complete or at max sets, just show the details
+          onNodeClick(setScores);
+        }
       }
     };
 
@@ -33,14 +42,19 @@ export const TreeVisualization = ({
     const occurred = nodeDatum.attributes?.occurred;
     const isClickable = nodeDatum.attributes?.isClickable;
     const isDarkMode = resolvedTheme === 'dark';
+    const sequence = nodeDatum.attributes?.sequence;
+    const setScores = sequence ? sequence.split(' ').filter(Boolean) : [];
+    const isComplete = isMatchComplete(setScores);
+    const isAtMaxSets = setScores.length >= 5;
 
+    // Determine node color based on state
     const fillColor = occurred
       ? isDarkMode
         ? 'rgb(0, 200, 0)'
         : 'rgb(0, 128, 0)' // Green for occurred scores
       : isDarkMode
       ? '#444'
-      : '#ddd'; // Grey for non-occurred scores
+      : '#ddd';
 
     const fontColor = isDarkMode ? '#fff' : '#000';
     const nodeSize = Math.max(20 - hierarchyPointNode.depth * 2, 5);
@@ -48,7 +62,7 @@ export const TreeVisualization = ({
     return (
       <g onClick={handleNodeClick} className={isClickable ? 'cursor-pointer' : ''}>
         <circle r={nodeSize} fill={fillColor} />
-        {isClickable && (
+        {isClickable && !isComplete && !isAtMaxSets && (
           <circle
             r={nodeSize + 2}
             fill='none'

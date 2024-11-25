@@ -1,5 +1,5 @@
 // src/app/api/scores/initial-scores/route.ts
-import { supabase } from "@/supabase/client";
+import { supabase } from "@/services/supabase/client";
 import { InitialScore } from "@/types/initial-score";
 import { NextRequest, NextResponse } from "next/server";
 

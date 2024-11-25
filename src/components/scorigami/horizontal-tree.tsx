@@ -40,9 +40,6 @@ const HorizontalTree: React.FC<HorizontalTreeProps> = ({ data, onNodeClick }) =>
     const svgGroup = svg.append('g').attr('transform', `translate(40,0)`);
 
     const root = d3.hierarchy<TreeNode>(data);
-    root.x0 = height / 2;
-    root.y0 = 0;
-
     const treeLayout = d3.tree<TreeNode>().size([height, width - 160]);
 
     treeLayout(root);
@@ -60,9 +57,9 @@ const HorizontalTree: React.FC<HorizontalTreeProps> = ({ data, onNodeClick }) =>
       .attr(
         'd',
         d3
-          .linkHorizontal()
-          .x((d: any) => d.y)
-          .y((d: any) => d.x)
+          .linkHorizontal<d3.HierarchyLink<TreeNode>, d3.HierarchyNode<TreeNode>>()
+          .x((d) => d.y as number)
+          .y((d) => d.x as number)
       )
       .attr('fill', 'none')
       .attr('stroke', '#ccc');

@@ -1,14 +1,14 @@
 import { useAtom } from 'jotai';
 import { useEffect } from 'react';
-import { Select, SelectTrigger, SelectContent, SelectValue, SelectItem } from '@/shadcn/components/ui/select';
+import { Select, SelectTrigger, SelectContent, SelectValue, SelectItem } from '@/components/ui/select';
 import {
   tournamentsAtom,
   selectedTournamentAtom,
   defaultAllTournament,
   ALL_TOURNAMENTS_STRING,
-} from '@/components/atoms/tournament-atom';
+} from '@/store/tournament';
 import { useQuery } from '@tanstack/react-query';
-import { fetchTournaments } from '@/api-utils';
+import { fetchTournaments } from '@/services/api-utils';
 import { Tournament } from '@/types/tournament';
 
 export const TournamentDropdown = () => {
@@ -58,7 +58,6 @@ export const TournamentDropdown = () => {
         <SelectItem value={ALL_TOURNAMENTS_STRING}>All Tournaments</SelectItem>
         {tournaments &&
           tournaments.map((tournament: Tournament) => {
-            console.log('got tournament', tournament);
             return (
               <SelectItem key={tournament.tournament_id} value={tournament.name}>
                 {tournament.name}

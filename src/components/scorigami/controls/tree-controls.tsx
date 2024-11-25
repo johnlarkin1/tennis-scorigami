@@ -1,14 +1,14 @@
 'use client';
 
 import * as React from 'react';
-import { Select, SelectTrigger, SelectContent, SelectValue, SelectItem } from '@/shadcn/components/ui/select';
-import { Card, CardContent } from '@/shadcn/components/ui/card';
-import { Switch } from '@/shadcn/components/ui/switch';
+import { Select, SelectTrigger, SelectContent, SelectValue, SelectItem } from '@/components/ui/select';
+import { Card, CardContent } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import { MoveHorizontal, MoveVertical, Calendar, Paintbrush, Hash, Users } from 'lucide-react';
 import { ViewType } from '@/components/scorigami/controls/tree-control-types';
-import { ToggleButton } from '@/shadcn/components/ui/toggle-button';
+import { ToggleButton } from '@/components/ui/toggle-button';
 import { useAtom } from 'jotai';
-import { selectedYearAtom, selectedSexAtom, SexType } from '@/components/atoms/scorigami-options-atom';
+import { selectedYearAtom, selectedSexAtom, SexType } from '@/store/scoreigami';
 import { YEARS } from '@/constants';
 import { TournamentDropdown } from '@/components/scorigami/controls/tournament-dropdown';
 

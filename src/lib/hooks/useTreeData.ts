@@ -1,25 +1,19 @@
 import { useEffect, useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { fetchInitialScores, fetchMatches } from "@/api-utils";
-import { POSSIBLE_SCORES, REACT_QUERY_STALE_TIME_MIN } from "@/constants"; // Import POSSIBLE_SCORES here
+import { fetchInitialScores, fetchMatches } from "@/services/api-utils";
+import { POSSIBLE_SCORES, REACT_QUERY_STALE_TIME_MIN } from "@/constants";
 import { InitialScore } from "@/types/initial-score";
 import { AggregatedMatchScore } from "@/types/set-score";
 import { TreeNode } from "@/types/tree-node";
 import { useAtom } from "jotai";
-import {
-  selectedSexAtom,
-  selectedYearAtom,
-} from "../atoms/scorigami-options-atom";
-import { selectedTournamentAtom } from "../atoms/tournament-atom";
-import {
-  buildTreeData,
-  getOccurredScoresInitial,
-} from "../utils/scoring-utils";
+import { selectedSexAtom, selectedYearAtom } from "../../store/scoreigami";
+import { selectedTournamentAtom } from "../../store/tournament";
+import { buildTreeData, getOccurredScoresInitial } from "../utils/scoring";
 
 type UseTreeDataProps = {
   selectedNodePath: string[];
   expandedNodes: string[];
-  setExpandedNodes: (nodes: string[]) => void;
+  setExpandedNodes: React.Dispatch<React.SetStateAction<string[]>>;
   setSelectedNodePath: (path: string[]) => void;
 };
 
@@ -134,7 +128,7 @@ export const useTreeData = ({
 
         return {
           ...node,
-          children: node.children.map(updateTreeWithNextScores),
+          children: node.children?.map(updateTreeWithNextScores),
         };
       };
 
@@ -151,13 +145,14 @@ export const useTreeData = ({
   }, [initialScores, expandedNodes]);
 
   const handleNodeClick = (path: string[]) => {
-    setSelectedNodePath(path);
+    if (path.length < 5) {
+      setSelectedNodePath(path);
+    }
   };
-
   const toggleNodeExpansion = (sequence: string) => {
-    setExpandedNodes((prev) =>
+    setExpandedNodes((prev: string[]) =>
       prev.includes(sequence)
-        ? prev.filter((node) => node !== sequence)
+        ? prev.filter((node: string) => node !== sequence)
         : [...prev, sequence]
     );
   };

@@ -28,7 +28,7 @@
 import { useTheme } from 'next-themes';
 import { Moon, Lock } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { Button } from '@/shadcn/components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogClose,
@@ -38,7 +38,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/shadcn/components/ui/dialog';
+} from '@/components/ui/dialog';
 
 export const ThemeToggle = () => {
   const [mounted, setMounted] = useState(false);

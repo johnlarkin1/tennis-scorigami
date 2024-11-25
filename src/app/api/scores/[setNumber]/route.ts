@@ -1,4 +1,4 @@
-import { supabase } from "@/supabase/client";
+import { supabase } from "@/services/supabase/client";
 import { NextRequest, NextResponse } from "next/server";
 import { AggregatedMatchScore } from "@/types/set-score";
 

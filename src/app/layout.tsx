@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import '@/styles';
-import { ThemeProvider } from '@/shadcn/components/theme-provider';
-import ReactQueryProvider from '@/components/providers/react-query-provider';
+import { Providers } from '@/providers';
 
 const geistSans = localFont({
   src: '../../public/fonts/GeistVF.woff',
   variable: '--font-geist-sans',
   weight: '100 900',
 });
+
 const geistMono = localFont({
   src: '../../public/fonts/GeistMonoVF.woff',
   variable: '--font-geist-mono',
@@ -35,9 +35,9 @@ export default function RootLayout({
         <link rel='manifest' href='/favicon/site.webmanifest' />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
-          <ReactQueryProvider>{children}</ReactQueryProvider>
-        </ThemeProvider>
+        <Providers attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+          {children}
+        </Providers>
       </body>
     </html>
   );

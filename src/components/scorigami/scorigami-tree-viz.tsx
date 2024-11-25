@@ -2,15 +2,15 @@
 
 import { useState, useRef } from 'react';
 import { useTheme } from 'next-themes';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { TreeControls } from '@/components/scorigami/controls/tree-controls';
 import { ViewType } from '@/components/scorigami/controls/tree-control-types';
-import { Header } from './header';
-import { useTreeData } from './hooks/useTreeData';
+import { Header } from '../layout/header';
+import { useTreeData } from '../../lib/hooks/useTreeData';
 import { TreeVisualization } from '@/components/scorigami/tree-visualization';
-import { MatchDetails } from '@/components/match-details';
-import { selectedSexAtom, selectedYearAtom } from './atoms/scorigami-options-atom';
-import { selectedTournamentAtom } from './atoms/tournament-atom';
+import { MatchDetails } from '@/components/scorigami/match-details';
+import { selectedSexAtom, selectedYearAtom } from '../../store/scoreigami';
+import { selectedTournamentAtom } from '../../store/tournament';
 import { useAtom } from 'jotai';
 
 export default function TennisScorigamiVisualization() {
@@ -65,7 +65,7 @@ export default function TennisScorigamiVisualization() {
                 <TreeVisualization
                   treeData={treeData}
                   viewType={viewType}
-                  resolvedTheme={resolvedTheme}
+                  resolvedTheme={resolvedTheme ? resolvedTheme : 'dark'}
                   showGradient={showGradient}
                   showCount={showCount}
                   onNodeClick={(path) => setSelectedNodePath(path)}

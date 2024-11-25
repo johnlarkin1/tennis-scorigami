@@ -1,4 +1,4 @@
-// scorigami-options-atom.ts
+// scoreigami related atoms
 import { atom } from "jotai";
 
 export type SexType = "Men and Women" | "Men" | "Women";

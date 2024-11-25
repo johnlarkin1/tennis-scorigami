@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { SocialIcon } from 'react-social-icons';
-import { Header } from '@/components/header';
+import { Header } from '@/components/layout/header';
 
 type TeamMember = {
   name: string;
@@ -126,9 +126,9 @@ const AboutPage: React.FC = () => {
         </div>
 
         <p className='text-xl mb-12 text-center max-w-5xl mx-auto'>
-          Tennis Scorigami is an innovative project that explores unique tennis match scores. Inspired by the concept of
-          scorigami in other sports, this project visualizes the occurrence of rare tennis scorelines in major
-          tournaments around the world.
+          Tennis Scorigami is an innovative (we think) project that explores unique tennis match scores. Inspired by the
+          concept of scorigami in other sports, this project visualizes the occurrence of rare tennis scorelines in
+          major tournaments around the world.
         </p>
 
         <div className='grid gap-8 md:grid-cols-3 mb-16'>

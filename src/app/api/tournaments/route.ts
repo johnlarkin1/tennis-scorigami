@@ -1,5 +1,5 @@
 // src/app/api/tournaments.ts
-import { supabase } from "@/supabase/client";
+import { supabase } from "@/services/supabase/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {

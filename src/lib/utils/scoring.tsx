@@ -47,3 +47,28 @@ export const getOccurredScoresInitial = (initialScores: InitialScore[]): Map<str
 
   return scoreCounts;
 };
+
+export const isMatchComplete = (scores: string[]): boolean => {
+  if (!scores.length) return false;
+
+  let playerAWins = 0;
+  let playerBWins = 0;
+
+  scores.forEach((score) => {
+    const [scoreA, scoreB] = score.split('-').map(Number);
+    if (scoreA > scoreB) playerAWins++;
+    else if (scoreB > scoreA) playerBWins++;
+  });
+
+  // Check for match completion (best of 5 or best of 3)
+  return (
+    playerAWins >= 3 ||
+    playerBWins >= 3 || // Best of 5 completion
+    (scores.length >= 2 && (playerAWins >= 2 || playerBWins >= 2))
+  ); // Best of 3 completion
+};
+
+// Function to parse set scores from sequence
+export const parseSetScores = (sequence: string): string[] => {
+  return sequence.split(' ').filter(Boolean);
+};
