@@ -1,5 +1,5 @@
-import { Icon } from 'lucide-react';
-import { tennisBall } from '@lucide/lab';
+import { tennisBall } from "@lucide/lab";
+import { Icon } from "lucide-react";
 
 interface TennisBallProps {
   className?: string;

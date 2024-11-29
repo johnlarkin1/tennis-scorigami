@@ -25,10 +25,7 @@
 //   );
 // }
 
-import { useTheme } from 'next-themes';
-import { Moon, Lock } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -38,7 +35,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
+import { Moon } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export const ThemeToggle = () => {
   const [mounted, setMounted] = useState(false);
@@ -46,8 +46,8 @@ export const ThemeToggle = () => {
 
   useEffect(() => {
     setMounted(true);
-    setTheme('dark');
-  }, []);
+    setTheme("dark");
+  }, [setTheme]);
 
   if (!mounted) return null;
 
@@ -55,8 +55,8 @@ export const ThemeToggle = () => {
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          variant='outline'
-          className='fixed bottom-4 left-4 p-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
+          variant="outline"
+          className="fixed bottom-4 left-4 p-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
         >
           <Moon />
         </Button>
@@ -72,14 +72,16 @@ export const ThemeToggle = () => {
           </div> */}
       </DialogTrigger>
 
-      <DialogContent className='sm:max-w-md'>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Dark Mode Only</DialogTitle>
-          <DialogDescription>Currently, only dark mode is supported. I'm working on it though!</DialogDescription>
+          <DialogDescription>
+            Currently, only dark mode is supported. I amm working on it though!
+          </DialogDescription>
         </DialogHeader>
-        <DialogFooter className='sm:justify-start'>
+        <DialogFooter className="sm:justify-start">
           <DialogClose asChild>
-            <Button type='button' variant='secondary'>
+            <Button type="button" variant="secondary">
               Close
             </Button>
           </DialogClose>

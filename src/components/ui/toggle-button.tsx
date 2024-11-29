@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
+import * as React from "react";
 
 type ToggleButtonProps = {
   isActive: boolean;
@@ -8,14 +8,19 @@ type ToggleButtonProps = {
   className?: string;
 };
 
-const ToggleButton: React.FC<ToggleButtonProps> = ({ isActive, onClick, children, className }) => {
+const ToggleButton: React.FC<ToggleButtonProps> = ({
+  isActive,
+  onClick,
+  children,
+  className,
+}) => {
   return (
     <Button
-      variant={isActive ? 'outline' : 'ghost'}
+      variant={isActive ? "outline" : "ghost"}
       onClick={onClick}
       className={`bg-background text-white px-4 py-2 flex items-center transition-colors 
-        ${isActive ? 'bg-blue-800 border border-gray-700' : 'bg-background hover:bg-blue-700'} 
-        ${className || ''}`}
+        ${isActive ? "bg-blue-800 border border-gray-700" : "bg-background hover:bg-blue-700"} 
+        ${className || ""}`}
     >
       {children}
     </Button>

@@ -1,9 +1,9 @@
-import ScorigamiTreeVisualization from '@/components/scorigami/scorigami-tree-viz';
+import { TennisScorigamiVisualization } from "@/components/scorigami/scorigami-tree-viz";
 
 export default function Home() {
   return (
     <div>
-      <ScorigamiTreeVisualization />
+      <TennisScorigamiVisualization />
     </div>
   );
 }

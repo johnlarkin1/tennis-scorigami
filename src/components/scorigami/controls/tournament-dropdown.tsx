@@ -1,22 +1,30 @@
-import { useAtom } from 'jotai';
-import { useEffect } from 'react';
-import { Select, SelectTrigger, SelectContent, SelectValue, SelectItem } from '@/components/ui/select';
 import {
-  tournamentsAtom,
-  selectedTournamentAtom,
-  defaultAllTournament,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { fetchTournaments } from "@/services/api-utils";
+import {
   ALL_TOURNAMENTS_STRING,
-} from '@/store/tournament';
-import { useQuery } from '@tanstack/react-query';
-import { fetchTournaments } from '@/services/api-utils';
-import { Tournament } from '@/types/tournament';
+  defaultAllTournament,
+  selectedTournamentAtom,
+  tournamentsAtom,
+} from "@/store/tournament";
+import { Tournament } from "@/types/tournament";
+import { useQuery } from "@tanstack/react-query";
+import { useAtom } from "jotai";
+import { useEffect } from "react";
 
 export const TournamentDropdown = () => {
   const [tournaments, setTournaments] = useAtom(tournamentsAtom);
-  const [selectedTournament, setSelectedTournament] = useAtom(selectedTournamentAtom);
+  const [selectedTournament, setSelectedTournament] = useAtom(
+    selectedTournamentAtom
+  );
 
   const { data, isLoading, isError } = useQuery<Tournament[]>({
-    queryKey: ['tournaments'],
+    queryKey: ["tournaments"],
     queryFn: fetchTournaments,
   });
 
@@ -37,7 +45,9 @@ export const TournamentDropdown = () => {
       setSelectedTournament(defaultAllTournament);
     } else {
       if (tournaments) {
-        const selected = tournaments.find((tournament: Tournament) => tournament.name === value);
+        const selected = tournaments.find(
+          (tournament: Tournament) => tournament.name === value
+        );
         if (selected) {
           setSelectedTournament(selected);
         }
@@ -46,12 +56,16 @@ export const TournamentDropdown = () => {
   };
 
   if (isError) {
-    return <p className='text-red-500'>Error loading tournaments!</p>;
+    return <p className="text-red-500">Error loading tournaments!</p>;
   }
 
   return (
-    <Select onValueChange={handleTournamentChange} value={selectedTournament.name} disabled={isLoading}>
-      <SelectTrigger className='select-trigger w-48'>
+    <Select
+      onValueChange={handleTournamentChange}
+      value={selectedTournament.name}
+      disabled={isLoading}
+    >
+      <SelectTrigger className="select-trigger w-48">
         <SelectValue placeholder={ALL_TOURNAMENTS_STRING} />
       </SelectTrigger>
       <SelectContent>
@@ -59,7 +73,10 @@ export const TournamentDropdown = () => {
         {tournaments &&
           tournaments.map((tournament: Tournament) => {
             return (
-              <SelectItem key={tournament.tournament_id} value={tournament.name}>
+              <SelectItem
+                key={tournament.tournament_id}
+                value={tournament.name}
+              >
                 {tournament.name}
               </SelectItem>
             );

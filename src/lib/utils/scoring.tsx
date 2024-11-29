@@ -1,14 +1,17 @@
-import { POSSIBLE_SCORES } from '@/constants';
-import { InitialScore } from '@/types/initial-score';
-import { TreeNode } from '@/types/tree-node';
+import { POSSIBLE_SCORES } from "@/constants";
+import { InitialScore } from "@/types/initial-score";
+import { TreeNode } from "@/types/tree-node";
 
-export const buildTreeData = (scoreCounts: Map<string, number>, expandedNodes: string[]): TreeNode => {
+export const buildTreeData = (
+  scoreCounts: Map<string, number>,
+  expandedNodes: string[]
+): TreeNode => {
   function buildNode(depth: number, path: string[] = []): TreeNode[] {
     if (depth > 5) return [];
 
     return POSSIBLE_SCORES.map((score) => {
       const currentPath = [...path, score];
-      const sequence = currentPath.join(' ');
+      const sequence = currentPath.join(" ");
       const count = scoreCounts.get(sequence) || 0;
       const occurred = count > 0;
       const isExpanded = expandedNodes.includes(sequence);
@@ -21,23 +24,26 @@ export const buildTreeData = (scoreCounts: Map<string, number>, expandedNodes: s
           count,
           isClickable: occurred && depth === 1, // Only first-level nodes are clickable initially
         },
-        children: isExpanded && occurred ? buildNode(depth + 1, currentPath) : [],
+        children:
+          isExpanded && occurred ? buildNode(depth + 1, currentPath) : [],
       };
     });
   }
 
   return {
-    name: 'Love All',
+    name: "Love All",
     children: buildNode(1),
     attributes: {
       occurred: true,
-      sequence: '',
+      sequence: "",
       isClickable: true,
     },
   };
 };
 
-export const getOccurredScoresInitial = (initialScores: InitialScore[]): Map<string, number> => {
+export const getOccurredScoresInitial = (
+  initialScores: InitialScore[]
+): Map<string, number> => {
   const scoreCounts = new Map<string, number>();
 
   initialScores.forEach((score) => {
@@ -55,7 +61,7 @@ export const isMatchComplete = (scores: string[]): boolean => {
   let playerBWins = 0;
 
   scores.forEach((score) => {
-    const [scoreA, scoreB] = score.split('-').map(Number);
+    const [scoreA, scoreB] = score.split("-").map(Number);
     if (scoreA > scoreB) playerAWins++;
     else if (scoreB > scoreA) playerBWins++;
   });
@@ -70,5 +76,5 @@ export const isMatchComplete = (scores: string[]): boolean => {
 
 // Function to parse set scores from sequence
 export const parseSetScores = (sequence: string): string[] => {
-  return sequence.split(' ').filter(Boolean);
+  return sequence.split(" ").filter(Boolean);
 };

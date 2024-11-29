@@ -1,15 +1,15 @@
-import { AggregatedMatchScore } from "@/types/set-score";
-import { Tournament } from "../types/tournament";
 import { defaultAllTournament } from "@/store/tournament";
-import { SexType } from "@/store/scoreigami";
 import { InitialScore } from "@/types/initial-score";
+import { AggregatedMatchScore } from "@/types/set-score";
+import { SexType } from "@/types/tree-control-types";
+import { Tournament } from "../types/tournament";
 
 export const fetchMatches = async (
   setNumber: number,
   scoreSequence: { playerAScore: number; playerBScore: number }[],
   tournament?: Tournament,
   eventYear?: string,
-  eventGender?: SexType,
+  eventGender?: SexType
 ): Promise<AggregatedMatchScore[]> => {
   const params = new URLSearchParams();
 
@@ -35,7 +35,7 @@ export const fetchMatches = async (
 
   try {
     const response = await fetch(
-      `/api/scores/${setNumber}?${params.toString()}`,
+      `/api/scores/${setNumber}?${params.toString()}`
     );
     if (!response.ok) {
       throw new Error(`Error fetching matches for set ${setNumber}`);
@@ -66,7 +66,7 @@ const mapSexTypeToApi = (sex: SexType): string | undefined => {
 export const fetchInitialScores = async (
   tournament?: Tournament,
   eventYear?: string,
-  eventGender?: SexType,
+  eventGender?: SexType
 ): Promise<InitialScore[]> => {
   const params = new URLSearchParams();
 
@@ -88,7 +88,7 @@ export const fetchInitialScores = async (
 
   // Perform the API fetch call
   const response = await fetch(
-    `/api/scores/initial-scores?${params.toString()}`,
+    `/api/scores/initial-scores?${params.toString()}`
   );
 
   if (!response.ok) {

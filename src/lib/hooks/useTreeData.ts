@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { fetchInitialScores, fetchMatches } from "@/services/api-utils";
 import { POSSIBLE_SCORES, REACT_QUERY_STALE_TIME_MIN } from "@/constants";
+import { fetchInitialScores, fetchMatches } from "@/services/api-utils";
+import {
+  selectedSexAtom,
+  selectedYearAtom,
+} from "@/store/scoreigami/tree-controls";
+import { selectedTournamentAtom } from "@/store/tournament";
 import { InitialScore } from "@/types/initial-score";
 import { AggregatedMatchScore } from "@/types/set-score";
 import { TreeNode } from "@/types/tree-node";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useAtom } from "jotai";
-import { selectedSexAtom, selectedYearAtom } from "../../store/scoreigami";
-import { selectedTournamentAtom } from "../../store/tournament";
+import { useEffect, useState } from "react";
 import { buildTreeData, getOccurredScoresInitial } from "../utils/scoring";
 
 type UseTreeDataProps = {
@@ -43,7 +46,6 @@ export const useTreeData = ({
   });
 
   const {
-    data: detailedMatches = [],
     isLoading: isDetailedMatchesLoading,
     isError: isDetailedMatchesError,
   } = useQuery<AggregatedMatchScore[]>({
@@ -52,9 +54,9 @@ export const useTreeData = ({
       if (selectedNodePath.length > 0) {
         const setNumber = selectedNodePath.length;
         const scoreSequence = selectedNodePath.map((scoreString) => {
-          const [playerAScore, playerBScore] = scoreString.split("-").map(
-            Number,
-          );
+          const [playerAScore, playerBScore] = scoreString
+            .split("-")
+            .map(Number);
           return { playerAScore, playerBScore };
         });
 
@@ -63,7 +65,7 @@ export const useTreeData = ({
           scoreSequence,
           selectedTournament,
           selectedYear,
-          selectedSex,
+          selectedSex
         );
         setMatchesForSelectedNode(matches);
 
@@ -83,7 +85,7 @@ export const useTreeData = ({
   // Expand the tree with next possible scores
   const expandTreeWithNextScores = (
     matches: AggregatedMatchScore[],
-    setNumber: number,
+    setNumber: number
   ) => {
     const nextScoresMap: Map<string, boolean> = new Map();
 

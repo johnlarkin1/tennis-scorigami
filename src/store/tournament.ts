@@ -1,6 +1,6 @@
 // src/atoms/tournament-atom.ts
-import { atom } from "jotai";
 import { Tournament } from "@/types/tournament";
+import { atom } from "jotai";
 
 // Atom to hold the list of tournaments fetched from the API
 export const tournamentsAtom = atom<Tournament[] | null>(null);

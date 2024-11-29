@@ -1,11 +1,11 @@
 import { supabase } from "@/services/supabase/client";
-import { NextRequest, NextResponse } from "next/server";
 import { AggregatedMatchScore } from "@/types/set-score";
+import { NextRequest, NextResponse } from "next/server";
 
 // We are calling the Supabase RPC to get the aggregated match scores
 export async function GET(
   req: NextRequest,
-  props: { params: Promise<{ setNumber: string }> },
+  props: { params: Promise<{ setNumber: string }> }
 ) {
   const params = await props.params;
   const { setNumber } = params;
@@ -17,9 +17,12 @@ export async function GET(
 
   // Validate required params
   if (!setNumber) {
-    return NextResponse.json({ error: "Set number is required" }, {
-      status: 400,
-    });
+    return NextResponse.json(
+      { error: "Set number is required" },
+      {
+        status: 400,
+      }
+    );
   }
 
   try {
@@ -38,9 +41,6 @@ export async function GET(
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Convert setNumber to an integer and adjust for zero-based index
-    const setIndex = Number(setNumber) - 1;
-
     // Optionally filter by score sequence on the server-side
     let filteredData = data;
 
@@ -48,7 +48,8 @@ export async function GET(
       filteredData = data.filter((match: any) => {
         // Ensure all scores match the previous score sequence up to the current set
         return parsedScoreSequence.every((score: any, index: number) => {
-          const validIndex = match.player_a_scores.length > index &&
+          const validIndex =
+            match.player_a_scores.length > index &&
             match.player_b_scores.length > index;
 
           return (
