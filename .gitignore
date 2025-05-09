@@ -45,6 +45,15 @@ next-env.d.ts
 # Ignore all files under the specified directory
 scripts/batch-ingestion/sportradar-tennis-v3/sportradar_tennis_v3/*
 scripts/batch-ingestion/sportradar-tennis-v3/sportadar_tennis_v3/**
+backend/batch-ingestion/sportradar-tennis-v3/sportradar_tennis_v3/*
+backend/batch-ingestion/sportradar-tennis-v3/sportadar_tennis_v3/**
+backend/batch-ingestion/sportradar-tennis-v3/**
+backend/visualizations/output/**
 
 # But do not ignore the directory itself
 !scripts/batch-ingestion/sportradar-tennis-v3/sportradar_tennis_v3/
+
+
+# Ignore all repomix-output.xml files recursively
+**/repomix-output.xml
+public
