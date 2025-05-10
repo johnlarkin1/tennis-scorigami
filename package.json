@@ -12,7 +12,15 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "generate-types": "npx supabase gen types --lang=typescript --project-id anrvneirjnmuurloqoie --schema public > src/supabase/database.types.ts",
     "prepare": "husky",
-    "commit": "npx git-cz"
+    "commit": "npx git-cz",
+    "db:generate": "dotenvx run -- drizzle-kit generate:pg",
+    "db:push": "dotenvx run -- drizzle-kit push:pg",
+    "db:pull": "dotenvx run -- drizzle-kit introspect:pg",
+    "db:check": "dotenvx run -- drizzle-kit check:pg",
+    "db:studio": "dotenvx run -- drizzle-kit studio",
+    "db:up": "dotenvx run -- drizzle-kit up:pg",
+    "db:migrate": "dotenvx run -- tsx src/db/scripts/migrate.ts",
+    "db:seed": "dotenvx run -- tsx src/db/scripts/seed.ts"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
@@ -50,12 +58,15 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "d3": "^7.9.0",
+    "dotenv": "^16.5.0",
+    "drizzle-orm": "^0.43.1",
     "eslint-js": "github:eslint/js",
     "jotai": "^2.10.0",
     "lucide-react": "^0.452.0",
     "next": "^15.0.1",
     "next-swagger-doc": "^0.4.0",
     "next-themes": "^0.3.0",
+    "pg": "^8.15.6",
     "react": "^18",
     "react-d3-tree": "^3.6.2",
     "react-dom": "^18",
@@ -67,6 +78,7 @@
   "devDependencies": {
     "@commitlint/cli": "^19.6.0",
     "@commitlint/config-conventional": "^19.6.0",
+    "@dotenvx/dotenvx": "^1.43.0",
     "@next/eslint-plugin-next": "^15.0.3",
     "@types/d3": "^7.4.3",
     "@types/node": "^20",
@@ -76,6 +88,7 @@
     "commitizen": "^4.3.1",
     "commitlint": "^19.6.0",
     "cz-conventional-changelog": "^3.3.0",
+    "drizzle-kit": "^0.31.1",
     "eslint": "^9.15.0",
     "eslint-config-next": "^15.0.1",
     "eslint-config-prettier": "^9.1.0",
@@ -85,6 +98,7 @@
     "postcss": "^8.4.47",
     "prettier-plugin-organize-imports": "^4.1.0",
     "tailwindcss": "^3.4.13",
+    "tsx": "^4.19.4",
     "typescript": "^5"
   }
 }
