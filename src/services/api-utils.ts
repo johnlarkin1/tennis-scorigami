@@ -35,7 +35,7 @@ export const fetchMatches = async (
 
   try {
     const response = await fetch(
-      `/api/scores/${setNumber}?${params.toString()}`
+      `/api/v1/scores/${setNumber}?${params.toString()}`
     );
     if (!response.ok) {
       throw new Error(`Error fetching matches for set ${setNumber}`);
@@ -88,7 +88,7 @@ export const fetchInitialScores = async (
 
   // Perform the API fetch call
   const response = await fetch(
-    `/api/scores/initial-scores?${params.toString()}`
+    `/api/v1/scores/initial-scores?${params.toString()}`
   );
 
   if (!response.ok) {
@@ -99,7 +99,7 @@ export const fetchInitialScores = async (
 };
 
 export const fetchTournaments = async (): Promise<Tournament[]> => {
-  const response = await fetch("/api/tournaments");
+  const response = await fetch("/api/v1/tournaments");
   if (!response.ok) {
     throw new Error("Failed to fetch tournaments");
   }

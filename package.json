@@ -13,14 +13,15 @@
     "generate-types": "npx supabase gen types --lang=typescript --project-id anrvneirjnmuurloqoie --schema public > src/supabase/database.types.ts",
     "prepare": "husky",
     "commit": "npx git-cz",
-    "db:generate": "dotenvx run -- drizzle-kit generate:pg",
-    "db:push": "dotenvx run -- drizzle-kit push:pg",
-    "db:pull": "dotenvx run -- drizzle-kit introspect:pg",
-    "db:check": "dotenvx run -- drizzle-kit check:pg",
+    "db:generate": "dotenvx run -- drizzle-kit generate",
+    "db:push": "dotenvx run -- drizzle-kit push",
+    "db:pull": "dotenvx run -- drizzle-kit pull",
+    "db:check": "dotenvx run -- drizzle-kit check",
     "db:studio": "dotenvx run -- drizzle-kit studio",
-    "db:up": "dotenvx run -- drizzle-kit up:pg",
-    "db:migrate": "dotenvx run -- tsx src/db/scripts/migrate.ts",
-    "db:seed": "dotenvx run -- tsx src/db/scripts/seed.ts"
+    "db:up": "dotenvx run -- drizzle-kit up",
+    "db:migrate": "dotenvx run -- drizzle-kit migrate",
+    "db:seed": "dotenvx run -- tsx src/db/scripts/seed.ts",
+    "typecheck": "tsc --noEmit"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
@@ -82,6 +83,7 @@
     "@next/eslint-plugin-next": "^15.0.3",
     "@types/d3": "^7.4.3",
     "@types/node": "^20",
+    "@types/pg": "^8.15.1",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.4.20",
