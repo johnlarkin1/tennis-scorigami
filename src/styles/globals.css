@@ -1,11 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 @layer utilities {
@@ -15,7 +15,9 @@ body {
 }
 
 html {
-  transition: background-color 0.3s, color 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
 }
 
 @layer base {
@@ -43,7 +45,7 @@ html {
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 204 61% 5%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
@@ -91,11 +93,15 @@ html {
 
 .node circle {
   cursor: pointer;
-  transition: fill 0.3s ease, stroke-width 0.3s ease;
+  transition:
+    fill 0.3s ease,
+    stroke-width 0.3s ease;
 }
 
 .node text {
-  font: 12px 'Inter', sans-serif;
+  font:
+    12px "Inter",
+    sans-serif;
   transition: fill 0.3s ease;
 }
 

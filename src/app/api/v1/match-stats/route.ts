@@ -23,7 +23,17 @@ export async function GET() {
       FROM mv_match_completion
     `);
 
-    return NextResponse.json(result.rows);
+    // Convert string values to numbers
+    const processedRows = result.rows.map((row) => ({
+      ...row,
+      best_of: Number(row.best_of),
+      total_possible: Number(row.total_possible),
+      total_occurred: Number(row.total_occurred),
+      total_never_occurred: Number(row.total_never_occurred),
+      completion_pct: Number(row.completion_pct),
+    }));
+
+    return NextResponse.json(processedRows);
   } catch (err: any) {
     console.error("🔴 match-stats error:", err);
     return NextResponse.json(
