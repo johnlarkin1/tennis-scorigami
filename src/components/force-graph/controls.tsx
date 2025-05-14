@@ -12,12 +12,13 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { ToggleButton } from "@/components/ui/toggle-button";
 import { YEARS } from "@/constants";
-import { SexType } from "@/types/tree-control-types";
+import { SexType, ViewType } from "@/types/tree-control-types";
 import { atom, useAtom } from "jotai";
 import {
   Calendar,
   Hash,
   Layers,
+  Link,
   Maximize,
   Minimize,
   Network,
@@ -27,17 +28,25 @@ import {
 import * as React from "react";
 
 // Force graph specific atoms
-const graphDensityAtom = atom(50);
-const graphLayoutAtom = atom<"3d" | "2d">("3d");
-const showLabelsAtom = atom(true);
-const nodeStrengthAtom = atom(50);
-const graphColorModeAtom = atom<"category" | "gradient">("category");
+export const graphDensityAtom = atom(50);
+export const graphLayoutAtom = atom<"3d" | "2d">("3d");
+export const showLabelsAtom = atom(true);
+export const nodeStrengthAtom = atom(50);
+export const graphColorModeAtom = atom<"category" | "gradient">("category");
+export const showEdgesAtom = atom(true);
 
-// Reuse filter atoms from tree controls
-import {
-  selectedSexAtom,
-  selectedYearAtom,
-} from "@/store/scoreigami/tree-controls";
+// View type control
+export const viewTypeAtom = atom<ViewType>("vertical");
+
+// Visual controls
+export const showGradientAtom = atom<boolean>(false);
+export const showCountAtom = atom<boolean>(false);
+
+// Filter controls
+export const selectedYearAtom = atom<string>("All Years");
+export const selectedSexAtom = atom<SexType>("Men and Women");
+export const selectedSetsAtom = atom<3 | 5>(3);
+nodeStrengthAtom;
 
 type ForceGraphControlsProps = {
   className?: string;
@@ -52,6 +61,7 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
   const [nodeStrength, setNodeStrength] = useAtom(nodeStrengthAtom);
   const [showLabels, setShowLabels] = useAtom(showLabelsAtom);
   const [colorMode, setColorMode] = useAtom(graphColorModeAtom);
+  const [showEdges, setShowEdges] = useAtom(showEdgesAtom);
 
   // Filter controls (reused from tree controls)
   const [selectedYear, setSelectedYear] = useAtom(selectedYearAtom);
@@ -194,6 +204,22 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
                 Show Node Labels
               </label>
             </div>
+          </div>
+
+          {/* link visibility */}
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="showEdges"
+              checked={showEdges}
+              onCheckedChange={(checked) => setShowEdges(checked)}
+            />
+            <label
+              htmlFor="showEdges"
+              className="text-sm text-gray-300 flex items-center"
+            >
+              <Link className="mr-1 h-4 w-4" />
+              Show Edges
+            </label>
           </div>
 
           {/* Slam and Year Selectors */}
