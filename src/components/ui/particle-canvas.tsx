@@ -46,6 +46,7 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
     let rotation = 0;
     let staticBallCenter = { x: 0, y: 0 };
     let staticBallRadius = 0;
+    let netOffset = 0;
 
     /* physics constants */
     const springStrength = 0.02;
@@ -61,7 +62,8 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
 
     /* off-screen canvas for text mask */
     const off = document.createElement("canvas");
-    const offCtx = off.getContext("2d")!;
+    // Set willReadFrequently to true to optimize getImageData calls
+    const offCtx = off.getContext("2d", { willReadFrequently: true })!;
 
     function prepareTextMask() {
       off.width = W;
@@ -71,9 +73,21 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
       offCtx.font = "bold 132px sans-serif";
       offCtx.textAlign = "left";
       const leftX = W * 0.1;
-      offCtx.fillText("TENNIS", leftX, H * 0.4);
-      offCtx.fillText("SCORIGAMI", leftX, H * 0.6 + 40);
+      offCtx.textBaseline = "middle";
 
+      // how far apart your two baselines *used* to be:
+      const origY1 = H * 0.4;
+      const origY2 = H * 0.6 + 40;
+      const halfGap = (origY2 - origY1) / 2;
+
+      const centerY = staticBallCenter.y; // = H/2
+
+      // now place each line's *center* halfGap above / below the ball
+      const y1 = centerY - halfGap;
+      const y2 = centerY + halfGap;
+
+      offCtx.fillText("TENNIS", leftX, y1);
+      offCtx.fillText("SCORIGAMI", leftX, y2);
       const img = offCtx.getImageData(0, 0, W, H).data;
 
       textPts = [];
@@ -150,13 +164,72 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
       }
     }
 
+    function drawNetTexture() {
+      const cellSize = 40; // Size of each net "cell"
+      const lineWidth = 1.5;
+      
+      // Main net grid
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.05)"; // Very subtle white lines
+      ctx.lineWidth = lineWidth;
+      
+      // Vertical lines
+      for (let x = netOffset % cellSize; x < W; x += cellSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, H);
+        ctx.stroke();
+      }
+      
+      // Horizontal lines
+      for (let y = 0; y < H; y += cellSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(W, y);
+        ctx.stroke();
+      }
+      
+      // Crossing diagonal threads (characteristic of tennis nets)
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
+      ctx.lineWidth = 1;
+      
+      // Draw X patterns within each cell
+      for (let x = netOffset % cellSize; x < W; x += cellSize) {
+        for (let y = 0; y < H; y += cellSize) {
+          // Top-left to bottom-right
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x + cellSize, y + cellSize);
+          ctx.stroke();
+          
+          // Top-right to bottom-left
+          ctx.beginPath();
+          ctx.moveTo(x + cellSize, y);
+          ctx.lineTo(x, y + cellSize);
+          ctx.stroke();
+        }
+      }
+      
+      // Add a subtle gradient overlay to fade the net at edges
+      const gradient = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W, H)/2);
+      gradient.addColorStop(0, "rgba(0, 0, 0, 0)");
+      gradient.addColorStop(0.7, "rgba(0, 0, 0, 0)");
+      gradient.addColorStop(1, "rgba(0, 0, 0, 0.3)");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, W, H);
+    }
+
     function resize() {
       W = canvas.width = canvas.clientWidth;
       H = canvas.height = canvas.clientHeight;
       staticBallCenter = { x: W * 0.75, y: H / 2 };
       staticBallRadius = Math.min(W, H) * staticBallFactor;
-      prepareTextMask();
-      initParticles();
+      
+      // Use requestAnimationFrame to avoid setTimeout performance issues
+      requestAnimationFrame(() => {
+        prepareTextMask();
+        initParticles();
+      });
+      
       balls = [];
       mouse.x = offscreen;
       mouse.y = offscreen;
@@ -165,6 +238,7 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
     let physicsId: number;
     function updatePhysics() {
       rotation += ballRotationSpeed;
+      netOffset += 0.1; // Subtle net movement
       const c = staticBallCenter;
 
       particles.forEach((p) => {
@@ -234,6 +308,9 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
     let drawId: number;
     function draw() {
       ctx.clearRect(0, 0, W, H);
+
+      // Draw the net texture as background
+      drawNetTexture();
 
       // text dots
       ctx.fillStyle = "#0f0";

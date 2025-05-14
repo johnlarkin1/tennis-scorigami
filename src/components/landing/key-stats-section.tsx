@@ -126,7 +126,7 @@ export const KeyStatsSection: React.FC<KeyStatsSectionProps> = ({
   };
 
   return (
-    <section className="py-16 bg-gray-900" id="stats">
+    <section className="pt-4 pb-16 bg-gray-900" id="stats">
       <SectionDivider
         id="key-stats-title-divider"
         title="Key Scorigami Statistics"

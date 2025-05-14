@@ -1,43 +1,35 @@
 import { db } from "@/db";
+import { mvMatchWithSamples } from "@/db/schema";
+import { and, eq, not } from "drizzle-orm";
 import { NextResponse } from "next/server";
-
-export type MatchStat = {
-  gender: "women" | "men";
-  best_of: 3 | 5;
-  total_possible: number;
-  total_occurred: number;
-  total_never_occurred: number;
-  completion_pct: number;
-};
 
 export async function GET() {
   try {
-    const result = await db.execute<MatchStat>(`
-      SELECT
-        gender,
-        best_of,
-        total_possible,
-        total_occurred,
-        total_never_occurred,
-        completion_pct
-      FROM mv_match_completion
-    `);
+    const rows = await db
+      .select({
+        gender:               mvMatchWithSamples.gender,
+        best_of:              mvMatchWithSamples.bestOf,
+        total_possible:       mvMatchWithSamples.totalPossible,
+        total_occurred:       mvMatchWithSamples.totalOccurred,
+        total_never_occurred: mvMatchWithSamples.totalNeverOccurred,
+        completion_pct:       mvMatchWithSamples.completionPct,
+        samples:              mvMatchWithSamples.samples,
+      })
+      .from(mvMatchWithSamples)
+      .where(
+        not(
+          and(
+            eq(mvMatchWithSamples.gender, "women"),
+            eq(mvMatchWithSamples.bestOf, 5)
+          )!
+        )
+      );
 
-    // Convert string values to numbers
-    const processedRows = result.rows.map((row) => ({
-      ...row,
-      best_of: Number(row.best_of),
-      total_possible: Number(row.total_possible),
-      total_occurred: Number(row.total_occurred),
-      total_never_occurred: Number(row.total_never_occurred),
-      completion_pct: Number(row.completion_pct),
-    }));
-
-    return NextResponse.json(processedRows);
+    return NextResponse.json(rows);
   } catch (err: any) {
     console.error("🔴 match-stats error:", err);
     return NextResponse.json(
-      { error: "Could not load match stats" },
+      { error: "Could not load match stats with samples" },
       { status: 500 }
     );
   }

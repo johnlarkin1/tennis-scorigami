@@ -1,0 +1,57 @@
+/* ================================================== */
+/*  Custom Split-Flap Overrides (after extras/themes.css) */
+/* ================================================== */
+
+/* 1) Make each display container an inline-flex row with a tiny gap */
+.custom-flap-gender,
+.custom-flap-best {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* tweak to taste: 0.125rem = 2px */
+  gap: 0.125rem;
+}
+
+/* 2) Base styling for every flap “digit” */
+.custom-flap-gender [data-kind="digit"],
+.custom-flap-best [data-kind="digit"] {
+  /* match your wrapper bg-gray-800 */
+  background-color: #1f2937;
+  /* match your text-gray-300 */
+  color: #d1d5db;
+  font-family: "Inter", sans-serif;
+  /* a little over 1 character-width each */
+  width: 1.2ch;
+  /* height = 1 em of the font-size set by the “M” class */
+  height: 1em;
+  line-height: 1em;
+  text-align: center;
+  /* rounded-lg + subtle border */
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 3) If the flap is in “words” mode (single‐char words like ’S, spaces, punctuation), let it auto-size */
+.custom-flap-gender [data-kind="digit"][data-mode="words"],
+.custom-flap-best [data-kind="digit"][data-mode="words"] {
+  width: auto;
+  min-width: 0.8em;
+}
+
+/* 4) Style the hinge (the tiny stripe between top/bottom) */
+/*   height ~0.04 em (≈1px), full-width of each flap */
+.custom-flap-gender [data-kind="hinge"],
+.custom-flap-best [data-kind="hinge"] {
+  height: 0.04em;
+  width: 100%;
+}
+.custom-flap-gender [data-kind="hinge"] {
+  background-color: #4ade80; /* green-400 */
+}
+.custom-flap-best [data-kind="hinge"] {
+  background-color: #60a5fa; /* blue-400 */
+}

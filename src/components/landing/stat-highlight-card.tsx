@@ -70,7 +70,7 @@ export const StatHighlightCard: React.FC<StatHighlightCardProps> = ({
             <AnimatedPercentageBar percentage={stat.completion_pct} />
           </div>
           <div className="text-lg font-semibold text-yellow-400 w-16 text-right">
-            {stat.completion_pct.toFixed(2)}%
+            {Number(stat.completion_pct).toFixed(2)}%
           </div>
         </div>
       </div>

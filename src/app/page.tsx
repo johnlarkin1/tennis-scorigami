@@ -6,6 +6,7 @@ import { HeroSection } from "@/components/landing/hero-section";
 import { KeyStatsSection } from "@/components/landing/key-stats-section";
 import { SectionDivider } from "@/components/landing/section-divider";
 import { MatchStat } from "@/components/landing/types";
+import UnscoredMatchesSection from "@/components/landing/unscored-matches-section";
 import { Header } from "@/components/layout/header";
 import { TennisScorigamiVisualization } from "@/components/scorigami/scorigami-tree-viz";
 import { useEffect, useState } from "react";
@@ -42,10 +43,12 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="bg-gray-900 text-white">
       <Header />
       <main>
-        <HeroSection />
+        <HeroSection className="h-[30vh]" />
+
+        <UnscoredMatchesSection className="h-auto" />
         {/* Replace StatsCarousel with KeyStatsSection */}
         <KeyStatsSection stats={stats} isLoading={isLoading} error={error} />
 
