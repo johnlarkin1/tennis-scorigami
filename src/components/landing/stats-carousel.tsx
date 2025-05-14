@@ -1,9 +1,9 @@
 "use client";
 
+import { MatchStat, StatCarouselProps } from "@/types/landing/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import FlipNumbers from "react-flip-numbers";
-import { MatchStat, StatCarouselProps } from "./types";
 
 export const StatsCarousel: React.FC<StatCarouselProps> = ({
   stats,

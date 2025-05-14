@@ -23,6 +23,7 @@ export const Header = () => (
       <nav className="flex space-x-6">
         {[
           { href: "/", label: "Home" },
+          { href: "/explore", label: "Explore" },
           { href: "/about", label: "About" },
         ].map(({ href, label }) => (
           <Button

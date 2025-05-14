@@ -1,5 +1,6 @@
 "use client";
 
+import { SectionDivider } from "@/components/landing/section-divider";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 
@@ -27,9 +28,9 @@ export const ConceptExplanation = () => {
   };
 
   return (
-    <section className="py-20 bg-gray-900" id="concept">
+    <section className="bg-gray-900" id="concept">
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
+        <div className="mx-auto w-3/4">
           <motion.div
             ref={ref}
             variants={containerVariants}
@@ -41,7 +42,7 @@ export const ConceptExplanation = () => {
               variants={itemVariants}
               className="text-3xl md:text-4xl font-bold mb-6"
             >
-              What is Tennis Scorigami?
+              <SectionDivider id="concept-divider" title="What is Tennis Scorigami?" fullWidth />
             </motion.h2>
             <motion.p
               variants={itemVariants}
