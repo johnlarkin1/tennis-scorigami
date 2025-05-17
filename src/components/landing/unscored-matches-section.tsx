@@ -6,6 +6,11 @@ import { useEffect, useRef, useState } from "react";
 import FlipNumbers from "react-flip-numbers";
 
 import { TennisScoreboard } from "@/components/scoreboard";
+import {
+  SkeletonDot,
+  SkeletonFlipNumber,
+  SkeletonScoreboard,
+} from "@/components/ui/skeleton-loaders";
 import type { MatchStatWithSamples } from "@/types/match-stats/response";
 
 const FLIP_NUMBERS_HEIGHT = 20;
@@ -27,19 +32,25 @@ interface Props {
 
 export default function UnscoredMatchesSection({ className }: Props) {
   const [stats, setStats] = useState<MatchStatWithSamples[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [displayPatterns, setDisplayPatterns] = useState<string[][]>([]);
   const autoRef = useRef<number | null>(null);
 
   // Fetch live stats once on mount
   useEffect(() => {
+    setIsLoading(true);
     fetch("/api/v1/match-stats")
       .then((res) => res.json())
       .then((data: MatchStatWithSamples[]) => {
         console.log(data);
         setStats(data);
+        setIsLoading(false);
       })
-      .catch(console.error);
+      .catch((error) => {
+        console.error(error);
+        setIsLoading(false);
+      });
   }, []);
 
   useEffect(() => {
@@ -71,8 +82,120 @@ export default function UnscoredMatchesSection({ className }: Props) {
     setCurrentIndex((i) => (i + 1) % stats.length);
   };
 
-  if (!stats.length) {
-    return <div className={className}>Loading…</div>;
+  // Render loading state with skeleton UI
+  if (isLoading) {
+    const startDataCollectionYear = 1981;
+    const currentYear = new Date().getFullYear();
+    const yearsSinceStart = currentYear - startDataCollectionYear;
+
+    return (
+      <section className={`${className} bg-gray-900 overflow-hidden`}>
+        <div className="mx-auto max-w-none">
+          {/* Title with glow effect */}
+          <div className="flex justify-center mt-16 mb-8">
+            <div className="max-w-4xl w-full">
+              <h2 className="text-2xl md:text-3xl font-bold text-white text-center border border-gray-700 rounded-lg px-8 py-6 shadow-[0_0_30px_rgba(68,219,94,0.3),inset_0_0_30px_rgba(68,219,94,0.1)] bg-gray-900/50 backdrop-blur-sm">
+                In the past{" "}
+                <span className="text-green-400">{yearsSinceStart}</span> years
+                of tennis matches since{" "}
+                <span className="text-green-400">
+                  {startDataCollectionYear}
+                </span>
+                , some score combinations have still never occurred. This
+                project is designed to track and discover these missing
+                scorelines.
+              </h2>
+            </div>
+          </div>
+
+          {/* Stats & Nav - Skeleton */}
+          <div className="flex justify-center mb-12">
+            <div className="max-w-5xl w-full border border-gray-700 rounded-lg px-6 py-8 shadow-[0_0_30px_rgba(68,219,94,0.3),inset_0_0_30px_rgba(68,219,94,0.1)] bg-gray-900/50 backdrop-blur-sm">
+              <div className="flex items-center justify-between gap-4">
+                <button
+                  disabled
+                  className="shrink-0 group flex items-center gap-2 px-4 py-2 bg-[#c5c75a]/50 text-black rounded-lg opacity-50"
+                  aria-label="Previous format"
+                >
+                  <ChevronLeft size={20} />
+                  <span className="hidden sm:inline text-sm font-medium">
+                    Previous
+                  </span>
+                </button>
+
+                <div className="flex-1 text-center">
+                  <div className="space-y-6">
+                    {/* Never-played - Skeleton */}
+                    <div className="flex items-center justify-center text-lg md:text-xl">
+                      <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+                        <span className="text-gray-300">There are</span>
+                        <SkeletonFlipNumber />
+                        <span className="text-gray-300">
+                          never-played score combinations in
+                        </span>
+                        <SkeletonFlipNumber />
+                        <SkeletonFlipNumber />
+                        <span className="text-gray-300">matches</span>
+                      </div>
+                    </div>
+
+                    {/* Total possible - Skeleton */}
+                    <div className="flex items-center justify-center text-lg md:text-xl">
+                      <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+                        <span className="text-gray-300">Out of</span>
+                        <SkeletonFlipNumber />
+                        <span className="text-gray-300">possible score.</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Dots - Skeleton */}
+                  <div className="flex items-center justify-center gap-8 mt-8">
+                    {Array(3)
+                      .fill(0)
+                      .map((_, idx) => (
+                        <SkeletonDot key={idx} />
+                      ))}
+                  </div>
+                </div>
+
+                <button
+                  disabled
+                  className="shrink-0 group flex items-center gap-2 px-4 py-2 bg-[#c5c75a]/50 text-black rounded-lg opacity-50"
+                  aria-label="Next format"
+                >
+                  <span className="hidden sm:inline text-sm font-medium">
+                    Next
+                  </span>
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Scoreboards Header - Skeleton */}
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-green-400 mb-2">
+              Never-Occurred Scorelines
+            </h3>
+            <div className="max-w-2xl mx-auto">
+              <div className="h-4 bg-gray-600/30 rounded w-full mb-2 animate-pulse"></div>
+              <div className="h-4 bg-gray-600/30 rounded w-4/5 mx-auto mb-2 animate-pulse"></div>
+              <div className="h-4 bg-gray-600/30 rounded w-3/4 mx-auto animate-pulse"></div>
+            </div>
+          </div>
+
+          {/* Scoreboards - Skeleton */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-[90%] mx-auto">
+            {Array(6)
+              .fill(0)
+              .map((_, idx) => (
+                <SkeletonScoreboard key={idx} />
+              ))}
+          </div>
+        </div>
+      </section>
+    );
   }
 
   const currentStat = stats[currentIndex];
