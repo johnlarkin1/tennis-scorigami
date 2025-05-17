@@ -90,7 +90,7 @@ const Legend = ({
 
   if (colorMode === "category") {
     return (
-      <div className="absolute top-4 left-4 bg-gray-800/90 rounded-lg p-4 backdrop-blur-sm max-w-xs">
+      <div className="absolute top-4 right-4 bg-gray-800/90 rounded-lg p-4 backdrop-blur-sm max-w-xs shadow-lg z-10">
         <h3 className="text-white text-sm font-semibold mb-3">Score Levels</h3>
         {Array.from({ length: Math.min(maxDepth + 1, 5) }, (_, i) => (
           <div key={i} className="mb-3">
@@ -127,7 +127,7 @@ const Legend = ({
     );
   } else {
     return (
-      <div className="absolute top-4 left-4 bg-gray-800/90 rounded-lg p-4 backdrop-blur-sm">
+      <div className="absolute top-4 right-4 bg-gray-800/90 rounded-lg p-4 backdrop-blur-sm shadow-lg z-10">
         <h3 className="text-white text-sm font-semibold mb-3">
           Occurrence Frequency
         </h3>

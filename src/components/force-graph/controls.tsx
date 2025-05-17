@@ -1,7 +1,6 @@
 "use client";
 
 import { TournamentDropdown } from "@/components/scorigami/controls/tournament-dropdown";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -9,44 +8,43 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { ToggleButton } from "@/components/ui/toggle-button";
 import { YEARS } from "@/constants";
-import { SexType, ViewType } from "@/types/tree-control-types";
+import { selectedTournamentAtom } from "@/store/tournament";
+import { SexType } from "@/types/tree-control-types";
 import { atom, useAtom } from "jotai";
 import {
+  AlertCircle,
   Calendar,
   Hash,
   Layers,
-  Link,
-  Maximize,
-  Minimize,
   Network,
   Paintbrush,
   Users,
 } from "lucide-react";
 import * as React from "react";
+import { useEffect } from "react";
 
-// Force graph specific atoms
-export const graphDensityAtom = atom(50);
+// Force graph atoms - keeping them but removing some controls
+export const graphDensityAtom = atom(50); // We keep the atom but remove the UI control
 export const graphLayoutAtom = atom<"3d" | "2d">("3d");
-export const showLabelsAtom = atom(true);
-export const nodeStrengthAtom = atom(50);
+export const nodeStrengthAtom = atom(50); // We keep the atom but remove the UI control
 export const graphColorModeAtom = atom<"category" | "gradient">("category");
-export const showEdgesAtom = atom(true);
-
-// View type control
-export const viewTypeAtom = atom<ViewType>("vertical");
-
-// Visual controls
-export const showGradientAtom = atom<boolean>(false);
-export const showCountAtom = atom<boolean>(false);
+export const showLabelsAtom = atom(true); // We keep the atom but remove the UI control
+export const showEdgesAtom = atom(true); // We keep the atom but remove the UI control
 
 // Filter controls
 export const selectedYearAtom = atom<string>("All Years");
 export const selectedSexAtom = atom<SexType>("Men and Women");
 export const selectedSetsAtom = atom<3 | 5>(3);
-nodeStrengthAtom;
+
+// Tournament-specific set mappings
+const GRAND_SLAM_TOURNAMENTS = [
+  "Australian Open",
+  "French Open",
+  "Wimbledon",
+  "US Open",
+];
 
 type ForceGraphControlsProps = {
   className?: string;
@@ -57,222 +55,240 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
 }) => {
   // Graph type and layout controls
   const [graphLayout, setGraphLayout] = useAtom(graphLayoutAtom);
-  const [graphDensity, setGraphDensity] = useAtom(graphDensityAtom);
-  const [nodeStrength, setNodeStrength] = useAtom(nodeStrengthAtom);
-  const [showLabels, setShowLabels] = useAtom(showLabelsAtom);
   const [colorMode, setColorMode] = useAtom(graphColorModeAtom);
-  const [showEdges, setShowEdges] = useAtom(showEdgesAtom);
 
-  // Filter controls (reused from tree controls)
+  // Filter controls
   const [selectedYear, setSelectedYear] = useAtom(selectedYearAtom);
   const [selectedSex, setSelectedSex] = useAtom(selectedSexAtom);
+  const [selectedSets, setSelectedSets] = useAtom(selectedSetsAtom);
+  const [selectedTournament] = useAtom(selectedTournamentAtom);
 
-  // Slider component temporarily replaced with a range input
-  const SliderComponent = ({
-    value,
-    onValueChange,
-    min,
-    max,
-    step,
-    className,
-  }: {
-    value: number[];
-    onValueChange: (values: number[]) => void;
-    min: number;
-    max: number;
-    step: number;
-    className?: string;
-  }) => (
-    <input
-      type="range"
-      min={min}
-      max={max}
-      step={step}
-      value={value[0]}
-      onChange={(e) => onValueChange([Number(e.target.value)])}
-      className={`w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer ${className}`}
-    />
-  );
+  // When gender changes, ensure women can only have 3 sets
+  useEffect(() => {
+    if (selectedSex === "Women" && selectedSets === 5) {
+      setSelectedSets(3);
+    }
+  }, [selectedSex, selectedSets, setSelectedSets]);
+
+  // When sets change to 5, force 2D layout due to browser performance limitations
+  useEffect(() => {
+    if (selectedSets === 5 && graphLayout === "3d") {
+      setGraphLayout("2d");
+    }
+  }, [selectedSets, graphLayout, setGraphLayout]);
+
+  // When tournament changes, automatically set the appropriate number of sets
+  useEffect(() => {
+    if (selectedTournament && selectedTournament.name !== "All Tournaments") {
+      // For Grand Slam tournaments, men play best of 5
+      const isGrandSlam = GRAND_SLAM_TOURNAMENTS.includes(
+        selectedTournament.name
+      );
+      if (isGrandSlam && selectedSex !== "Women") {
+        setSelectedSets(5);
+      } else {
+        setSelectedSets(3); // All other tournaments use best of 3
+      }
+    }
+  }, [selectedTournament, selectedSex, setSelectedSets]);
+
+  // Check if 5 sets should be disabled based on current selection
+  const isFiveSetsDisabled =
+    selectedSex === "Women" ||
+    (selectedTournament.name !== "All Tournaments" &&
+      !GRAND_SLAM_TOURNAMENTS.includes(selectedTournament.name));
 
   return (
-    <Card className="w-full mx-auto mb-6 bg-gray-800 border-gray-700 rounded-md">
-      <CardContent className="p-6">
-        <h2 className="text-xl font-semibold">Force Graph Controls</h2>
-        <p className="text-gray-400 mb-4 text-sm">
-          Customize the view settings for the tennis score force graph
-          visualization. Adjust layout, density, colors, and filters to explore
-          different patterns.
-        </p>
-        <div className="flex flex-col gap-6">
-          {/* Layout and Visualization Controls */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-sm font-medium mb-2">Graph Layout</h3>
-              <div className="flex gap-2">
-                <ToggleButton
-                  isActive={graphLayout === "3d"}
-                  onClick={() => setGraphLayout("3d")}
-                >
-                  <Layers className="mr-2 h-4 w-4" />
-                  3D View
-                </ToggleButton>
-                <ToggleButton
-                  isActive={graphLayout === "2d"}
-                  onClick={() => setGraphLayout("2d")}
-                >
-                  <Network className="mr-2 h-4 w-4" />
-                  <span>2D View</span>
-                </ToggleButton>
-              </div>
-            </div>
+    <div className={`${className} space-y-6`}>
+      <div>
+        <h2 className="text-xl font-bold text-white mb-4">
+          Visualization Options
+        </h2>
 
-            <div>
-              <h3 className="text-sm font-medium mb-2">Node Coloring</h3>
-              <div className="flex gap-2">
-                <ToggleButton
-                  isActive={colorMode === "category"}
-                  onClick={() => setColorMode("category")}
-                >
-                  <Hash className="mr-2 h-4 w-4" />
-                  Category Based
-                </ToggleButton>
-                <ToggleButton
-                  isActive={colorMode === "gradient"}
-                  onClick={() => setColorMode("gradient")}
-                >
-                  <Paintbrush className="mr-2 h-4 w-4" />
-                  <span>Gradient</span>
-                </ToggleButton>
-              </div>
-            </div>
-          </div>
-
-          {/* Sliders for Graph Properties */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-medium">Graph Density</h3>
-                <span className="text-xs text-gray-400">{graphDensity}%</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Minimize className="h-4 w-4 text-gray-400" />
-                <SliderComponent
-                  value={[graphDensity]}
-                  onValueChange={(values) => setGraphDensity(values[0])}
-                  min={10}
-                  max={100}
-                  step={5}
-                  className="flex-1"
-                />
-                <Maximize className="h-4 w-4 text-gray-400" />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-medium">Node Force Strength</h3>
-                <span className="text-xs text-gray-400">{nodeStrength}%</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Minimize className="h-4 w-4 text-gray-400" />
-                <SliderComponent
-                  value={[nodeStrength]}
-                  onValueChange={(values) => setNodeStrength(values[0])}
-                  min={10}
-                  max={100}
-                  step={5}
-                  className="flex-1"
-                />
-                <Maximize className="h-4 w-4 text-gray-400" />
-              </div>
-            </div>
-          </div>
-
-          {/* Toggle Options */}
-          <div className="flex items-center gap-4 bg-gray-700 rounded-md px-3 py-2">
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="showLabels"
-                checked={showLabels}
-                onCheckedChange={(checked) => setShowLabels(checked)}
-              />
-              <label
-                htmlFor="showLabels"
-                className="text-sm text-gray-300 flex items-center"
-              >
-                <Hash className="mr-1 h-4 w-4" />
-                Show Node Labels
-              </label>
-            </div>
-          </div>
-
-          {/* link visibility */}
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="showEdges"
-              checked={showEdges}
-              onCheckedChange={(checked) => setShowEdges(checked)}
-            />
-            <label
-              htmlFor="showEdges"
-              className="text-sm text-gray-300 flex items-center"
+        {/* Graph Layout */}
+        <div className="mb-6">
+          <h3 className="text-md font-medium text-white mb-3">Graph Layout</h3>
+          <div className="flex gap-3">
+            <ToggleButton
+              isActive={graphLayout === "3d"}
+              onClick={() => setGraphLayout("3d")}
+              disabled={selectedSets === 5}
+              className={`px-4 py-2 rounded ${
+                selectedSets === 5 ? "opacity-50 cursor-not-allowed" : ""
+              } ${graphLayout === "3d" ? "bg-blue-600 border-blue-400" : "bg-gray-900 border border-gray-700"}`}
             >
-              <Link className="mr-1 h-4 w-4" />
-              Show Edges
+              <Layers className="mr-2 h-5 w-5" />
+              3D View
+            </ToggleButton>
+            <ToggleButton
+              isActive={graphLayout === "2d"}
+              onClick={() => setGraphLayout("2d")}
+              className={`px-4 py-2 rounded ${graphLayout === "2d" ? "bg-blue-600 border-blue-400" : "bg-gray-900 border border-gray-700"}`}
+            >
+              <Network className="mr-2 h-5 w-5" />
+              <span>2D View</span>
+            </ToggleButton>
+          </div>
+          {selectedSets === 5 && (
+            <div className="text-amber-400 text-sm flex items-center mt-2">
+              <AlertCircle className="h-4 w-4 mr-1 flex-shrink-0" />
+              <span>3D view disabled for Best of 5 due to complexity</span>
+            </div>
+          )}
+        </div>
+
+        {/* Node Coloring */}
+        <div className="mb-6">
+          <h3 className="text-md font-medium text-white mb-3">Node Coloring</h3>
+          <div className="flex gap-3">
+            <ToggleButton
+              isActive={colorMode === "category"}
+              onClick={() => setColorMode("category")}
+              className={`px-4 py-2 rounded ${colorMode === "category" ? "bg-blue-600 border-blue-400" : "bg-gray-900 border border-gray-700"}`}
+            >
+              <Hash className="mr-2 h-5 w-5" />
+              Category Based
+            </ToggleButton>
+            <ToggleButton
+              isActive={colorMode === "gradient"}
+              onClick={() => setColorMode("gradient")}
+              className={`px-4 py-2 rounded ${colorMode === "gradient" ? "bg-blue-600 border-blue-400" : "bg-gray-900 border border-gray-700"}`}
+            >
+              <Paintbrush className="mr-2 h-5 w-5" />
+              <span>Gradient</span>
+            </ToggleButton>
+          </div>
+        </div>
+      </div>
+
+      {/* Match Filters */}
+      <div className="pt-4 border-t border-gray-700">
+        <h2 className="text-xl font-bold text-white mb-4">Match Filters</h2>
+
+        <div className="space-y-5">
+          {/* Tournament Dropdown */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Tournament
             </label>
+            <div className="relative w-full bg-gray-900 rounded border border-gray-700">
+              <TournamentDropdown />
+            </div>
           </div>
 
-          {/* Slam and Year Selectors */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {/* Tournament (Slam) Select with "All" Option */}
-            <TournamentDropdown />
-
-            {/* Year Select with "All" Option */}
+          {/* Year Select */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Year
+            </label>
             <Select onValueChange={setSelectedYear} value={selectedYear}>
-              <SelectTrigger className="select-trigger">
-                <Calendar className="mr-2 h-4 w-4" />
-                <SelectValue placeholder="Year" />
+              <SelectTrigger className="bg-gray-900 border border-gray-700 text-white h-10 rounded w-full">
+                <Calendar className="mr-2 h-4 w-4 text-gray-400" />
+                <SelectValue placeholder="Year" className="text-white" />
               </SelectTrigger>
-              <SelectContent className="min-w-[inherit] bg-gray-800 text-white border-gray-700 rounded-md">
-                <SelectItem value="All Years" className="hover:bg-gray-700">
+              <SelectContent className="bg-gray-900 text-white border-gray-700 rounded-md">
+                <SelectItem
+                  value="All Years"
+                  className="hover:bg-gray-800 focus:bg-gray-800 text-white py-2"
+                >
                   All Years
                 </SelectItem>
                 {YEARS.map((year) => (
                   <SelectItem
                     key={year.value}
                     value={year.value}
-                    className="hover:bg-gray-700"
+                    className="hover:bg-gray-800 focus:bg-gray-800 text-white py-2"
                   >
                     {year.label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+          </div>
 
-            {/* Gender Select */}
+          {/* Gender Select */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Division
+            </label>
             <Select
               onValueChange={(value) => setSelectedSex(value as SexType)}
               value={selectedSex}
             >
-              <SelectTrigger className="select-trigger">
-                <Users className="mr-2 h-4 w-4" />
-                <SelectValue placeholder="Gender" />
+              <SelectTrigger className="bg-gray-900 border border-gray-700 text-white h-10 rounded w-full">
+                <Users className="mr-2 h-4 w-4 text-gray-400" />
+                <SelectValue placeholder="Division" className="text-white" />
               </SelectTrigger>
-              <SelectContent className="min-w-[inherit] bg-gray-800 text-white border-gray-700 rounded-md">
-                <SelectItem value="Men and Women" className="hover:bg-gray-700">
+              <SelectContent className="bg-gray-900 text-white border-gray-700 rounded-md">
+                <SelectItem
+                  value="Men and Women"
+                  className="hover:bg-gray-800 focus:bg-gray-800 text-white py-2"
+                >
                   Men and Women
                 </SelectItem>
-                <SelectItem value="Men" className="hover:bg-gray-700">
+                <SelectItem
+                  value="Men"
+                  className="hover:bg-gray-800 focus:bg-gray-800 text-white py-2"
+                >
                   Men
                 </SelectItem>
-                <SelectItem value="Women" className="hover:bg-gray-700">
+                <SelectItem
+                  value="Women"
+                  className="hover:bg-gray-800 focus:bg-gray-800 text-white py-2"
+                >
                   Women
                 </SelectItem>
               </SelectContent>
             </Select>
           </div>
+
+          {/* Match Format */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Match Format
+            </label>
+            <Select
+              onValueChange={(value) => setSelectedSets(Number(value) as 3 | 5)}
+              value={selectedSets.toString()}
+              disabled={isFiveSetsDisabled}
+            >
+              <SelectTrigger
+                className={`bg-gray-900 border border-gray-700 text-white h-10 rounded w-full ${isFiveSetsDisabled ? "opacity-70" : ""}`}
+              >
+                <Hash className="mr-2 h-4 w-4 text-gray-400" />
+                <SelectValue placeholder="Sets" className="text-white" />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-900 text-white border-gray-700 rounded-md">
+                <SelectItem
+                  value="3"
+                  className="hover:bg-gray-800 focus:bg-gray-800 text-white py-2"
+                >
+                  Best of 3 Sets
+                </SelectItem>
+                <SelectItem
+                  value="5"
+                  className={`hover:bg-gray-800 focus:bg-gray-800 text-white py-2 ${isFiveSetsDisabled ? "opacity-50" : ""}`}
+                  disabled={isFiveSetsDisabled}
+                >
+                  Best of 5 Sets
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            {isFiveSetsDisabled && (
+              <div className="text-amber-400 text-sm flex items-center mt-2">
+                <AlertCircle className="h-4 w-4 mr-1 flex-shrink-0" />
+                <span>
+                  {selectedSex === "Women"
+                    ? "Women's matches are best of 3 sets"
+                    : selectedTournament.name !== "All Tournaments"
+                      ? "This tournament uses best of 3 sets format"
+                      : ""}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };

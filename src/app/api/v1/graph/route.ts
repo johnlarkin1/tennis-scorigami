@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
   /* 2) select your materialized views */
   type ViewKey = "3-men" | "3-women" | "3-all" | "5-men" | "5-women" | "5-all";
   // const key = `${sets}-${sex}` as ViewKey;
-  const key = "5-men";
+  const key = "3-men";
   const nodesViewMap: Record<ViewKey, string> = {
     "3-men": "mv_graph_nodes_3_men",
     "3-women": "mv_graph_nodes_3_women",

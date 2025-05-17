@@ -1,36 +1,60 @@
+"use client";
+
 import { ForceGraphControls } from "@/components/force-graph/controls";
 import { ForceGraph } from "@/components/force-graph/graph";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
+import { ChevronLeft, Settings } from "lucide-react";
+import { useState } from "react";
 
 export default function ExplorePage() {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
   return (
-    <main className="min-h-screen bg-gray-900 text-white">
+    <main className="min-h-screen bg-gray-900 text-white flex flex-col">
       <Header />
 
-      <section className="py-16 px-4">
-        <div className="container mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-center">
-            Explore Tennis Scorigami Data
-          </h1>
-          <p className="text-lg text-gray-300 max-w-3xl mx-auto text-center mb-12">
-            Visualize the relationships between tennis scores and match outcomes
-            in an interactive 3D force graph. Use the controls below to filter
-            the data and customize the visualization.
-          </p>
+      {/* Page Header */}
+      <div className="pt-8 pb-4 px-6">
+        <h1 className="text-3xl md:text-4xl font-bold text-center">
+          Explore Tennis Scorigami Data
+        </h1>
+        <p className="text-md text-gray-300 max-w-3xl mx-auto text-center mt-3">
+          Visualize the relationships between tennis scores and match outcomes
+          in an interactive force graph.
+        </p>
+      </div>
 
-          {/* Force Graph Controls */}
-          <ForceGraphControls />
+      {/* Main Content with Sidebar and Graph */}
+      <div className="flex flex-1 relative">
+        {/* Sidebar Controls */}
+        <aside
+          className={`bg-gray-800 border-r border-gray-700 h-[calc(100vh-180px)] z-10 transition-all duration-300 overflow-y-auto
+            ${sidebarOpen ? "w-80 lg:w-96" : "w-0"}`}
+        >
+          {sidebarOpen && (
+            <div className="p-4">
+              <ForceGraphControls />
+            </div>
+          )}
+        </aside>
 
-          {/* Force Graph Visualization */}
-          <div
-            className="mt-8 bg-gray-800 rounded-lg shadow-xl overflow-hidden"
-            style={{ height: "70vh", minHeight: "500px" }}
-          >
+        {/* Toggle Button */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className={`absolute top-4 bg-gray-700 hover:bg-gray-600 z-20 p-2 rounded-r-lg shadow-lg transition-all duration-300
+            ${sidebarOpen ? "left-80 lg:left-96" : "left-0"}`}
+        >
+          {sidebarOpen ? <ChevronLeft size={18} /> : <Settings size={18} />}
+        </button>
+
+        {/* Main Graph Area */}
+        <div className="flex-1 bg-gray-850 relative">
+          <div className="absolute inset-0">
             <ForceGraph />
           </div>
         </div>
-      </section>
+      </div>
 
       <Footer />
     </main>
