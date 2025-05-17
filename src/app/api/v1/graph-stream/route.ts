@@ -1,63 +1,25 @@
-// src/app/api/v1/graph/route.ts
+// src/app/api/v1/graph-stream/route.ts
 import { db } from "@/db";
 import { bad } from "@/lib/errors";
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
 import { sql } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 export const runtime = "nodejs";
-export const revalidate = 300; // 5-minute ISR / CDN cache
+export const revalidate = 300;
 
-/**
- * We manually add a "root" node to the graph, which is a dummy node that
- * represents all the nodes in the graph. This is because the graph is
- * directed and we need to ensure that there are no cycles.
- */
-const ROOT_ID = 0; // pick an ID that never collides
+const ROOT_ID = 0;
 const ROOT_SLUG = "love-all";
-
 const rootNode: NodeDTO = {
   id: ROOT_ID,
   slug: ROOT_SLUG,
   played: false,
   depth: 0,
-  occurrences: 0, // or you could sum all depth=1 occurrences
+  occurrences: 0,
   norm: 0,
 };
 
-/**
- * Throws if it finds any directed cycle in edges.
- */
-function assertNoCycles(nodes: NodeDTO[], edges: EdgeDTO[]) {
-  // build adjacency list
-  const adj = new Map<number, number[]>();
-  for (const { frm, to } of edges) {
-    if (frm === to) throw new Error(`Self-loop at node ${frm}`);
-    adj.set(frm, (adj.get(frm) || []).concat(to));
-  }
-
-  const visiting = new Set<number>();
-  const visited = new Set<number>();
-
-  function dfs(u: number) {
-    visiting.add(u);
-    for (const v of adj.get(u) || []) {
-      if (visiting.has(v)) {
-        throw new Error(`Cycle detected: ${u} → ${v}`);
-      }
-      if (!visited.has(v)) dfs(v);
-    }
-    visiting.delete(u);
-    visited.add(u);
-  }
-
-  for (const { id } of nodes) {
-    if (!visited.has(id)) dfs(id);
-  }
-}
-
 export async function GET(req: NextRequest) {
-  /* 1) parse & validate */
   const url = new URL(req.url);
   const sets = Number(url.searchParams.get("sets") ?? "5");
   const sex = (url.searchParams.get("gender") ?? "all").toLowerCase();
@@ -67,7 +29,7 @@ export async function GET(req: NextRequest) {
   if (sets === 5 && sex === "women")
     return bad("women only play best of 3 sets");
 
-  /* 2) select your materialized views */
+  // determine views
   type ViewKey = "3-men" | "3-women" | "3-all" | "5-men" | "5-women" | "5-all";
   // const key = `${sets}-${sex}` as ViewKey;
   const key = "5-men";
@@ -90,8 +52,8 @@ export async function GET(req: NextRequest) {
   const nodesView = nodesViewMap[key];
   const edgesView = edgesViewMap[key];
 
-  /* 3) fetch nodes */
-  const rawNodes = (await db
+  // 1) load & normalize nodes
+  const rawNodes = await db
     .select({
       id: sql<number>`id`,
       slug: sql<string>`slug`,
@@ -101,56 +63,92 @@ export async function GET(req: NextRequest) {
     })
     .from(sql.raw(nodesView))
     .orderBy(sql`depth`)
-    .execute()) as Array<{
-    id: number;
-    slug: string;
-    depth: number;
-    played: boolean;
-    occurrences: number;
-  }>;
+    .execute();
 
-  /* 4) compute norm */
   const maxOcc = rawNodes.reduce((m, n) => Math.max(m, n.occurrences), 1);
   const nodes: NodeDTO[] = rawNodes.map((n) => ({
     ...n,
     norm: n.occurrences / maxOcc,
   }));
 
+  // 2) root‐to‐depth1 edges
   const rootEdges: EdgeDTO[] = nodes
     .filter((n) => n.depth === 1)
     .map((n) => ({ frm: ROOT_ID, to: n.id }));
 
-  /* 5) fetch edges */
-  const rawEdges = (await db
-    .select({
-      frm: sql<number>`frm`,
-      to: sql<number>`"to"`, // quoted reserved word
-    })
+  // 3) load edges
+  const rawEdges = await db
+    .select({ frm: sql<number>`frm`, to: sql<number>`"to"` })
     .from(sql.raw(edgesView))
-    .execute()) as Array<{ frm: number; to: number }>;
+    .execute();
   const edges: EdgeDTO[] = rawEdges.map((e) => ({ frm: e.frm, to: e.to }));
 
+  // 4) inject root node & edges
   nodes.unshift(rootNode);
   edges.unshift(...rootEdges);
 
-  /* 6) cycle-detect only */
+  // 5) cycle‐detect
   try {
     assertNoCycles(nodes, edges);
   } catch (err: any) {
     console.error(err.message);
     return bad(err.message);
   }
-  /* 6.5) log node and edge counts */
+
+  // Log node and edge counts
   console.log(`[API] Graph data: ${nodes.length} nodes, ${edges.length} edges`);
 
-  /* 7) return clean data */
-  return NextResponse.json(
-    { nodes, edges },
-    {
-      headers: {
-        "Content-Type": "application/json",
-        "Cache-Control": "public, max-age=60, stale-while-revalidate=240",
-      },
+  // 6) stream NDJSON
+  const encoder = new TextEncoder();
+  const totalNodes = nodes.length;
+  const totalEdges = edges.length;
+  const stream = new ReadableStream({
+    start(ctrl) {
+      // meta
+      ctrl.enqueue(
+        encoder.encode(
+          JSON.stringify({ type: "meta", totalNodes, totalEdges }) + "\n"
+        )
+      );
+      // nodes
+      for (const n of nodes) {
+        ctrl.enqueue(
+          encoder.encode(JSON.stringify({ type: "node", ...n }) + "\n")
+        );
+      }
+      // edges
+      for (const e of edges) {
+        ctrl.enqueue(
+          encoder.encode(JSON.stringify({ type: "edge", ...e }) + "\n")
+        );
+      }
+      // end marker
+      ctrl.enqueue(encoder.encode(JSON.stringify({ type: "end" }) + "\n"));
+      ctrl.close();
+    },
+  });
+
+  return new Response(stream, {
+    headers: { "Content-Type": "application/x-ndjson" },
+  });
+}
+
+function assertNoCycles(nodes: NodeDTO[], edges: EdgeDTO[]) {
+  const adj = new Map<number, number[]>();
+  for (const { frm, to } of edges) {
+    if (frm === to) throw new Error(`Self-loop at ${frm}`);
+    adj.set(frm, (adj.get(frm) || []).concat(to));
+  }
+  const visiting = new Set<number>();
+  const visited = new Set<number>();
+  function dfs(u: number) {
+    visiting.add(u);
+    for (const v of adj.get(u) || []) {
+      if (visiting.has(v)) throw new Error(`Cycle: ${u}→${v}`);
+      if (!visited.has(v)) dfs(v);
     }
-  );
+    visiting.delete(u);
+    visited.add(u);
+  }
+  for (const { id } of nodes) if (!visited.has(id)) dfs(id);
 }

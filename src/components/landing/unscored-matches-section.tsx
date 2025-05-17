@@ -76,12 +76,17 @@ export default function UnscoredMatchesSection({ className }: Props) {
   }
 
   const currentStat = stats[currentIndex];
-  const slotCount = displayPatterns[0]?.length ?? currentStat.best_of + currentStat.best_of;
+  const slotCount =
+    displayPatterns[0]?.length ?? currentStat.best_of + currentStat.best_of;
   const dashRow = Array(slotCount).fill("-");
   const patternsToDisplay = Array.from(
     { length: 6 },
     (_, i) => displayPatterns[i] || dashRow
   );
+
+  const startDataCollectionYear = 1981;
+  const currentYear = new Date().getFullYear();
+  const yearsSinceStart = currentYear - startDataCollectionYear;
 
   return (
     <section className={`${className} bg-gray-900 overflow-hidden`}>
@@ -90,7 +95,12 @@ export default function UnscoredMatchesSection({ className }: Props) {
         <div className="flex justify-center mt-16 mb-8">
           <div className="max-w-4xl w-full">
             <h2 className="text-2xl md:text-3xl font-bold text-white text-center border border-gray-700 rounded-lg px-8 py-6 shadow-[0_0_30px_rgba(68,219,94,0.3),inset_0_0_30px_rgba(68,219,94,0.1)] bg-gray-900/50 backdrop-blur-sm">
-              Some scores have never occurred in professional tennis since 1981. We are on the hunt for them.
+              In the past{" "}
+              <span className="text-green-400">{yearsSinceStart}</span> years of
+              tennis matches since{" "}
+              <span className="text-green-400">{startDataCollectionYear}</span>,
+              some score combinations have still never occurred. This project is
+              designed to track and discover these missing scorelines.
             </h2>
           </div>
         </div>
@@ -105,7 +115,9 @@ export default function UnscoredMatchesSection({ className }: Props) {
                 aria-label="Previous format"
               >
                 <ChevronLeft size={20} />
-                <span className="hidden sm:inline text-sm font-medium">Previous</span>
+                <span className="hidden sm:inline text-sm font-medium">
+                  Previous
+                </span>
               </button>
 
               <div className="flex-1 text-center">
@@ -127,7 +139,9 @@ export default function UnscoredMatchesSection({ className }: Props) {
                           duration={FLIP_NUMBERS_DURATION}
                         />
                       </span>
-                      <span className="text-gray-300">never-played score combinations in</span>
+                      <span className="text-gray-300">
+                        never-played score combinations in
+                      </span>
                       <span className="inline-flex items-center h-9 w-[100px] px-4 bg-gradient-to-r from-green-500/10 to-green-400/10 rounded-lg justify-center">
                         <FlipNumbers
                           height={FLIP_NUMBERS_HEIGHT}
@@ -175,7 +189,7 @@ export default function UnscoredMatchesSection({ className }: Props) {
                           duration={FLIP_NUMBERS_DURATION}
                         />
                       </span>
-                      <span className="text-gray-300">possible scores</span>
+                      <span className="text-gray-300">possible score.</span>
                     </div>
                   </div>
                 </div>
@@ -189,7 +203,9 @@ export default function UnscoredMatchesSection({ className }: Props) {
                           idx === currentIndex ? "bg-green-400" : "bg-gray-600"
                         }`}
                       />
-                      <span className={`text-sm transition-colors ${idx === currentIndex ? "text-gray-300" : "text-gray-500"}`}>
+                      <span
+                        className={`text-sm transition-colors ${idx === currentIndex ? "text-gray-300" : "text-gray-500"}`}
+                      >
                         {stats[idx].gender.toUpperCase()} {stats[idx].best_of}
                       </span>
                     </div>
@@ -202,20 +218,43 @@ export default function UnscoredMatchesSection({ className }: Props) {
                 className="shrink-0 group flex items-center gap-2 px-4 py-2 bg-[#c5c75a] text-black rounded-lg transition-all duration-200 hover:bg-opacity-90 active:scale-95"
                 aria-label="Next format"
               >
-                <span className="hidden sm:inline text-sm font-medium">Next</span>
+                <span className="hidden sm:inline text-sm font-medium">
+                  Next
+                </span>
                 <ChevronRight size={20} />
               </button>
             </div>
           </div>
         </div>
 
+        {/* Scoreboards Header */}
+        <div className="text-center mb-8">
+          <h3 className="text-2xl font-bold text-green-400 mb-2">
+            Never-Occurred Scorelines
+          </h3>
+          <p className="text-gray-300 max-w-2xl mx-auto">
+            Below are examples of score combinations that have never happened in
+            professional {currentStat.gender.toLowerCase()}'s best-of-
+            {currentStat.best_of} tennis matches. These are just a few of the{" "}
+            {currentStat.total_never_occurred.toLocaleString()} missing
+            scorelines.
+          </p>
+        </div>
+
         {/* Scoreboards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-[90%] mx-auto">
           {patternsToDisplay.map((pattern, idx) => (
-            <TennisScoreboard
+            <div
               key={`${currentStat.gender}_${currentStat.best_of}-${idx}`}
-              scores={pattern}
-            />
+              className="flex flex-col"
+            >
+              <div className="bg-gray-800/50 text-center py-2 rounded-t-lg border-t border-l border-r border-green-600">
+                <span className="text-green-400 font-medium">
+                  Unplayed Scoreline #{idx + 1}
+                </span>
+              </div>
+              <TennisScoreboard scores={pattern} />
+            </div>
           ))}
         </div>
       </div>
