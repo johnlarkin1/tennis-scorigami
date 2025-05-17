@@ -1,12 +1,5 @@
 "use client";
 
-import { scaleLinear } from "d3-scale";
-import { useAtom } from "jotai";
-import dynamic from "next/dynamic";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { ForceGraphMethods } from "react-force-graph-3d";
-import { useResizeDetector } from "react-resize-detector";
-
 import {
   graphColorModeAtom,
   graphDensityAtom,
@@ -18,6 +11,13 @@ import {
   showLabelsAtom,
 } from "@/components/force-graph/controls";
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
+import { scaleLinear } from "d3-scale";
+import { useAtom } from "jotai";
+import dynamic from "next/dynamic";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { ForceGraphMethods } from "react-force-graph-3d";
+import { useResizeDetector } from "react-resize-detector";
+import SpriteText from "three-spritetext";
 
 // All colors in one place
 const DEPTH_COLORS: Record<number, string> = {
@@ -326,6 +326,47 @@ export const ForceGraph = () => {
       nodeVal,
       nodeColor,
       nodeThreeObjectExtend: true,
+      // -------- 3-D labels --------
+      nodeThreeObject: showLabels
+        ? (n: { slug: string | undefined }) => {
+            const sprite = new SpriteText(n.slug); // slug == score string
+            sprite.color = "#ffffff";
+            sprite.textHeight = 6; // world-space units
+            sprite.material.depthWrite = false; // keeps text on top
+            sprite.material.depthTest = false; //   don't get clipped by it
+            sprite.renderOrder = 999; //   last thing the GPU draws
+            // sprite.backgroundColor = "rgba(0,0,0,0.75)";
+            // sprite.material.opacity = 1.0; // keep underlying sphere visible
+            return sprite;
+          }
+        : undefined,
+
+      // -------- 2-D labels --------
+      nodeCanvasObject: showLabels
+        ? (
+            n: { slug: string | undefined; x: number; y: number },
+            ctx: any,
+            globalScale: number
+          ) => {
+            const label = n.slug;
+            const fontSizePx = 12 / globalScale; // don’t grow when zooming
+            ctx.font = `${fontSizePx}px Inter, sans-serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+
+            const padding = 2 / globalScale;
+            const m = ctx.measureText(label);
+            const w = m.width + padding * 2;
+            const h = fontSizePx + padding * 2;
+            ctx.fillStyle = "rgba(0,0,0,0.45)";
+            ctx.fillRect(n.x - w / 2, n.y - h / 2, w, h);
+
+            ctx.fillStyle = "#fff";
+            ctx.fillText(label, n.x, n.y);
+          }
+        : undefined,
+      nodeCanvasObjectMode: () => "after", // draw text on top of nodes
+
       nodeDescription: (n: any) => nodeLabel(n),
       linkColor: (link: any) => {
         // Make links more visible with gradient based on depth
@@ -364,7 +405,7 @@ export const ForceGraph = () => {
       linkDirectionalParticleSpeed: 0.01,
       linkDirectionalParticleWidth: 3,
     }),
-    [nodeLabel, nodeVal, nodeColor, showEdges, data.nodes]
+    [showLabels, nodeLabel, nodeVal, nodeColor, showEdges, data.nodes]
   );
 
   const onNodeClick = useCallback((n: any) => {

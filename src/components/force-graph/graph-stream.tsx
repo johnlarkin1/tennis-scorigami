@@ -261,6 +261,7 @@ export const ForceGraphStream = () => {
             <ForceGraph3D
               width={width}
               height={height}
+              // @ts-ignore
               ref={(inst) => (fgRef.current = inst!)}
               graphData={data}
               {...graphProps}

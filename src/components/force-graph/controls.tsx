@@ -25,6 +25,7 @@ import {
   Layers,
   Network,
   Paintbrush,
+  Tag,
   Users,
 } from "lucide-react";
 import * as React from "react";
@@ -61,6 +62,7 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
   // Graph type and layout controls
   const [graphLayout, setGraphLayout] = useAtom(graphLayoutAtom);
   const [colorMode, setColorMode] = useAtom(graphColorModeAtom);
+  const [showLabels, setShowLabels] = useAtom(showLabelsAtom);
 
   // Filter controls
   const [selectedYear, setSelectedYear] = useAtom(selectedYearAtom);
@@ -228,6 +230,62 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
                 className={`relative z-10 ${colorMode === "gradient" ? "text-white" : "text-gray-300"}`}
               >
                 Gradient
+              </span>
+            </motion.button>
+          </div>
+        </div>
+
+        {/* Show Labels Toggle */}
+        <div className="mb-6">
+          <h3 className="text-md font-bold text-white mb-3 border-l-2 border-gray-600 pl-2">
+            Node Labels
+          </h3>
+          <div className="grid grid-cols-2 gap-2">
+            <motion.button
+              onClick={() => setShowLabels(true)}
+              className="relative flex items-center justify-center py-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {showLabels && (
+                <motion.div
+                  className="absolute inset-0 bg-blue-600 rounded-lg"
+                  layoutId="activeLabelsBg"
+                  initial={false}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+              <Tag
+                className={`mr-2 h-5 w-5 relative z-10 ${showLabels ? "text-white" : "text-gray-300"}`}
+              />
+              <span
+                className={`relative z-10 ${showLabels ? "text-white" : "text-gray-300"}`}
+              >
+                Show Labels
+              </span>
+            </motion.button>
+
+            <motion.button
+              onClick={() => setShowLabels(false)}
+              className="relative flex items-center justify-center py-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {!showLabels && (
+                <motion.div
+                  className="absolute inset-0 bg-blue-600 rounded-lg"
+                  layoutId="activeLabelsBg"
+                  initial={false}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+              <Tag
+                className={`mr-2 h-5 w-5 relative z-10 ${!showLabels ? "text-white" : "text-gray-300"}`}
+              />
+              <span
+                className={`relative z-10 ${!showLabels ? "text-white" : "text-gray-300"}`}
+              >
+                Hide Labels
               </span>
             </motion.button>
           </div>
