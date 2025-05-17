@@ -15,13 +15,15 @@ export default function ExplorePage() {
       <Header />
 
       {/* Page Header */}
-      <div className="pt-8 pb-4 px-6">
-        <h1 className="text-3xl md:text-4xl font-bold text-center">
+      <div className="pt-8 pb-4 px-6 border-b border-gray-700 shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+        <h2 className="text-3xl md:text-4xl font-bold text-center">
           Explore Tennis Scorigami Data
-        </h1>
+        </h2>
         <p className="text-md text-gray-300 max-w-3xl mx-auto text-center mt-3">
-          Visualize the relationships between tennis scores and match outcomes
-          in an interactive force graph.
+          This graph (really tree, see more in our technical discussion) is
+          meant to show all possible score sequences in tennis matches. You can
+          filter by tournament, year, and division. Click the gear icon on the
+          left to adjust the parameters. Click on nodes to see more detail.
         </p>
       </div>
 
