@@ -1,4 +1,8 @@
 import {
+  dropdownContentClass,
+  dropdownItemClass,
+} from "@/components/lib/force-graph/styles";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -15,6 +19,7 @@ import {
 import { Tournament } from "@/types/tournament";
 import { useQuery } from "@tanstack/react-query";
 import { useAtom } from "jotai";
+import { Trophy } from "lucide-react";
 import { useEffect } from "react";
 
 export const TournamentDropdown = () => {
@@ -65,17 +70,27 @@ export const TournamentDropdown = () => {
       value={selectedTournament.name}
       disabled={isLoading}
     >
-      <SelectTrigger className="select-trigger w-48">
-        <SelectValue placeholder={ALL_TOURNAMENTS_STRING} />
+      <SelectTrigger className="bg-gray-900 border border-gray-700 text-white h-10 rounded w-full flex items-center justify-center">
+        <Trophy className="mr-2 h-4 w-4 text-green-400" />
+        <SelectValue
+          placeholder={ALL_TOURNAMENTS_STRING}
+          className="text-white text-center"
+        />
       </SelectTrigger>
-      <SelectContent>
-        <SelectItem value={ALL_TOURNAMENTS_STRING}>All Tournaments</SelectItem>
+      <SelectContent className={dropdownContentClass}>
+        <SelectItem
+          value={ALL_TOURNAMENTS_STRING}
+          className={dropdownItemClass}
+        >
+          All Tournaments
+        </SelectItem>
         {tournaments &&
           tournaments.map((tournament: Tournament) => {
             return (
               <SelectItem
                 key={tournament.tournament_id}
                 value={tournament.name}
+                className={dropdownItemClass}
               >
                 {tournament.name}
               </SelectItem>

@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export const Header = () => (
-  <header className="font-sans bg-gray-900 text-white shadow-md px-6 py-4">
+  <header className="font-sans bg-gray-900 text-white shadow-md px-6 py-4 border-b border-gray-700 shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
     <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
       <Link href="/" className="flex items-center space-x-1">
         <Image

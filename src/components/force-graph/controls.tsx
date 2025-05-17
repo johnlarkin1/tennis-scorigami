@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  dropdownContentClass,
+  dropdownItemClass,
+  dropdownTriggerClass,
+} from "@/components/lib/force-graph/styles";
 import { TournamentDropdown } from "@/components/scorigami/controls/tournament-dropdown";
 import {
   Select,
@@ -8,10 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ToggleButton } from "@/components/ui/toggle-button";
 import { YEARS } from "@/constants";
 import { selectedTournamentAtom } from "@/store/tournament";
 import { SexType } from "@/types/tree-control-types";
+import { motion } from "framer-motion";
 import { atom, useAtom } from "jotai";
 import {
   AlertCircle,
@@ -107,27 +112,62 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
 
         {/* Graph Layout */}
         <div className="mb-6">
-          <h3 className="text-md font-medium text-white mb-3">Graph Layout</h3>
-          <div className="flex gap-3">
-            <ToggleButton
-              isActive={graphLayout === "3d"}
-              onClick={() => setGraphLayout("3d")}
+          <h3 className="text-md font-bold text-white mb-3 border-l-2 border-gray-600 pl-2">
+            Graph Layout
+          </h3>
+          <div className="grid grid-cols-2 gap-2">
+            <motion.button
+              onClick={() => {
+                if (selectedSets !== 5) setGraphLayout("3d");
+              }}
               disabled={selectedSets === 5}
-              className={`px-4 py-2 rounded ${
+              className={`relative flex items-center justify-center py-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden ${
                 selectedSets === 5 ? "opacity-50 cursor-not-allowed" : ""
-              } ${graphLayout === "3d" ? "bg-blue-600 border-blue-400" : "bg-gray-900 border border-gray-700"}`}
+              }`}
+              whileHover={selectedSets !== 5 ? { scale: 1.02 } : {}}
+              whileTap={selectedSets !== 5 ? { scale: 0.98 } : {}}
             >
-              <Layers className="mr-2 h-5 w-5" />
-              3D View
-            </ToggleButton>
-            <ToggleButton
-              isActive={graphLayout === "2d"}
+              {graphLayout === "3d" && (
+                <motion.div
+                  className="absolute inset-0 bg-blue-600 rounded-lg"
+                  layoutId="activeButtonBg"
+                  initial={false}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+              <Layers
+                className={`mr-2 h-5 w-5 relative z-10 ${graphLayout === "3d" ? "text-white" : "text-gray-300"}`}
+              />
+              <span
+                className={`relative z-10 ${graphLayout === "3d" ? "text-white" : "text-gray-300"}`}
+              >
+                3D View
+              </span>
+            </motion.button>
+
+            <motion.button
               onClick={() => setGraphLayout("2d")}
-              className={`px-4 py-2 rounded ${graphLayout === "2d" ? "bg-blue-600 border-blue-400" : "bg-gray-900 border border-gray-700"}`}
+              className="relative flex items-center justify-center py-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              <Network className="mr-2 h-5 w-5" />
-              <span>2D View</span>
-            </ToggleButton>
+              {graphLayout === "2d" && (
+                <motion.div
+                  className="absolute inset-0 bg-blue-600 rounded-lg"
+                  layoutId="activeButtonBg"
+                  initial={false}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+              <Network
+                className={`mr-2 h-5 w-5 relative z-10 ${graphLayout === "2d" ? "text-white" : "text-gray-300"}`}
+              />
+              <span
+                className={`relative z-10 ${graphLayout === "2d" ? "text-white" : "text-gray-300"}`}
+              >
+                2D View
+              </span>
+            </motion.button>
           </div>
           {selectedSets === 5 && (
             <div className="text-amber-400 text-sm flex items-center mt-2">
@@ -139,24 +179,57 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
 
         {/* Node Coloring */}
         <div className="mb-6">
-          <h3 className="text-md font-medium text-white mb-3">Node Coloring</h3>
-          <div className="flex gap-3">
-            <ToggleButton
-              isActive={colorMode === "category"}
+          <h3 className="text-md font-bold text-white mb-3 border-l-2 border-gray-600 pl-2">
+            Node Coloring
+          </h3>
+          <div className="grid grid-cols-2 gap-2">
+            <motion.button
               onClick={() => setColorMode("category")}
-              className={`px-4 py-2 rounded ${colorMode === "category" ? "bg-blue-600 border-blue-400" : "bg-gray-900 border border-gray-700"}`}
+              className="relative flex items-center justify-center py-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              <Hash className="mr-2 h-5 w-5" />
-              Category Based
-            </ToggleButton>
-            <ToggleButton
-              isActive={colorMode === "gradient"}
+              {colorMode === "category" && (
+                <motion.div
+                  className="absolute inset-0 bg-blue-600 rounded-lg"
+                  layoutId="activeColorBg"
+                  initial={false}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+              <Hash
+                className={`mr-2 h-5 w-5 relative z-10 ${colorMode === "category" ? "text-white" : "text-gray-300"}`}
+              />
+              <span
+                className={`relative z-10 ${colorMode === "category" ? "text-white" : "text-gray-300"}`}
+              >
+                Category Based
+              </span>
+            </motion.button>
+
+            <motion.button
               onClick={() => setColorMode("gradient")}
-              className={`px-4 py-2 rounded ${colorMode === "gradient" ? "bg-blue-600 border-blue-400" : "bg-gray-900 border border-gray-700"}`}
+              className="relative flex items-center justify-center py-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              <Paintbrush className="mr-2 h-5 w-5" />
-              <span>Gradient</span>
-            </ToggleButton>
+              {colorMode === "gradient" && (
+                <motion.div
+                  className="absolute inset-0 bg-blue-600 rounded-lg"
+                  layoutId="activeColorBg"
+                  initial={false}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+              <Paintbrush
+                className={`mr-2 h-5 w-5 relative z-10 ${colorMode === "gradient" ? "text-white" : "text-gray-300"}`}
+              />
+              <span
+                className={`relative z-10 ${colorMode === "gradient" ? "text-white" : "text-gray-300"}`}
+              >
+                Gradient
+              </span>
+            </motion.button>
           </div>
         </div>
       </div>
@@ -168,36 +241,34 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
         <div className="space-y-5">
           {/* Tournament Dropdown */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-bold text-white mb-2 border-l-2 border-gray-600 pl-2">
               Tournament
             </label>
-            <div className="relative w-full bg-gray-900 rounded border border-gray-700">
-              <TournamentDropdown />
-            </div>
+            <TournamentDropdown />
           </div>
 
           {/* Year Select */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-bold text-white mb-2 border-l-2 border-gray-600 pl-2">
               Year
             </label>
             <Select onValueChange={setSelectedYear} value={selectedYear}>
-              <SelectTrigger className="bg-gray-900 border border-gray-700 text-white h-10 rounded w-full">
-                <Calendar className="mr-2 h-4 w-4 text-gray-400" />
-                <SelectValue placeholder="Year" className="text-white" />
+              <SelectTrigger className={dropdownTriggerClass}>
+                <Calendar className="mr-2 h-4 w-4 text-green-400" />
+                <SelectValue
+                  placeholder="Year"
+                  className="text-white text-center"
+                />
               </SelectTrigger>
-              <SelectContent className="bg-gray-900 text-white border-gray-700 rounded-md">
-                <SelectItem
-                  value="All Years"
-                  className="hover:bg-gray-800 focus:bg-gray-800 text-white py-2"
-                >
+              <SelectContent className={dropdownContentClass}>
+                <SelectItem value="All Years" className={dropdownItemClass}>
                   All Years
                 </SelectItem>
                 {YEARS.map((year) => (
                   <SelectItem
                     key={year.value}
                     value={year.value}
-                    className="hover:bg-gray-800 focus:bg-gray-800 text-white py-2"
+                    className={dropdownItemClass}
                   >
                     {year.label}
                   </SelectItem>
@@ -206,36 +277,30 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
             </Select>
           </div>
 
-          {/* Gender Select */}
+          {/* Division Select */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-bold text-white mb-2 border-l-2 border-gray-600 pl-2">
               Division
             </label>
             <Select
               onValueChange={(value) => setSelectedSex(value as SexType)}
               value={selectedSex}
             >
-              <SelectTrigger className="bg-gray-900 border border-gray-700 text-white h-10 rounded w-full">
-                <Users className="mr-2 h-4 w-4 text-gray-400" />
-                <SelectValue placeholder="Division" className="text-white" />
+              <SelectTrigger className={dropdownTriggerClass}>
+                <Users className="mr-2 h-4 w-4 text-green-400" />
+                <SelectValue
+                  placeholder="Division"
+                  className="text-white text-center"
+                />
               </SelectTrigger>
-              <SelectContent className="bg-gray-900 text-white border-gray-700 rounded-md">
-                <SelectItem
-                  value="Men and Women"
-                  className="hover:bg-gray-800 focus:bg-gray-800 text-white py-2"
-                >
+              <SelectContent className={dropdownContentClass}>
+                <SelectItem value="Men and Women" className={dropdownItemClass}>
                   Men and Women
                 </SelectItem>
-                <SelectItem
-                  value="Men"
-                  className="hover:bg-gray-800 focus:bg-gray-800 text-white py-2"
-                >
+                <SelectItem value="Men" className={dropdownItemClass}>
                   Men
                 </SelectItem>
-                <SelectItem
-                  value="Women"
-                  className="hover:bg-gray-800 focus:bg-gray-800 text-white py-2"
-                >
+                <SelectItem value="Women" className={dropdownItemClass}>
                   Women
                 </SelectItem>
               </SelectContent>
@@ -244,7 +309,7 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
 
           {/* Match Format */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-bold text-white mb-2 border-l-2 border-gray-600 pl-2">
               Match Format
             </label>
             <Select
@@ -253,21 +318,21 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
               disabled={isFiveSetsDisabled}
             >
               <SelectTrigger
-                className={`bg-gray-900 border border-gray-700 text-white h-10 rounded w-full ${isFiveSetsDisabled ? "opacity-70" : ""}`}
+                className={`${dropdownTriggerClass} ${isFiveSetsDisabled ? "opacity-70" : ""}`}
               >
-                <Hash className="mr-2 h-4 w-4 text-gray-400" />
-                <SelectValue placeholder="Sets" className="text-white" />
+                <Hash className="mr-2 h-4 w-4 text-green-400" />
+                <SelectValue
+                  placeholder="Sets"
+                  className="text-white text-center"
+                />
               </SelectTrigger>
-              <SelectContent className="bg-gray-900 text-white border-gray-700 rounded-md">
-                <SelectItem
-                  value="3"
-                  className="hover:bg-gray-800 focus:bg-gray-800 text-white py-2"
-                >
+              <SelectContent className={dropdownContentClass}>
+                <SelectItem value="3" className={dropdownItemClass}>
                   Best of 3 Sets
                 </SelectItem>
                 <SelectItem
                   value="5"
-                  className={`hover:bg-gray-800 focus:bg-gray-800 text-white py-2 ${isFiveSetsDisabled ? "opacity-50" : ""}`}
+                  className={`${dropdownItemClass} ${isFiveSetsDisabled ? "opacity-50" : ""}`}
                   disabled={isFiveSetsDisabled}
                 >
                   Best of 5 Sets
