@@ -15,7 +15,7 @@ import type { MatchStatWithSamples } from "@/types/match-stats/response";
 
 const FLIP_NUMBERS_HEIGHT = 20;
 const FLIP_NUMBERS_WIDTH = 16;
-const FLIP_NUMBERS_DURATION = 1; // seconds
+const FLIP_NUMBERS_DURATION = 1;
 const CATEGORY_ANIMATION_TIME_SEC = 10;
 
 const FLIP_TEXT_STYLE = {
@@ -365,7 +365,7 @@ export default function UnscoredMatchesSection({ className }: Props) {
         </div>
 
         {/* Scoreboards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-[90%] mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-[90%] mx-auto mb-16">
           {patternsToDisplay.map((pattern, idx) => (
             <div
               key={`${currentStat.gender}_${currentStat.best_of}-${idx}`}
