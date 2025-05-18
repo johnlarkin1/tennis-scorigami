@@ -7,6 +7,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { SequenceInfo, SequenceMatch } from "@/types/sequence-matches/response";
+import {
+  convertSetsFilter,
+  convertSexFilter,
+  convertTournamentFilter,
+  convertYearFilter,
+} from "@/utils/filter-converters";
 import { format } from "date-fns";
 import {
   Award,
@@ -78,12 +84,10 @@ export function MatchDetailsModal({
 
       try {
         const params = new URLSearchParams();
-        const yearValue = filters.year === "All Years" ? "all" : filters.year;
-        const sexValue =
-          filters.sex === "Men and Women" ? "all" : filters.sex?.toLowerCase();
-        const tournamentValue =
-          filters.tournament === "All Tournaments" ? "all" : filters.tournament;
-        const setsValue = filters.sets === "All Sets" ? "all" : filters.sets;
+        const yearValue = convertYearFilter(filters.year);
+        const sexValue = convertSexFilter(filters.sex);
+        const tournamentValue = convertTournamentFilter(filters.tournament);
+        const setsValue = convertSetsFilter(filters.sets);
 
         if (yearValue) params.append("year", yearValue);
         if (sexValue) params.append("sex", sexValue);

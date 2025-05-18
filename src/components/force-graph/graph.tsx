@@ -14,6 +14,7 @@ import { DiscoveryModal } from "@/components/force-graph/discovery-modal";
 import { MatchDetailsModal } from "@/components/force-graph/match-details-modal";
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
 import { selectedTournamentAtom } from "@/store/tournament";
+import { convertSexFilter, convertYearFilter } from "@/utils/filter-converters";
 import { scaleLinear } from "d3-scale";
 import { useAtom } from "jotai";
 import dynamic from "next/dynamic";
@@ -238,12 +239,9 @@ export const ForceGraph = () => {
   /* ─ Fetch + sanitize + inject love-all root ─ */
   useEffect(() => {
     async function fetchGraph() {
-      const mapSex = (s: string) =>
-        s === "Men and Women" ? "all" : s.toLowerCase();
-
       const qs = new URLSearchParams({
-        year: selectedYear?.toString() ?? "",
-        gender: mapSex(selectedSex ?? ""),
+        year: selectedYear ? convertYearFilter(selectedYear.toString()) : "",
+        gender: convertSexFilter(selectedSex ?? ""),
         sets: selectedSets.toString(),
       });
 
