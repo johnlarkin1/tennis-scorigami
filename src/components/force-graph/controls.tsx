@@ -32,12 +32,12 @@ import * as React from "react";
 import { useEffect } from "react";
 
 // Force graph atoms - keeping them but removing some controls
-export const graphDensityAtom = atom(50); // We keep the atom but remove the UI control
+export const graphDensityAtom = atom(50);
 export const graphLayoutAtom = atom<"3d" | "2d">("3d");
-export const nodeStrengthAtom = atom(50); // We keep the atom but remove the UI control
+export const nodeStrengthAtom = atom(50);
 export const graphColorModeAtom = atom<"category" | "gradient">("category");
-export const showLabelsAtom = atom(true); // We keep the atom but remove the UI control
-export const showEdgesAtom = atom(true); // We keep the atom but remove the UI control
+export const showLabelsAtom = atom(false);
+export const showEdgesAtom = atom(true);
 
 // Filter controls
 export const selectedYearAtom = atom<string>("All Years");
@@ -119,6 +119,29 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
           </h3>
           <div className="grid grid-cols-2 gap-2">
             <motion.button
+              onClick={() => setGraphLayout("2d")}
+              className="relative flex items-center justify-center py-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {graphLayout === "2d" && (
+                <motion.div
+                  className="absolute inset-0 bg-blue-600 rounded-lg"
+                  layoutId="activeButtonBg"
+                  initial={false}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+              <Network
+                className={`mr-2 h-5 w-5 relative z-10 ${graphLayout === "2d" ? "text-white" : "text-gray-300"}`}
+              />
+              <span
+                className={`relative z-10 ${graphLayout === "2d" ? "text-white" : "text-gray-300"}`}
+              >
+                2D View
+              </span>
+            </motion.button>
+            <motion.button
               onClick={() => {
                 if (selectedSets !== 5) setGraphLayout("3d");
               }}
@@ -144,30 +167,6 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
                 className={`relative z-10 ${graphLayout === "3d" ? "text-white" : "text-gray-300"}`}
               >
                 3D View
-              </span>
-            </motion.button>
-
-            <motion.button
-              onClick={() => setGraphLayout("2d")}
-              className="relative flex items-center justify-center py-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              {graphLayout === "2d" && (
-                <motion.div
-                  className="absolute inset-0 bg-blue-600 rounded-lg"
-                  layoutId="activeButtonBg"
-                  initial={false}
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                />
-              )}
-              <Network
-                className={`mr-2 h-5 w-5 relative z-10 ${graphLayout === "2d" ? "text-white" : "text-gray-300"}`}
-              />
-              <span
-                className={`relative z-10 ${graphLayout === "2d" ? "text-white" : "text-gray-300"}`}
-              >
-                2D View
               </span>
             </motion.button>
           </div>
@@ -391,7 +390,8 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
                 <SelectItem
                   value="5"
                   className={`${dropdownItemClass} ${isFiveSetsDisabled ? "opacity-50" : ""}`}
-                  disabled={isFiveSetsDisabled}
+                  // disabled={isFiveSetsDisabled}
+                  disabled={true}
                 >
                   Best of 5 Sets
                 </SelectItem>

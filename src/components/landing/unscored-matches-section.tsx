@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import FlipNumbers from "react-flip-numbers";
 
 import { TennisScoreboard } from "@/components/scoreboard";
+import { ExploreButton } from "@/components/ui/explore-button";
 import {
   SkeletonDot,
   SkeletonFlipNumber,
@@ -16,7 +17,7 @@ import type { MatchStatWithSamples } from "@/types/match-stats/response";
 const FLIP_NUMBERS_HEIGHT = 20;
 const FLIP_NUMBERS_WIDTH = 16;
 const FLIP_NUMBERS_DURATION = 1;
-const CATEGORY_ANIMATION_TIME_SEC = 10;
+const CATEGORY_ANIMATION_TIME_SEC = 5;
 
 const FLIP_TEXT_STYLE = {
   color: "#4ade80",
@@ -43,7 +44,6 @@ export default function UnscoredMatchesSection({ className }: Props) {
     fetch("/api/v1/match-stats")
       .then((res) => res.json())
       .then((data: MatchStatWithSamples[]) => {
-        console.log(data);
         setStats(data);
         setIsLoading(false);
       })
@@ -172,6 +172,9 @@ export default function UnscoredMatchesSection({ className }: Props) {
               </div>
             </div>
           </div>
+
+          {/* Explore Interactively Button */}
+          <ExploreButton className="mb-8" />
 
           {/* Scoreboards Header - Skeleton */}
           <div className="text-center mb-8">
@@ -349,6 +352,9 @@ export default function UnscoredMatchesSection({ className }: Props) {
             </div>
           </div>
         </div>
+
+        {/* Explore Interactively Button */}
+        <ExploreButton className="mb-8" />
 
         {/* Scoreboards Header */}
         <div className="text-center mb-8">

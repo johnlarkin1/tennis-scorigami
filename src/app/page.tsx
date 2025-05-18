@@ -2,7 +2,6 @@ import { HeroSection } from "@/components/landing/hero-section";
 import UnscoredMatchesSection from "@/components/landing/unscored-matches-section";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
-import { FloatingExploreButton } from "@/components/ui/floating-explore-button";
 
 export default function Home() {
   return (
@@ -14,7 +13,7 @@ export default function Home() {
           <HeroSection className="h-[30vh]" />
           <UnscoredMatchesSection className="h-auto flex-1" />
 
-          <FloatingExploreButton targetId="force-graph" />
+          {/* <FloatingExploreButton targetId="force-graph" /> */}
         </div>
 
         {/* Additional sections below the fold */}

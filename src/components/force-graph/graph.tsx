@@ -10,7 +10,9 @@ import {
   showEdgesAtom,
   showLabelsAtom,
 } from "@/components/force-graph/controls";
+import { MatchDetailsModal } from "@/components/force-graph/match-details-modal";
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
+import { selectedTournamentAtom } from "@/store/tournament";
 import { scaleLinear } from "d3-scale";
 import { useAtom } from "jotai";
 import dynamic from "next/dynamic";
@@ -172,6 +174,12 @@ export const ForceGraph = () => {
   const [selectedYear] = useAtom(selectedYearAtom);
   const [selectedSex] = useAtom(selectedSexAtom);
   const [selectedSets] = useAtom(selectedSetsAtom);
+  const [selectedTournament] = useAtom(selectedTournamentAtom);
+
+  /* ─ Modal state ─ */
+  const [selectedSequenceId, setSelectedSequenceId] = useState<number | null>(
+    null
+  );
 
   /* ─ Graph data ─ */
   const [data, setData] = useState<GraphData>({ nodes: [], links: [] });
@@ -349,7 +357,7 @@ export const ForceGraph = () => {
             globalScale: number
           ) => {
             const label = n.slug;
-            const fontSizePx = 12 / globalScale; // don’t grow when zooming
+            const fontSizePx = 12 / globalScale; // don't grow when zooming
             ctx.font = `${fontSizePx}px Inter, sans-serif`;
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
@@ -409,126 +417,14 @@ export const ForceGraph = () => {
   );
 
   const onNodeClick = useCallback((n: any) => {
-    const message = [
-      `Score: ${n.slug}`,
-      `Depth: ${n.depth}`,
-      `Occurrences: ${n.occurrences}`,
-      `Normalized: ${Math.round(n.norm * 100)}%`,
-      `Status: ${n.played ? "Scored" : "Never occurred"}`,
-    ].join("\n");
-
-    alert(message);
+    if (n.id === ROOT_ID) return; // Don't open modal for root node
+    setSelectedSequenceId(n.id);
   }, []);
 
-  /* ─ Apply enhanced D3 forces for proper radial layout ─ */
-  // useEffect(() => {
-  //   const fg = fgRef.current;
-  //   if (!fg || !data.nodes.length) return;
-
-  //   // Delay applying forces to ensure the graph is fully initialized
-  //   const timeoutId = setTimeout(() => {
-  //     // Double-check that fg is still valid when the timeout executes
-  //     if (!fgRef.current) return;
-
-  //     const applyForces = () => {
-  //       try {
-  //         const fg = fgRef.current;
-  //         // Extra safety check to ensure fg is still valid
-  //         if (!fg) return;
-
-  //         // First, fix the root node at the center
-  //         const rootNode = data.nodes.find((n) => n.id === ROOT_ID);
-  //         if (rootNode) {
-  //           (rootNode as any).fx = 0;
-  //           (rootNode as any).fy = 0;
-  //           (rootNode as any).fz = 0;
-  //         }
-
-  //         // Repelling force - balanced to maintain structure
-  //         if (fg.d3Force) {
-  //           fg.d3Force("charge", forceManyBody().strength(REPULSION_STRENGTH));
-
-  //           // Link force - stronger to maintain connections visible
-  //           fg.d3Force(
-  //             "link",
-  //             forceLink(data.links)
-  //               .id((d: any) => d.id)
-  //               .distance((d: any) => {
-  //                 const source = data.nodes.find(
-  //                   (n) => n.id === d.source?.id || n.id === d.source
-  //                 );
-  //                 const target = data.nodes.find(
-  //                   (n) => n.id === d.target?.id || n.id === d.target
-  //                 );
-  //                 if (!source || !target) return 100;
-
-  //                 // Shorter distances for better connectivity
-  //                 const depthDiff = Math.abs(target.depth - source.depth);
-  //                 return depthDiff * 60 + 40;
-  //               })
-  //               .strength((d: any) => {
-  //                 const source = data.nodes.find(
-  //                   (n) => n.id === d.source?.id || n.id === d.source
-  //                 );
-  //                 const target = data.nodes.find(
-  //                   (n) => n.id === d.target?.id || n.id === d.target
-  //                 );
-  //                 if (!source || !target) return 1;
-
-  //                 // Stronger connections for adjacent depths
-  //                 const depthDiff = Math.abs(target.depth - source.depth);
-  //                 return depthDiff === 1 ? 1.5 : 1.0;
-  //               })
-  //           );
-
-  //           // Radial force - gentler to allow link connections
-  //           fg.d3Force(
-  //             "radial",
-  //             forceRadial((d: any) => ringRadius(d.depth), 0, 0, 0).strength(
-  //               (d: any) => {
-  //                 if (d.id === ROOT_ID) return 0;
-  //                 // Gentler radial force for outer rings to maintain connections
-  //                 return 0.4 + 0.3 / (d.depth || 1);
-  //               }
-  //             )
-  //           );
-
-  //           // Center force to keep everything centered
-  //           fg.d3Force("center", forceCenter(0, 0, 0).strength(0.05));
-
-  //           // Weaker z-axis constraint to allow some 3D spread
-  //           fg.d3Force("z", forceY((d: any) => 0).strength(0.05));
-
-  //           // Collision detection with variable radius
-  //           fg.d3Force(
-  //             "collide",
-  //             forceCollide((d: any) => {
-  //               const baseRadius = nodeVal(d) * (nodeStrength / 10);
-  //               // Give root node more space, but not too much
-  //               return d.id === ROOT_ID ? baseRadius * 1.3 : baseRadius * 0.7;
-  //             }).iterations(2)
-  //           );
-
-  //           // Gentle positioning forces
-  //           fg.d3Force("x", forceX(0).strength(0.02));
-  //           fg.d3Force("y", forceY(0).strength(0.02));
-
-  //           // Only reheat if the method exists
-  //           if (fg.d3ReheatSimulation) {
-  //             fg.d3ReheatSimulation();
-  //           }
-  //         }
-  //       } catch (error) {
-  //         console.error("Error applying force graph forces:", error);
-  //       }
-  //     };
-
-  //     applyForces();
-  //   }, 100); // Short delay to ensure graph is ready
-
-  //   // Clean up timeout if component unmounts
-  //   return () => clearTimeout(timeoutId);
-  // }, [data, nodeVal, nodeStrength, ringRadius]);
+  // Handle modal close
+  const handleCloseModal = useCallback(() => {
+    setSelectedSequenceId(null);
+  }, []);
 
   const graphKey = [
     data.nodes.length,
@@ -570,7 +466,7 @@ export const ForceGraph = () => {
               backdrop-blur-sm
             "
           >
-            <p>Click on a node to see more info</p>
+            <p>Click on a node to see matches</p>
             <p>Left-click: rotate</p>
             <p>Mouse-wheel/middle-click: zoom</p>
             <p>Right-click: pan</p>
@@ -581,6 +477,22 @@ export const ForceGraph = () => {
       <div className="absolute bottom-2 right-3 text-xs text-gray-500">
         layout {graphLayout} | density {graphDensity}% | strength {nodeStrength}
       </div>
+
+      {/* Match Details Modal */}
+      <MatchDetailsModal
+        sequenceId={selectedSequenceId}
+        onClose={handleCloseModal}
+        filters={{
+          year: selectedYear || "All Years",
+          sex: selectedSex || "Men and Women",
+          // Use the ID if available, otherwise use "All Tournaments"
+          tournament:
+            selectedTournament?.name !== "All Tournaments" &&
+            selectedTournament?.tournament_id
+              ? String(selectedTournament.tournament_id)
+              : "All Tournaments",
+        }}
+      />
     </div>
   );
 };
