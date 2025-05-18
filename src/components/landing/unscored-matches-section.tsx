@@ -12,6 +12,7 @@ import {
   SkeletonFlipNumber,
   SkeletonScoreboard,
 } from "@/components/ui/skeleton-loaders";
+import { START_DATA_COLLECTION_YEAR } from "@/constants";
 import type { MatchStatWithSamples } from "@/types/match-stats/response";
 
 const FLIP_NUMBERS_HEIGHT = 20;
@@ -84,9 +85,8 @@ export default function UnscoredMatchesSection({ className }: Props) {
 
   // Render loading state with skeleton UI
   if (isLoading) {
-    const startDataCollectionYear = 1981;
     const currentYear = new Date().getFullYear();
-    const yearsSinceStart = currentYear - startDataCollectionYear;
+    const yearsSinceStart = currentYear - START_DATA_COLLECTION_YEAR;
 
     return (
       <section className={`${className} bg-gray-900 overflow-hidden`}>
@@ -99,7 +99,7 @@ export default function UnscoredMatchesSection({ className }: Props) {
                 <span className="text-green-400">{yearsSinceStart}</span> years
                 of tennis matches since{" "}
                 <span className="text-green-400">
-                  {startDataCollectionYear}
+                  {START_DATA_COLLECTION_YEAR}
                 </span>
                 , some score combinations have still never occurred. This
                 project is designed to track and discover these missing

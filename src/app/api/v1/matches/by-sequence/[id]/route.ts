@@ -25,9 +25,15 @@ export async function GET(
   const year = url.searchParams.get("year");
   const sex = url.searchParams.get("sex")?.toLowerCase();
   const tournament = url.searchParams.get("tournament");
+  const sets = url.searchParams.get("sets");
   const limit = Math.min(Number(url.searchParams.get("limit") ?? 50), 50);
   const page = Math.max(1, Number(url.searchParams.get("page") ?? 1));
   const offset = (page - 1) * limit;
+
+  // Validate sets parameter if provided
+  if (sets && !["3", "5", "all"].includes(sets)) {
+    return bad("Sets parameter must be 3, 5, or all");
+  }
 
   const playerB = aliasedTable(player, "pb");
 
@@ -48,6 +54,9 @@ export async function GET(
     }
     if (tournament && tournament !== "all") {
       filters.push(eq(event.tournament_id, Number(tournament)));
+    }
+    if (sets && sets !== "all") {
+      filters.push(eq(matchSequenceStat.best_of, Number(sets)));
     }
 
     // 3) get TOTAL count before pagination

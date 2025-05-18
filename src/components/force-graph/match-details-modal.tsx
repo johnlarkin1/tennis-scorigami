@@ -1,4 +1,3 @@
-// src/components/force-graph/match-details-modal.tsx
 "use client";
 
 import {
@@ -9,7 +8,15 @@ import {
 } from "@/components/ui/dialog";
 import { SequenceInfo, SequenceMatch } from "@/types/sequence-matches/response";
 import { format } from "date-fns";
-import { CircleX, Loader2 } from "lucide-react";
+import {
+  Award,
+  CircleX,
+  Clock,
+  Loader2,
+  Sparkles,
+  Star,
+  TrendingUp,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 interface MatchDetailsModalProps {
@@ -19,6 +26,7 @@ interface MatchDetailsModalProps {
     year: string | null;
     sex: string | null;
     tournament: string | null;
+    sets: string | null;
   };
 }
 
@@ -40,6 +48,16 @@ export function MatchDetailsModal({
 
   const initialLoading = loading && page === 1;
   const loadingMore = loading && page > 1;
+
+  // Check if this is a rare sequence (less than 5 occurrences)
+  const isRareSequence = total > 0 && total < 5;
+
+  // Check if this is an historic sequence (first occurrence is very old)
+  const firstMatchYear =
+    matches.length > 0 ? Math.min(...matches.map((m) => m.event_year)) : null;
+  const currentYear = new Date().getFullYear();
+  const isHistoricSequence =
+    firstMatchYear && currentYear - firstMatchYear > 30;
 
   // Reset when modal opens or filters change
   useEffect(() => {
@@ -65,10 +83,12 @@ export function MatchDetailsModal({
           filters.sex === "Men and Women" ? "all" : filters.sex?.toLowerCase();
         const tournamentValue =
           filters.tournament === "All Tournaments" ? "all" : filters.tournament;
+        const setsValue = filters.sets === "All Sets" ? "all" : filters.sets;
 
         if (yearValue) params.append("year", yearValue);
         if (sexValue) params.append("sex", sexValue);
         if (tournamentValue) params.append("tournament", tournamentValue);
+        if (setsValue) params.append("sets", setsValue);
 
         params.append("page", page.toString());
         params.append("limit", limit.toString());
@@ -85,7 +105,7 @@ export function MatchDetailsModal({
         setSequence(data.sequence);
         setTotal(data.total);
 
-        // decide if there’s another page on the server
+        // decide if there's another page on the server
         const incoming: SequenceMatch[] = data.matches;
         setHasMore(incoming.length === limit);
 
@@ -136,11 +156,25 @@ export function MatchDetailsModal({
       >
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold flex items-center">
-            {initialLoading
-              ? "Loading sequence data…"
-              : sequence
-                ? `Score Sequence: ${sequence.slug}`
-                : "Sequence information"}
+            {initialLoading ? (
+              "Loading sequence data…"
+            ) : sequence ? (
+              <div className="flex items-center gap-2">
+                <span>Score Sequence: {sequence.slug}</span>
+                {isRareSequence && (
+                  <span className="inline-flex items-center bg-amber-800/60 text-amber-300 text-sm px-2 py-1 rounded-md">
+                    <Star className="h-4 w-4 mr-1" /> Rare Sequence
+                  </span>
+                )}
+                {isHistoricSequence && (
+                  <span className="inline-flex items-center bg-blue-800/60 text-blue-300 text-sm px-2 py-1 rounded-md">
+                    <Clock className="h-4 w-4 mr-1" /> Historic
+                  </span>
+                )}
+              </div>
+            ) : (
+              "Sequence information"
+            )}
           </DialogTitle>
         </DialogHeader>
 
@@ -154,32 +188,108 @@ export function MatchDetailsModal({
         )}
 
         {!initialLoading && !error && matches.length === 0 && (
-          <div className="bg-gray-800 rounded-md p-6 text-center mb-4">
+          <div className="bg-gradient-to-br from-red-900/20 to-red-800/30 border border-red-700/50 rounded-md p-6 text-center mb-4">
+            <Sparkles className="h-10 w-10 text-red-400 mx-auto mb-2" />
+            <p className="text-red-200 text-lg font-medium mb-2">
+              This may be an undiscovered sequence!
+            </p>
             <p className="text-gray-300 mb-2">
               No matches found with this score sequence.
             </p>
-            <p className="text-gray-400 text-sm">Try adjusting your filters.</p>
+            <p className="text-gray-400 text-sm">
+              Try adjusting your filters or explore the graph for other rare
+              sequences.
+            </p>
           </div>
         )}
 
         {matches.length > 0 && (
           <div className="space-y-4">
-            <div className="bg-gray-800 rounded-md p-4">
-              <p className="text-lg text-gray-300">
-                Found <span className="text-green-400 font-bold">{total}</span>{" "}
-                matches
-              </p>
+            <div
+              className={`rounded-md p-5 ${
+                isRareSequence
+                  ? "bg-gradient-to-r from-amber-900/50 to-amber-800/30 border border-amber-700"
+                  : isHistoricSequence
+                    ? "bg-gradient-to-r from-blue-900/50 to-blue-800/30 border border-blue-700"
+                    : "bg-gray-800"
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-lg">
+                  <span
+                    className={`font-bold ${isRareSequence ? "text-amber-300" : isHistoricSequence ? "text-blue-300" : "text-green-400"}`}
+                  >
+                    {total}
+                  </span>{" "}
+                  <span className="text-gray-300">matches found</span>
+                </p>
+
+                {isRareSequence && (
+                  <div className="flex items-center bg-amber-900/60 px-3 py-1 rounded-full">
+                    <Award className="h-4 w-4 text-amber-300 mr-2" />
+                    <span className="text-amber-200 text-sm">
+                      Statistical Rarity!
+                    </span>
+                  </div>
+                )}
+
+                {isHistoricSequence && !isRareSequence && (
+                  <div className="flex items-center bg-blue-900/60 px-3 py-1 rounded-full">
+                    <TrendingUp className="h-4 w-4 text-blue-300 mr-2" />
+                    <span className="text-blue-200 text-sm">
+                      Historic Pattern
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {isRareSequence && (
+                <p className="text-amber-200/80 text-sm mt-2">
+                  This sequence has only occurred in {total}{" "}
+                  {total === 1 ? "match" : "matches"} in recorded tennis
+                  history!
+                </p>
+              )}
+
+              {isHistoricSequence && (
+                <p className="text-blue-200/80 text-sm mt-2">
+                  This sequence first appeared in {firstMatchYear} -{" "}
+                  {currentYear - firstMatchYear} years ago!
+                </p>
+              )}
             </div>
 
             <div className="space-y-3">
               {matches.map((match) => (
                 <div
                   key={match.match_id}
-                  className="bg-gray-800 border border-gray-700 rounded-md p-4 hover:bg-gray-750 transition-colors"
+                  className={`${
+                    isRareSequence
+                      ? "bg-gradient-to-r from-gray-800 to-amber-900/10 border-amber-900/30"
+                      : isHistoricSequence &&
+                          match.event_year === firstMatchYear
+                        ? "bg-gradient-to-r from-gray-800 to-blue-900/10 border-blue-900/30"
+                        : "bg-gray-800 border-gray-700"
+                  } border rounded-md p-4 hover:bg-gray-750 transition-colors`}
                 >
                   <div className="flex justify-between mb-2">
-                    <span className="text-green-400 font-medium">
+                    <span
+                      className={`${
+                        isRareSequence
+                          ? "text-amber-400"
+                          : isHistoricSequence &&
+                              match.event_year === firstMatchYear
+                            ? "text-blue-400"
+                            : "text-green-400"
+                      } font-medium`}
+                    >
                       {match.event_name}
+                      {isHistoricSequence &&
+                        match.event_year === firstMatchYear && (
+                          <span className="ml-2 text-xs bg-blue-900/60 text-blue-200 px-1.5 py-0.5 rounded">
+                            First Occurrence
+                          </span>
+                        )}
                     </span>
                     <span className="text-gray-400">
                       {formatDate(match.match_start_time, match.event_year)}
@@ -206,7 +316,16 @@ export function MatchDetailsModal({
                       </div>
                     </div>
 
-                    <div className="bg-gray-900 px-3 py-2 rounded font-mono text-gray-300">
+                    <div
+                      className={`${
+                        isRareSequence
+                          ? "bg-amber-950"
+                          : isHistoricSequence &&
+                              match.event_year === firstMatchYear
+                            ? "bg-blue-950"
+                            : "bg-gray-900"
+                      } px-3 py-2 rounded font-mono text-gray-300`}
+                    >
                       {match.score || "Score not available"}
                     </div>
                   </div>

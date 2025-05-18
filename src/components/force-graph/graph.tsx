@@ -10,6 +10,7 @@ import {
   showEdgesAtom,
   showLabelsAtom,
 } from "@/components/force-graph/controls";
+import { DiscoveryModal } from "@/components/force-graph/discovery-modal";
 import { MatchDetailsModal } from "@/components/force-graph/match-details-modal";
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
 import { selectedTournamentAtom } from "@/store/tournament";
@@ -55,6 +56,24 @@ interface GraphData {
   nodes: NodeDTO[];
   links: GraphLink[];
 }
+
+// Banner to highlight unscored sequences
+const UnscoredBanner = ({ visible }: { visible: boolean }) => {
+  if (!visible) return null;
+
+  return (
+    <div className="absolute bottom-8 right-3 bg-gradient-to-r from-red-900/90 to-red-800/80 text-white px-4 py-3 rounded-lg shadow-lg backdrop-blur-sm max-w-xs z-10 border border-red-700/50">
+      <h3 className="font-bold mb-1 flex items-center">
+        <span className="text-red-400 mr-2">🔍</span>
+        Find Unscored Sequences
+      </h3>
+      <p className="text-sm text-gray-200">
+        Look for red nodes to discover score sequences that have never been
+        recorded in tennis history.
+      </p>
+    </div>
+  );
+};
 
 // Enhanced Legend component
 const Legend = ({
@@ -180,9 +199,16 @@ export const ForceGraph = () => {
   const [selectedSequenceId, setSelectedSequenceId] = useState<number | null>(
     null
   );
+  const [discoveryModalOpen, setDiscoveryModalOpen] = useState(false);
+  const [discoveredNode, setDiscoveredNode] = useState<NodeDTO | null>(null);
 
   /* ─ Graph data ─ */
   const [data, setData] = useState<GraphData>({ nodes: [], links: [] });
+
+  /* ─ Check if there are any unscored nodes ─ */
+  const hasUnscoredNodes = useMemo(() => {
+    return data.nodes.some((node) => !node.played && node.id !== ROOT_ID);
+  }, [data.nodes]);
 
   /* ─ Compute max depth for coloring ─ */
   const maxDepth = selectedSets;
@@ -416,14 +442,50 @@ export const ForceGraph = () => {
     [showLabels, nodeLabel, nodeVal, nodeColor, showEdges, data.nodes]
   );
 
-  const onNodeClick = useCallback((n: any) => {
-    if (n.id === ROOT_ID) return; // Don't open modal for root node
-    setSelectedSequenceId(n.id);
+  // Simple confetti effect for discoveries
+  const launchConfetti = useCallback(() => {
+    // Import and use confetti only on client side
+    import("canvas-confetti").then((confettiModule) => {
+      const confetti = confettiModule.default;
+
+      // Simple confetti burst
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+      });
+    });
   }, []);
 
-  // Handle modal close
-  const handleCloseModal = useCallback(() => {
+  const onNodeClick = useCallback(
+    (node: any) => {
+      if (node.id === ROOT_ID) return; // Don't open modal for root node
+
+      // Check if this is an unscored node
+      if (!node.played || node.occurrences === 0) {
+        console.log("Unscored node clicked:", node);
+
+        // Launch confetti (simple celebration)
+        launchConfetti();
+
+        // Open discovery modal
+        setDiscoveredNode(node);
+        setDiscoveryModalOpen(true);
+      } else {
+        // For scored nodes, use the regular match details modal
+        setSelectedSequenceId(node.id);
+      }
+    },
+    [launchConfetti]
+  );
+
+  // Handle modal closes
+  const handleCloseMatchModal = useCallback(() => {
     setSelectedSequenceId(null);
+  }, []);
+
+  const handleCloseDiscoveryModal = useCallback(() => {
+    setDiscoveryModalOpen(false);
   }, []);
 
   const graphKey = [
@@ -454,6 +516,10 @@ export const ForceGraph = () => {
             nodeRelSize={nodeStrength / 10}
             // onEngineStop={onEngineStop}
           />
+
+          {/* Show banner if there are unscored nodes */}
+          <UnscoredBanner visible={hasUnscoredNodes} />
+
           <div
             className="
               absolute
@@ -481,7 +547,7 @@ export const ForceGraph = () => {
       {/* Match Details Modal */}
       <MatchDetailsModal
         sequenceId={selectedSequenceId}
-        onClose={handleCloseModal}
+        onClose={handleCloseMatchModal}
         filters={{
           year: selectedYear || "All Years",
           sex: selectedSex || "Men and Women",
@@ -491,8 +557,17 @@ export const ForceGraph = () => {
             selectedTournament?.tournament_id
               ? String(selectedTournament.tournament_id)
               : "All Tournaments",
+          sets: String(selectedSets),
         }}
       />
+
+      {/* Discovery Modal for unscored nodes */}
+      {discoveryModalOpen && discoveredNode && (
+        <DiscoveryModal
+          node={discoveredNode}
+          onClose={handleCloseDiscoveryModal}
+        />
+      )}
     </div>
   );
 };
