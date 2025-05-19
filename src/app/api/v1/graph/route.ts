@@ -6,71 +6,72 @@ import { sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
-export const revalidate = 300; // 5-minute ISR / CDN cache
+export const revalidate = 300;
 
-/**
- * We manually add a "root" node to the graph, which is a dummy node that
- * represents all the nodes in the graph. This is because the graph is
- * directed and we need to ensure that there are no cycles.
- */
-const ROOT_ID = 0; // pick an ID that never collides
+const ROOT_ID = 0;
 const ROOT_SLUG = "love-all";
-
 const rootNode: NodeDTO = {
   id: ROOT_ID,
   slug: ROOT_SLUG,
   played: false,
   depth: 0,
-  occurrences: 0, // or you could sum all depth=1 occurrences
+  occurrences: 0,
   norm: 0,
 };
 
-/**
- * Throws if it finds any directed cycle in edges.
- */
 function assertNoCycles(nodes: NodeDTO[], edges: EdgeDTO[]) {
-  // build adjacency list
   const adj = new Map<number, number[]>();
   for (const { frm, to } of edges) {
     if (frm === to) throw new Error(`Self-loop at node ${frm}`);
     adj.set(frm, (adj.get(frm) || []).concat(to));
   }
-
   const visiting = new Set<number>();
   const visited = new Set<number>();
-
   function dfs(u: number) {
     visiting.add(u);
     for (const v of adj.get(u) || []) {
-      if (visiting.has(v)) {
-        throw new Error(`Cycle detected: ${u} → ${v}`);
-      }
+      if (visiting.has(v)) throw new Error(`Cycle detected: ${u} → ${v}`);
       if (!visited.has(v)) dfs(v);
     }
     visiting.delete(u);
     visited.add(u);
   }
-
-  for (const { id } of nodes) {
-    if (!visited.has(id)) dfs(id);
-  }
+  for (const { id } of nodes) if (!visited.has(id)) dfs(id);
 }
 
 export async function GET(req: NextRequest) {
-  /* 1) parse & validate */
+  /* 1) parse + validate */
   const url = new URL(req.url);
   const sets = Number(url.searchParams.get("sets") ?? "5");
-  const sex = (url.searchParams.get("gender") ?? "all").toLowerCase();
+  const sex = (url.searchParams.get("sex") ?? "all").toLowerCase();
+  const yearRaw = url.searchParams.get("year") ?? "all";
+  const tournRaw = url.searchParams.get("tournament") ?? "all";
+
+  let year: number | null = null;
+  if (yearRaw !== "all") {
+    const y = Number(yearRaw);
+    if (isNaN(y)) return bad("year must be a number or 'all'");
+    year = y;
+  }
+
+  let tournament: number | null = null;
+  if (tournRaw !== "all") {
+    const t = Number(tournRaw);
+    if (isNaN(t)) return bad("tournament must be a number or 'all'");
+    tournament = t;
+  }
+
   if (![3, 5].includes(sets)) return bad("sets must be 3 or 5");
   if (!["men", "women", "all"].includes(sex))
     return bad("gender must be men|women|all");
   if (sets === 5 && sex === "women")
     return bad("women only play best of 3 sets");
 
-  /* 2) select your materialized views */
+  /* 2) pick views */
   type ViewKey = "3-men" | "3-women" | "3-all" | "5-men" | "5-women" | "5-all";
   const key = `${sets}-${sex}` as ViewKey;
-  const nodesViewMap: Record<ViewKey, string> = {
+
+  const detNodes: Record<ViewKey, string> = {
     "3-men": "mv_graph_nodes_3_men",
     "3-women": "mv_graph_nodes_3_women",
     "3-all": "mv_graph_nodes_3",
@@ -78,7 +79,7 @@ export async function GET(req: NextRequest) {
     "5-women": "mv_graph_nodes_5_women",
     "5-all": "mv_graph_nodes_5_men",
   };
-  const edgesViewMap: Record<ViewKey, string> = {
+  const detEdges: Record<ViewKey, string> = {
     "3-men": "mv_graph_edges_3_men",
     "3-women": "mv_graph_edges_3_women",
     "3-all": "mv_graph_edges_3",
@@ -86,63 +87,111 @@ export async function GET(req: NextRequest) {
     "5-women": "mv_graph_edges_5_women",
     "5-all": "mv_graph_edges_5_men",
   };
-  const nodesView = nodesViewMap[key];
-  const edgesView = edgesViewMap[key];
+  const allNodes: Record<ViewKey, string> = {
+    "3-men": "mv_graph_nodes_3_men_all",
+    "3-women": "mv_graph_nodes_3_women_all",
+    "3-all": "mv_graph_nodes_3_all",
+    "5-men": "mv_graph_nodes_5_men_all",
+    "5-women": "mv_graph_nodes_5_women_all",
+    "5-all": "mv_graph_nodes_5_men",
+  };
+  const allEdges: Record<ViewKey, string> = {
+    "3-men": "mv_graph_edges_3_men_all",
+    "3-women": "mv_graph_edges_3_women_all",
+    "3-all": "mv_graph_edges_3_all",
+    "5-men": "mv_graph_edges_5_men_all",
+    "5-women": "mv_graph_edges_5_women_all",
+    "5-all": "mv_graph_edges_5_all",
+  };
+
+  const useRollup = year === null && tournament === null;
+  const nodesView = useRollup ? allNodes[key] : detNodes[key];
+  const edgesView = useRollup ? allEdges[key] : detEdges[key];
+
+  console.log(
+    `params: sets=${sets}, sex=${sex}, year=${yearRaw}, tourn=${tournRaw}`
+  );
+  console.log(
+    `views: nodes=${nodesView}, edges=${edgesView} (${useRollup ? "global" : "detailed"})`
+  );
 
   /* 3) fetch nodes */
-  const rawNodes = (await db
-    .select({
-      id: sql<number>`id`,
-      slug: sql<string>`slug`,
-      depth: sql<number>`depth`,
-      played: sql<boolean>`played`,
-      occurrences: sql<number>`occurrences`,
-    })
-    .from(sql.raw(nodesView))
-    .orderBy(sql`depth`)
-    .execute()) as Array<{
-    id: number;
-    slug: string;
-    depth: number;
-    played: boolean;
-    occurrences: number;
-  }>;
+  let rawNodes;
+  if (useRollup) {
+    rawNodes = await db
+      .select({
+        id: sql<number>`id`,
+        slug: sql<string>`slug`,
+        depth: sql<number>`depth`,
+        played: sql<boolean>`played`,
+        occurrences: sql<number>`occurrences`,
+      })
+      .from(sql.raw(`${allNodes[key]}`))
+      .orderBy(sql`depth`)
+      .execute();
+  } else {
+    // detailed: inline the LEFT JOIN of aggregated stats
+    rawNodes = await db
+      .select({
+        id: sql<number>`b.id`,
+        slug: sql<string>`b.slug`,
+        depth: sql<number>`b.depth`,
+        played: sql<boolean>`COALESCE(f.played, FALSE)`,
+        occurrences: sql<number>`COALESCE(f.occurrences, 0)`,
+      })
+      .from(
+        sql.raw(`
+        ${allNodes[key]} AS b
+        LEFT JOIN (
+          SELECT
+            d.id,
+            BOOL_OR(d.played)   AS played,
+            SUM(d.occurrences)  AS occurrences
+          FROM ${detNodes[key]} AS d
+          INNER JOIN event AS e
+            ON d.event_id = e.event_id
+          WHERE
+            ${year !== null ? `e.event_year = ${year}::int` : `TRUE`}
+            AND ${tournament !== null ? `e.tournament_id = ${tournament}::int` : `TRUE`}
+          GROUP BY d.id
+        ) AS f
+          ON f.id = b.id
+      `)
+      )
+      .orderBy(sql`b.depth`)
+      .execute();
+  }
 
-  /* 4) compute norm */
+  console.log(`Fetched ${rawNodes.length} nodes`);
+
+  /* 4) normalize */
   const maxOcc = rawNodes.reduce((m, n) => Math.max(m, n.occurrences), 1);
-  const nodes: NodeDTO[] = rawNodes.map((n) => ({
+  const nodes = rawNodes.map((n) => ({
     ...n,
     norm: n.occurrences / maxOcc,
   }));
 
-  const rootEdges: EdgeDTO[] = nodes
+  /* 5) root edges */
+  const rootEdges = nodes
     .filter((n) => n.depth === 1)
     .map((n) => ({ frm: ROOT_ID, to: n.id }));
 
-  /* 5) fetch edges */
-  const rawEdges = (await db
+  /* 6) fetch + assemble edges */
+  const rawEdges = await db
     .select({
       frm: sql<number>`frm`,
-      to: sql<number>`"to"`, // quoted reserved word
+      to: sql<number>`"to"`,
     })
     .from(sql.raw(edgesView))
-    .execute()) as Array<{ frm: number; to: number }>;
-  const edges: EdgeDTO[] = rawEdges.map((e) => ({ frm: e.frm, to: e.to }));
+    .execute();
 
+  const edges: EdgeDTO[] = [
+    ...rootEdges,
+    ...rawEdges.map((e) => ({ frm: e.frm, to: e.to })),
+  ];
+
+  /* 7) respond */
   nodes.unshift(rootNode);
-  edges.unshift(...rootEdges);
-
-  /* 6) cycle-detect only */
-  try {
-    assertNoCycles(nodes, edges);
-  } catch (err: any) {
-    console.error(err.message);
-    return bad(err.message);
-  }
-  /* 6.5) log node and edge counts */
-  console.log(`[API] Graph data: ${nodes.length} nodes, ${edges.length} edges`);
-
-  /* 7) return clean data */
   return NextResponse.json(
     { nodes, edges },
     {

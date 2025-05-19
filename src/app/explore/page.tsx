@@ -21,9 +21,9 @@ export default function ExplorePage() {
         </h2>
         <p className="text-md text-gray-300 max-w-3xl mx-auto text-center mt-3">
           This graph (really tree, see more in our technical discussion) is
-          meant to show all possible score sequences in tennis matches. You can
-          filter by tournament, year, and division. Click the gear icon on the
-          left to adjust the parameters. Click on nodes to see more detail.
+          meant to show all possible score sequences in tennis matches. Click
+          the gear icon on the left to adjust the parameters. Click on nodes to
+          see more detail.
         </p>
       </div>
 

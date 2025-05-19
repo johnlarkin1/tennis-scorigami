@@ -241,7 +241,7 @@ export const ForceGraph = () => {
     async function fetchGraph() {
       const qs = new URLSearchParams({
         year: selectedYear ? convertYearFilter(selectedYear.toString()) : "",
-        gender: convertSexFilter(selectedSex ?? ""),
+        sex: convertSexFilter(selectedSex ?? ""),
         sets: selectedSets.toString(),
       });
 
