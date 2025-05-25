@@ -18,7 +18,14 @@ import { convertSexFilter, convertYearFilter } from "@/utils/filter-converters";
 import { scaleLinear } from "d3-scale";
 import { useAtom } from "jotai";
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { ForceGraphMethods } from "react-force-graph-3d";
 import { useResizeDetector } from "react-resize-detector";
 import SpriteText from "three-spritetext";
@@ -205,6 +212,9 @@ export const ForceGraph = () => {
 
   /* ─ Graph data ─ */
   const [data, setData] = useState<GraphData>({ nodes: [], links: [] });
+  // Loading and progress state
+  const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0); // For future use
 
   /* ─ Check if there are any unscored nodes ─ */
   const hasUnscoredNodes = useMemo(() => {
@@ -239,51 +249,59 @@ export const ForceGraph = () => {
   /* ─ Fetch + sanitize + inject love-all root ─ */
   useEffect(() => {
     async function fetchGraph() {
-      const qs = new URLSearchParams({
-        year: selectedYear ? convertYearFilter(selectedYear.toString()) : "",
-        sex: convertSexFilter(selectedSex ?? ""),
-        sets: selectedSets.toString(),
-      });
+      setLoading(true);
+      try {
+        const qs = new URLSearchParams({
+          year: selectedYear ? convertYearFilter(selectedYear.toString()) : "",
+          sex: convertSexFilter(selectedSex ?? ""),
+          sets: selectedSets.toString(),
+        });
 
-      const { nodes: rawNodes, edges: rawEdges } = (await (
-        await fetch(`/api/v1/graph?${qs}`)
-      ).json()) as { nodes: NodeDTO[]; edges: EdgeDTO[] };
+        const { nodes: rawNodes, edges: rawEdges } = (await (
+          await fetch(`/api/v1/graph?${qs}`)
+        ).json()) as { nodes: NodeDTO[]; edges: EdgeDTO[] };
 
-      // dedupe & sanitize
-      const deduped = Array.from(
-        new Map(rawEdges.map((e) => [`${e.frm}-${e.to}`, e])).values()
-      );
-      const nodeIds = new Set(rawNodes.map((n) => n.id));
-      const valid = deduped.filter(
-        (e) => nodeIds.has(e.frm) && nodeIds.has(e.to)
-      );
+        // dedupe & sanitize
+        const deduped = Array.from(
+          new Map(rawEdges.map((e) => [`${e.frm}-${e.to}`, e])).values()
+        );
+        const nodeIds = new Set(rawNodes.map((n) => n.id));
+        const valid = deduped.filter(
+          (e) => nodeIds.has(e.frm) && nodeIds.has(e.to)
+        );
 
-      // remap
-      let nodes = rawNodes.slice();
-      let links = valid.map((e) => ({ source: e.frm, target: e.to }));
+        // remap
+        let nodes = rawNodes.slice();
+        let links = valid.map((e) => ({ source: e.frm, target: e.to }));
 
-      // inject love-all root
-      if (!nodes.some((n) => n.depth === 0)) {
-        nodes = [
-          {
-            id: ROOT_ID,
-            slug: "love-all",
-            played: false,
-            depth: 0,
-            occurrences: 0,
-            norm: 0,
-          },
-          ...nodes,
-        ];
-        const rootLinks = nodes
-          .filter((n) => n.depth === 1)
-          .map((n) => ({ source: ROOT_ID, target: n.id }));
-        links = [...rootLinks, ...links];
+        // inject love-all root
+        if (!nodes.some((n) => n.depth === 0)) {
+          nodes = [
+            {
+              id: ROOT_ID,
+              slug: "love-all",
+              played: false,
+              depth: 0,
+              occurrences: 0,
+              norm: 0,
+            },
+            ...nodes,
+          ];
+          const rootLinks = nodes
+            .filter((n) => n.depth === 1)
+            .map((n) => ({ source: ROOT_ID, target: n.id }));
+          links = [...rootLinks, ...links];
+        }
+
+        setData({ nodes, links });
+      } finally {
+        setLoading(false);
       }
-
-      setData({ nodes, links });
     }
-    fetchGraph().catch(console.error);
+    fetchGraph().catch((err) => {
+      setLoading(false);
+      console.error(err);
+    });
   }, [selectedYear, selectedSex, selectedSets]);
 
   /* ─ onEngineStop ⇒ center & zoom to fit ─ */
@@ -497,8 +515,31 @@ export const ForceGraph = () => {
   /* ─ Render ─ */
   return (
     <div ref={wrapperRef} className="relative w-full h-full overflow-hidden">
-      {width && height && (
-        <>
+      {loading && (
+        <div className="absolute inset-0 z-50 bg-black/40 flex items-center justify-center">
+          <svg
+            className="animate-spin h-12 w-12 text-gray-300"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+              fill="none"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v8z"
+            />
+          </svg>
+        </div>
+      )}
+      {width && height && !loading && (
+        <Fragment>
           <ForceGraph3D
             key={graphKey}
             width={width}
@@ -536,7 +577,7 @@ export const ForceGraph = () => {
             <p>Right-click: pan</p>
           </div>
           <Legend colorMode={colorMode} maxDepth={maxDepth} data={data} />
-        </>
+        </Fragment>
       )}
       <div className="absolute bottom-2 right-3 text-xs text-gray-500">
         layout {graphLayout} | density {graphDensity}% | strength {nodeStrength}

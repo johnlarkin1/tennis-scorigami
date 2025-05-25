@@ -193,7 +193,7 @@ export async function GET(req: NextRequest) {
   /* 7) respond */
   nodes.unshift(rootNode);
   return NextResponse.json(
-    { nodes, edges },
+    { nodes, edges, progress: 1 },
     {
       headers: {
         "Content-Type": "application/json",
