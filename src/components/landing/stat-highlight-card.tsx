@@ -22,7 +22,7 @@ export const StatHighlightCard: React.FC<StatHighlightCardProps> = ({
         {categoryTitle}
       </h3>
       <p className="text-gray-300 mb-6 text-center text-sm">
-        For {genderDisplay}'s matches of {stat.best_of} set length, there are:
+        For {genderDisplay}&apos;s matches of {stat.best_of} set length, there are:
       </p>
 
       <div className="space-y-5 flex-grow">

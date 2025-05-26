@@ -50,9 +50,6 @@ const FREQUENCY_LEGEND = [
 
 // Graph constants
 const ROOT_ID = 0;
-const BASE_RADIUS = 60;
-const RADIUS_INCREMENT = 80;
-const REPULSION_STRENGTH = -80;
 
 // Dynamically load only on client
 const ForceGraph3D = dynamic(() => import("react-force-graph-3d"), {
@@ -212,9 +209,8 @@ export const ForceGraph = () => {
 
   /* ─ Graph data ─ */
   const [data, setData] = useState<GraphData>({ nodes: [], links: [] });
-  // Loading and progress state
+  // Loading state
   const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState(0); // For future use
 
   /* ─ Check if there are any unscored nodes ─ */
   const hasUnscoredNodes = useMemo(() => {
@@ -226,7 +222,7 @@ export const ForceGraph = () => {
 
   /* ─ Depth-based occurrence scales ─ */
   const depthScales = useMemo(() => {
-    const scales: Record<number, any> = {};
+    const scales: Record<number, ReturnType<typeof scaleLinear>> = {};
     const nodesByDepth = data.nodes.reduce(
       (acc, node) => {
         if (!acc[node.depth]) acc[node.depth] = [];
@@ -304,26 +300,10 @@ export const ForceGraph = () => {
     });
   }, [selectedYear, selectedSex, selectedSets]);
 
-  /* ─ onEngineStop ⇒ center & zoom to fit ─ */
-  const onEngineStop = useCallback(() => {
-    const fg = fgRef.current;
-    if (!fg) return;
-    fg.zoomToFit(400, 0.9);
-    fg.cameraPosition(
-      { x: 0, y: 0, z: fg.camera().position.z },
-      { x: 0, y: 0, z: 0 },
-      0
-    );
-  }, []);
-
-  /* ─ Calculate ring radius for each depth level ─ */
-  const ringRadius = useCallback((depth: number) => {
-    return depth === 0 ? 0 : BASE_RADIUS + (depth - 1) * RADIUS_INCREMENT;
-  }, []);
 
   /* ─ Node styling ─ */
   const nodeColor = useCallback(
-    (n: any) => {
+    (n: NodeDTO) => {
       // Root node
       if (n.id === ROOT_ID) return DEPTH_COLORS[0];
 
@@ -349,7 +329,7 @@ export const ForceGraph = () => {
     [colorMode, depthScales]
   );
 
-  const nodeVal = useCallback((n: any) => {
+  const nodeVal = useCallback((n: NodeDTO) => {
     if (n.id === ROOT_ID) return 200; // Make root slightly larger
     // Scale node size based on occurrences
     const baseSize = Math.max(n.norm * 100, 1); // Fixed: multiply by 100 instead of 10
@@ -358,7 +338,7 @@ export const ForceGraph = () => {
   }, []);
 
   /* ─ Enhanced tooltip ─ */
-  const nodeLabel = useCallback((n: any) => {
+  const nodeLabel = useCallback((n: NodeDTO) => {
     const parts = [`Score: ${n.slug}`];
     if (n.id !== ROOT_ID) {
       parts.push(`Depth: ${n.depth}`);
@@ -395,7 +375,7 @@ export const ForceGraph = () => {
       nodeCanvasObject: showLabels
         ? (
             n: { slug: string | undefined; x: number; y: number },
-            ctx: any,
+            ctx: CanvasRenderingContext2D,
             globalScale: number
           ) => {
             const label = n.slug;
@@ -417,15 +397,13 @@ export const ForceGraph = () => {
         : undefined,
       nodeCanvasObjectMode: () => "after", // draw text on top of nodes
 
-      nodeDescription: (n: any) => nodeLabel(n),
-      linkColor: (link: any) => {
+      nodeDescription: (n: NodeDTO) => nodeLabel(n),
+      linkColor: (link: { source: { id: number } | number; target: { id: number } | number }) => {
         // Make links more visible with gradient based on depth
-        const source = data.nodes.find(
-          (n) => n.id === link.source?.id || n.id === link.source
-        );
-        const target = data.nodes.find(
-          (n) => n.id === link.target?.id || n.id === link.target
-        );
+        const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+        const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+        const source = data.nodes.find((n) => n.id === sourceId);
+        const target = data.nodes.find((n) => n.id === targetId);
         if (!source || !target) return "#666";
 
         // Higher depth links get brighter colors
@@ -433,14 +411,12 @@ export const ForceGraph = () => {
         const brightness = 40 + maxDepth * 15;
         return `hsl(200, 70%, ${brightness}%)`;
       },
-      linkWidth: (link: any) => {
+      linkWidth: (link: { source: { id: number } | number; target: { id: number } | number }) => {
         // Vary link width based on connection depth
-        const source = data.nodes.find(
-          (n) => n.id === link.source?.id || n.id === link.source
-        );
-        const target = data.nodes.find(
-          (n) => n.id === link.target?.id || n.id === link.target
-        );
+        const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+        const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+        const source = data.nodes.find((n) => n.id === sourceId);
+        const target = data.nodes.find((n) => n.id === targetId);
         if (!source || !target) return 1;
 
         // Connections to higher depths are thicker
@@ -474,7 +450,7 @@ export const ForceGraph = () => {
   }, []);
 
   const onNodeClick = useCallback(
-    (node: any) => {
+    (node: NodeDTO) => {
       if (node.id === ROOT_ID) return; // Don't open modal for root node
 
       // Check if this is an unscored node
@@ -545,7 +521,7 @@ export const ForceGraph = () => {
             width={width}
             height={height}
             style={{ display: "block" }}
-            // @ts-ignore
+            // @ts-expect-error - ForceGraph3D ref type incompatibility
             ref={(inst) => (fgRef.current = inst!)}
             graphData={data}
             {...graphProps}

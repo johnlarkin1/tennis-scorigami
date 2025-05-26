@@ -149,7 +149,7 @@ export const KeyStatsSection: React.FC<KeyStatsSectionProps> = ({
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
         >
-          {displayableStats.map(({ stat, title }, index) =>
+          {displayableStats.map(({ stat, title }) =>
             stat ? (
               <motion.div
                 key={`${stat.gender}-${stat.best_of}`}

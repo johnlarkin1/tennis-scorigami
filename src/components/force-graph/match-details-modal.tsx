@@ -120,9 +120,9 @@ export function MatchDetailsModal({
             (m) => !prev.some((p) => p.match_id === m.match_id)
           ),
         ]);
-      } catch (err: any) {
+      } catch (err) {
         console.error(err);
-        setError(err.message || "Failed to load match data");
+        setError(err instanceof Error ? err.message : "Failed to load match data");
       } finally {
         setLoading(false);
       }

@@ -9,13 +9,10 @@ import { useResizeDetector } from "react-resize-detector";
 
 import {
   graphColorModeAtom,
-  graphDensityAtom,
-  graphLayoutAtom,
   selectedSetsAtom,
   selectedSexAtom,
   selectedYearAtom,
   showEdgesAtom,
-  showLabelsAtom,
 } from "@/components/force-graph/controls";
 import type { NodeDTO } from "@/lib/types";
 
@@ -52,10 +49,7 @@ export const ForceGraphStream = () => {
   const { width, height, ref: wrapperRef } = useResizeDetector();
 
   /* UI atoms */
-  const [graphLayout] = useAtom(graphLayoutAtom);
-  const [showLabels] = useAtom(showLabelsAtom);
   const [colorMode] = useAtom(graphColorModeAtom);
-  const [graphDensity] = useAtom(graphDensityAtom);
   const [showEdges] = useAtom(showEdgesAtom);
   const [selectedYear] = useAtom(selectedYearAtom);
   const [selectedSex] = useAtom(selectedSexAtom);
@@ -170,7 +164,7 @@ export const ForceGraphStream = () => {
 
   /* ─── callbacks & graph props ───────────────────────────────────────────── */
   const nodeColor = useCallback(
-    (n: any) => {
+    (n: NodeDTO) => {
       if (n.id === ROOT_ID) return DEPTH_COLORS[0];
       if (!n.played || n.occurrences === 0) return NEVER_OCCURRED_COLOR;
 
@@ -184,12 +178,12 @@ export const ForceGraphStream = () => {
     [colorMode, depthScales]
   );
 
-  const nodeVal = useCallback((n: any) => {
+  const nodeVal = useCallback((n: NodeDTO) => {
     if (n.id === ROOT_ID) return 200;
     return Math.max(n.norm * 100, 1) + Math.log(n.occurrences + 1) * 2 + 3;
   }, []);
 
-  const nodeLabel = useCallback((n: any) => {
+  const nodeLabel = useCallback((n: NodeDTO) => {
     const parts = [`Score: ${n.slug}`];
     if (n.id !== ROOT_ID) {
       parts.push(`Depth: ${n.depth}`);
@@ -207,16 +201,16 @@ export const ForceGraphStream = () => {
       nodeColor,
       nodeThreeObjectExtend: true,
       nodeDescription: nodeLabel,
-      linkColor: (l: any) => {
-        const s = data.nodes.find((n) => n.id === (l.source as any).id);
-        const t = data.nodes.find((n) => n.id === (l.target as any).id);
+      linkColor: (l: GraphLink) => {
+        const s = data.nodes.find((n) => n.id === (l.source as number));
+        const t = data.nodes.find((n) => n.id === (l.target as number));
         if (!s || !t) return "#666";
         const d = Math.max(s.depth, t.depth);
         return `hsl(200,70%,${40 + d * 15}%)`;
       },
-      linkWidth: (l: any) => {
-        const s = data.nodes.find((n) => n.id === (l.source as any).id);
-        const t = data.nodes.find((n) => n.id === (l.target as any).id);
+      linkWidth: (l: GraphLink) => {
+        const s = data.nodes.find((n) => n.id === (l.source as number));
+        const t = data.nodes.find((n) => n.id === (l.target as number));
         if (!s || !t) return 1;
         return 1 + Math.max(s.depth, t.depth) * 0.5;
       },
@@ -231,7 +225,7 @@ export const ForceGraphStream = () => {
     [data.nodes, nodeColor, nodeLabel, nodeVal, showEdges]
   );
 
-  const onNodeClick = useCallback((n: any) => {
+  const onNodeClick = useCallback((n: NodeDTO) => {
     alert(
       [
         `Score: ${n.slug}`,
@@ -261,7 +255,7 @@ export const ForceGraphStream = () => {
             <ForceGraph3D
               width={width}
               height={height}
-              // @ts-ignore
+              // @ts-expect-error - ForceGraph3D ref type incompatibility
               ref={(inst) => (fgRef.current = inst!)}
               graphData={data}
               {...graphProps}

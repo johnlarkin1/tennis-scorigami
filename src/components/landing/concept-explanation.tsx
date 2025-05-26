@@ -50,7 +50,7 @@ export const ConceptExplanation = () => {
             >
               Tennis Scorigami is the concept of tracking unique score
               combinations that have occurred in professional tennis matches.
-              Inspired by Jon Bois's Football Scorigami, this project explores
+              Inspired by Jon Bois&apos;s Football Scorigami, this project explores
               the mathematical possibilities of tennis scoring and documents
               which score patterns have been achieved and which remain
               theoretical.
@@ -121,12 +121,12 @@ export const ConceptExplanation = () => {
               </h3>
               <ul className="list-disc pl-6 text-gray-300 space-y-3">
                 <li>
-                  Women's tennis has a higher completion percentage in best-of-3
-                  matches (99.59%) compared to men's (98.64%).
+                  Women&apos;s tennis has a higher completion percentage in best-of-3
+                  matches (99.59%) compared to men&apos;s (98.64%).
                 </li>
                 <li>
                   Only 8.47% of the theoretically possible score combinations in
-                  men's best-of-5 matches have ever occurred.
+                  men&apos;s best-of-5 matches have ever occurred.
                 </li>
                 <li>
                   Some score combinations that seem plausible have never

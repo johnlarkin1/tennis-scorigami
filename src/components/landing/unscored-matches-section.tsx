@@ -363,7 +363,7 @@ export default function UnscoredMatchesSection({ className }: Props) {
           </h3>
           <p className="text-gray-300 max-w-2xl mx-auto">
             Below are examples of score combinations that have never happened in
-            professional {currentStat.gender.toLowerCase()}'s best-of-
+            professional {currentStat.gender.toLowerCase()}&apos;s best-of-
             {currentStat.best_of} tennis matches. These are just a few of the{" "}
             {currentStat.total_never_occurred.toLocaleString()} missing
             scorelines.

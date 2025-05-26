@@ -1,4 +1,5 @@
 // src/types/3d-force-graph.d.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 declare module "3d-force-graph" {
   interface ForceGraph3DInstance {
