@@ -38,7 +38,7 @@
 
 - **Next.js:** The core of the web application, enabling SSR, API routes, and a modern developer experience.
 - **SigmaJS:** (Planned) For rendering and interacting with large, complex score graphs in the browser.
-- **Drizzle ORM:** (Planned) For type-safe, efficient database queries and mutations from the Next.js app.
+- **Drizzle ORM:** For type-safe, efficient database queries and mutations from the Next.js app.
 - **Python Ingestion:** Handles all heavy data lifting, ETL, and ensures the database is always up-to-date with the latest tennis results.
 
 ---

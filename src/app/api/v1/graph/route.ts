@@ -101,7 +101,7 @@ export async function GET(req: NextRequest) {
     "3-all": "mv_graph_edges_3_all",
     "5-men": "mv_graph_edges_5_men_all",
     "5-women": "mv_graph_edges_5_women_all",
-    "5-all": "mv_graph_edges_5_all",
+    "5-all": "mv_graph_edges_5_men",
   };
 
   const useRollup = year === null && tournament === null;
