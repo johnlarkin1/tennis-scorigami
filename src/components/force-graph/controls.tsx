@@ -44,13 +44,10 @@ export const selectedYearAtom = atom<string>("All Years");
 export const selectedSexAtom = atom<SexType>("Men and Women");
 export const selectedSetsAtom = atom<3 | 5>(3);
 
-// Tournament-specific set mappings
-const GRAND_SLAM_TOURNAMENTS = [
-  "Australian Open",
-  "French Open",
-  "Wimbledon",
-  "US Open",
-];
+// Tournament-specific set mappings - check if it's a Grand Slam by event_abbr
+const isGrandSlamTournament = (tournament: { event_type?: { event_abbr?: string } }) => {
+  return tournament?.event_type?.event_abbr === "G";
+};
 
 type ForceGraphControlsProps = {
   className?: string;
@@ -88,9 +85,7 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
   useEffect(() => {
     if (selectedTournament && selectedTournament.name !== "All Tournaments") {
       // For Grand Slam tournaments, men play best of 5
-      const isGrandSlam = GRAND_SLAM_TOURNAMENTS.includes(
-        selectedTournament.name
-      );
+      const isGrandSlam = isGrandSlamTournament(selectedTournament);
       if (isGrandSlam && selectedSex !== "Women") {
         setSelectedSets(5);
       } else {
@@ -103,7 +98,7 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
   const isFiveSetsDisabled =
     selectedSex === "Women" ||
     (selectedTournament.name !== "All Tournaments" &&
-      !GRAND_SLAM_TOURNAMENTS.includes(selectedTournament.name));
+      !isGrandSlamTournament(selectedTournament));
 
   return (
     <div className={`${className} space-y-6`}>

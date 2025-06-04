@@ -2,7 +2,7 @@ import { defaultAllTournament } from "@/store/tournament";
 import { InitialScore } from "@/types/initial-score";
 import { AggregatedMatchScore } from "@/types/set-score";
 import { SexType } from "@/types/tree-control-types";
-import { Tournament } from "../types/tournament";
+import { Tournament, TournamentGroup } from "../types/tournament";
 
 export const fetchMatches = async (
   setNumber: number,
@@ -104,5 +104,14 @@ export const fetchTournaments = async (): Promise<Tournament[]> => {
     throw new Error("Failed to fetch tournaments");
   }
   const data: Tournament[] = await response.json();
+  return data;
+};
+
+export const fetchTournamentGroups = async (): Promise<TournamentGroup[]> => {
+  const response = await fetch("/api/v1/tournaments");
+  if (!response.ok) {
+    throw new Error("Failed to fetch tournament groups");
+  }
+  const data: TournamentGroup[] = await response.json();
   return data;
 };

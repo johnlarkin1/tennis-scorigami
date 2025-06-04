@@ -12,6 +12,10 @@ import {
 } from "@/components/force-graph/controls";
 import { DiscoveryModal } from "@/components/force-graph/discovery-modal";
 import { MatchDetailsModal } from "@/components/force-graph/match-details-modal";
+// Dynamic import for SigmaGraph to prevent SSR issues
+const SigmaGraph = dynamic(() => import("@/components/force-graph/sigma-graph").then(mod => ({ default: mod.SigmaGraph })), {
+  ssr: false,
+});
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
 import { selectedTournamentAtom } from "@/store/tournament";
 import { convertSexFilter, convertYearFilter } from "@/utils/filter-converters";
@@ -251,6 +255,9 @@ export const ForceGraph = () => {
           year: selectedYear ? convertYearFilter(selectedYear.toString()) : "",
           sex: convertSexFilter(selectedSex ?? ""),
           sets: selectedSets.toString(),
+          tournament: selectedTournament && selectedTournament.tournament_id > 0 
+            ? selectedTournament.tournament_id.toString() 
+            : "all",
         });
 
         const { nodes: rawNodes, edges: rawEdges } = (await (
@@ -298,7 +305,7 @@ export const ForceGraph = () => {
       setLoading(false);
       console.error(err);
     });
-  }, [selectedYear, selectedSex, selectedSets]);
+  }, [selectedYear, selectedSex, selectedSets, selectedTournament]);
 
 
   /* ─ Node styling ─ */
@@ -516,21 +523,30 @@ export const ForceGraph = () => {
       )}
       {width && height && !loading && (
         <Fragment>
-          <ForceGraph3D
-            key={graphKey}
-            width={width}
-            height={height}
-            style={{ display: "block" }}
-            // @ts-expect-error - ForceGraph3D ref type incompatibility
-            ref={(inst) => (fgRef.current = inst!)}
-            graphData={data}
-            {...graphProps}
-            onNodeClick={onNodeClick}
-            showNavInfo={false}
-            enableNodeDrag={true}
-            nodeRelSize={nodeStrength / 10}
-            // onEngineStop={onEngineStop}
-          />
+          {graphLayout === "2d" ? (
+            <SigmaGraph
+              selectedSets={selectedSets}
+              selectedSex={selectedSex || ""}
+              selectedYear={selectedYear || ""}
+              className="w-full h-full"
+            />
+          ) : (
+            <ForceGraph3D
+              key={graphKey}
+              width={width}
+              height={height}
+              style={{ display: "block" }}
+              // @ts-expect-error - ForceGraph3D ref type incompatibility
+              ref={(inst) => (fgRef.current = inst!)}
+              graphData={data}
+              {...graphProps}
+              onNodeClick={onNodeClick}
+              showNavInfo={false}
+              enableNodeDrag={true}
+              nodeRelSize={nodeStrength / 10}
+              // onEngineStop={onEngineStop}
+            />
+          )}
 
           {/* Show banner if there are unscored nodes */}
           <UnscoredBanner visible={hasUnscoredNodes} />
@@ -552,7 +568,11 @@ export const ForceGraph = () => {
             <p>Mouse-wheel/middle-click: zoom</p>
             <p>Right-click: pan</p>
           </div>
-          <Legend colorMode={colorMode} maxDepth={maxDepth} data={data} />
+          
+          {/* Only show legend for 3D mode */}
+          {graphLayout === "3d" && (
+            <Legend colorMode={colorMode} maxDepth={maxDepth} data={data} />
+          )}
         </Fragment>
       )}
       <div className="absolute bottom-2 right-3 text-xs text-gray-500">
