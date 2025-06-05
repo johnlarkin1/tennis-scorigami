@@ -1,7 +1,13 @@
 import { render, screen } from '@testing-library/react'
-import { HeroSection } from '@/components/landing/hero-section'
+import HeroSection from '@/components/landing/hero-section'
 
-jest.mock('@/components/ui/particle-canvas', () => require('../../../__tests__/__mocks__/ParticleCanvas'))
+jest.mock('@/components/ui/particle-canvas', () => ({
+  ParticleCanvas: ({ className }: { className?: string }) => (
+    <div data-testid="particle-canvas" className={className}>
+      Particle Canvas Mock
+    </div>
+  )
+}))
 
 describe('HeroSection', () => {
   it('renders the hero section with correct structure', () => {

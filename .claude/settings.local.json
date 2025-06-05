@@ -15,7 +15,8 @@
       "Bash(npx next build:*)",
       "Bash(npx tsc:*)",
       "Bash(npm run lint)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(npm run test:*)"
     ],
     "deny": []
   },

@@ -3,7 +3,7 @@ import { Header } from '@/components/layout/header'
 
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: ({ src, alt, width, height, priority }: any) => (
+  default: ({ src, alt, width, height, priority }: { src: string; alt: string; width: number; height: number; priority?: boolean }) => (
     <img 
       src={src} 
       alt={alt} 
@@ -17,7 +17,7 @@ jest.mock('next/image', () => ({
 
 jest.mock('next/link', () => ({
   __esModule: true,
-  default: ({ href, children, className }: any) => (
+  default: ({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) => (
     <a href={href} className={className} data-testid={`link-${href}`}>
       {children}
     </a>
