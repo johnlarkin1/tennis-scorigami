@@ -31,8 +31,6 @@ export async function GET(req: NextRequest) {
       (t) => t.event_abbr && ["G", "M", "A"].includes(t.event_abbr)
     );
 
-    console.log(filteredTournaments);
-
     const groupedTournaments = filteredTournaments.reduce(
       (acc, t) => {
         const eventAbbr = t.event_abbr;
