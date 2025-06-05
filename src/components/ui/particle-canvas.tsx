@@ -167,11 +167,11 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
     function drawNetTexture() {
       const cellSize = 40; // Size of each net "cell"
       const lineWidth = 1.5;
-      
+
       // Main net grid
       ctx.strokeStyle = "rgba(255, 255, 255, 0.05)"; // Very subtle white lines
       ctx.lineWidth = lineWidth;
-      
+
       // Vertical lines
       for (let x = netOffset % cellSize; x < W; x += cellSize) {
         ctx.beginPath();
@@ -179,7 +179,7 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
         ctx.lineTo(x, H);
         ctx.stroke();
       }
-      
+
       // Horizontal lines
       for (let y = 0; y < H; y += cellSize) {
         ctx.beginPath();
@@ -187,11 +187,11 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
         ctx.lineTo(W, y);
         ctx.stroke();
       }
-      
+
       // Crossing diagonal threads (characteristic of tennis nets)
       ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
       ctx.lineWidth = 1;
-      
+
       // Draw X patterns within each cell
       for (let x = netOffset % cellSize; x < W; x += cellSize) {
         for (let y = 0; y < H; y += cellSize) {
@@ -200,7 +200,7 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
           ctx.moveTo(x, y);
           ctx.lineTo(x + cellSize, y + cellSize);
           ctx.stroke();
-          
+
           // Top-right to bottom-left
           ctx.beginPath();
           ctx.moveTo(x + cellSize, y);
@@ -208,9 +208,16 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
           ctx.stroke();
         }
       }
-      
+
       // Add a subtle gradient overlay to fade the net at edges
-      const gradient = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W, H)/2);
+      const gradient = ctx.createRadialGradient(
+        W / 2,
+        H / 2,
+        0,
+        W / 2,
+        H / 2,
+        Math.max(W, H) / 2
+      );
       gradient.addColorStop(0, "rgba(0, 0, 0, 0)");
       gradient.addColorStop(0.7, "rgba(0, 0, 0, 0)");
       gradient.addColorStop(1, "rgba(0, 0, 0, 0.3)");
@@ -223,13 +230,13 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
       H = canvas.height = canvas.clientHeight;
       staticBallCenter = { x: W * 0.75, y: H / 2 };
       staticBallRadius = Math.min(W, H) * staticBallFactor;
-      
+
       // Use requestAnimationFrame to avoid setTimeout performance issues
       requestAnimationFrame(() => {
         prepareTextMask();
         initParticles();
       });
-      
+
       balls = [];
       mouse.x = offscreen;
       mouse.y = offscreen;

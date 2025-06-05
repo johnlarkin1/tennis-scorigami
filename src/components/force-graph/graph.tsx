@@ -12,10 +12,6 @@ import {
 } from "@/components/force-graph/controls";
 import { DiscoveryModal } from "@/components/force-graph/discovery-modal";
 import { MatchDetailsModal } from "@/components/force-graph/match-details-modal";
-// Dynamic import for SigmaGraph to prevent SSR issues
-const SigmaGraph = dynamic(() => import("@/components/force-graph/sigma-graph").then(mod => ({ default: mod.SigmaGraph })), {
-  ssr: false,
-});
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
 import { selectedTournamentAtom } from "@/store/tournament";
 import { convertSexFilter, convertYearFilter } from "@/utils/filter-converters";
@@ -59,6 +55,17 @@ const ROOT_ID = 0;
 const ForceGraph3D = dynamic(() => import("react-force-graph-3d"), {
   ssr: false,
 });
+
+// Dynamic import for SigmaGraph to prevent SSR issues with WebGL
+const SigmaGraph = dynamic(
+  () =>
+    import("@/components/force-graph/sigma-graph").then((mod) => ({
+      default: mod.SigmaGraph,
+    })),
+  {
+    ssr: false,
+  }
+);
 
 type GraphLink = { source: number; target: number };
 interface GraphData {
@@ -255,9 +262,10 @@ export const ForceGraph = () => {
           year: selectedYear ? convertYearFilter(selectedYear.toString()) : "",
           sex: convertSexFilter(selectedSex ?? ""),
           sets: selectedSets.toString(),
-          tournament: selectedTournament && selectedTournament.tournament_id > 0 
-            ? selectedTournament.tournament_id.toString() 
-            : "all",
+          tournament:
+            selectedTournament && selectedTournament.tournament_id > 0
+              ? selectedTournament.tournament_id.toString()
+              : "all",
         });
 
         const { nodes: rawNodes, edges: rawEdges } = (await (
@@ -306,7 +314,6 @@ export const ForceGraph = () => {
       console.error(err);
     });
   }, [selectedYear, selectedSex, selectedSets, selectedTournament]);
-
 
   /* ─ Node styling ─ */
   const nodeColor = useCallback(
@@ -405,10 +412,15 @@ export const ForceGraph = () => {
       nodeCanvasObjectMode: () => "after", // draw text on top of nodes
 
       nodeDescription: (n: NodeDTO) => nodeLabel(n),
-      linkColor: (link: { source: { id: number } | number; target: { id: number } | number }) => {
+      linkColor: (link: {
+        source: { id: number } | number;
+        target: { id: number } | number;
+      }) => {
         // Make links more visible with gradient based on depth
-        const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
-        const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+        const sourceId =
+          typeof link.source === "object" ? link.source.id : link.source;
+        const targetId =
+          typeof link.target === "object" ? link.target.id : link.target;
         const source = data.nodes.find((n) => n.id === sourceId);
         const target = data.nodes.find((n) => n.id === targetId);
         if (!source || !target) return "#666";
@@ -418,10 +430,15 @@ export const ForceGraph = () => {
         const brightness = 40 + maxDepth * 15;
         return `hsl(200, 70%, ${brightness}%)`;
       },
-      linkWidth: (link: { source: { id: number } | number; target: { id: number } | number }) => {
+      linkWidth: (link: {
+        source: { id: number } | number;
+        target: { id: number } | number;
+      }) => {
         // Vary link width based on connection depth
-        const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
-        const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+        const sourceId =
+          typeof link.source === "object" ? link.source.id : link.source;
+        const targetId =
+          typeof link.target === "object" ? link.target.id : link.target;
         const source = data.nodes.find((n) => n.id === sourceId);
         const target = data.nodes.find((n) => n.id === targetId);
         if (!source || !target) return 1;
@@ -568,7 +585,7 @@ export const ForceGraph = () => {
             <p>Mouse-wheel/middle-click: zoom</p>
             <p>Right-click: pan</p>
           </div>
-          
+
           {/* Only show legend for 3D mode */}
           {graphLayout === "3d" && (
             <Legend colorMode={colorMode} maxDepth={maxDepth} data={data} />

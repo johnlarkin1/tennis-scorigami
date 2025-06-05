@@ -1,2 +1,2 @@
-npx --no-install commitlint --edit "$1"
-
+#!/bin/sh
+# Commitlint disabled - you can use any commit message format

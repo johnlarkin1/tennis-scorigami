@@ -12,11 +12,16 @@ import { Check, Copy, Download, Share2, Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface DiscoveryModalProps {
-  node: NodeDTO;
+  node: NodeDTO | null;
   onClose: () => void;
+  isOpen?: boolean;
 }
 
-export function DiscoveryModal({ node, onClose }: DiscoveryModalProps) {
+export function DiscoveryModal({
+  node,
+  onClose,
+  isOpen = true,
+}: DiscoveryModalProps) {
   const [copied, setCopied] = useState(false);
   const [shareSupported, setShareSupported] = useState(false);
 
@@ -24,6 +29,11 @@ export function DiscoveryModal({ node, onClose }: DiscoveryModalProps) {
     // Check if Web Share API is supported
     setShareSupported(!!navigator.share);
   }, []);
+
+  // Guard against null node
+  if (!node) {
+    return null;
+  }
 
   // Generate a celebratory message
   const getMessage = () => {
@@ -76,7 +86,7 @@ export function DiscoveryModal({ node, onClose }: DiscoveryModalProps) {
   };
 
   return (
-    <Dialog open onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md mx-auto bg-gradient-to-br from-gray-900 to-gray-800 border-red-600 border-2 rounded-xl shadow-[0_0_30px_rgba(220,38,38,0.3)] text-white">
         <DialogHeader className="flex flex-col items-center">
           <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center mb-2 animate-bounce">

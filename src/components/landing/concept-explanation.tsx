@@ -42,7 +42,11 @@ export const ConceptExplanation = () => {
               variants={itemVariants}
               className="text-3xl md:text-4xl font-bold mb-6"
             >
-              <SectionDivider id="concept-divider" title="What is Tennis Scorigami?" fullWidth />
+              <SectionDivider
+                id="concept-divider"
+                title="What is Tennis Scorigami?"
+                fullWidth
+              />
             </motion.h2>
             <motion.p
               variants={itemVariants}
@@ -50,9 +54,9 @@ export const ConceptExplanation = () => {
             >
               Tennis Scorigami is the concept of tracking unique score
               combinations that have occurred in professional tennis matches.
-              Inspired by Jon Bois&apos;s Football Scorigami, this project explores
-              the mathematical possibilities of tennis scoring and documents
-              which score patterns have been achieved and which remain
+              Inspired by Jon Bois&apos;s Football Scorigami, this project
+              explores the mathematical possibilities of tennis scoring and
+              documents which score patterns have been achieved and which remain
               theoretical.
             </motion.p>
           </motion.div>
@@ -121,8 +125,8 @@ export const ConceptExplanation = () => {
               </h3>
               <ul className="list-disc pl-6 text-gray-300 space-y-3">
                 <li>
-                  Women&apos;s tennis has a higher completion percentage in best-of-3
-                  matches (99.59%) compared to men&apos;s (98.64%).
+                  Women&apos;s tennis has a higher completion percentage in
+                  best-of-3 matches (99.59%) compared to men&apos;s (98.64%).
                 </li>
                 <li>
                   Only 8.47% of the theoretically possible score combinations in

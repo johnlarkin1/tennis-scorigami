@@ -122,7 +122,9 @@ export function MatchDetailsModal({
         ]);
       } catch (err) {
         console.error(err);
-        setError(err instanceof Error ? err.message : "Failed to load match data");
+        setError(
+          err instanceof Error ? err.message : "Failed to load match data"
+        );
       } finally {
         setLoading(false);
       }

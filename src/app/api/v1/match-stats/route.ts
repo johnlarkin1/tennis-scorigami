@@ -7,13 +7,13 @@ export async function GET() {
   try {
     const rows = await db
       .select({
-        gender:               mvMatchWithSamples.gender,
-        best_of:              mvMatchWithSamples.bestOf,
-        total_possible:       mvMatchWithSamples.totalPossible,
-        total_occurred:       mvMatchWithSamples.totalOccurred,
+        gender: mvMatchWithSamples.gender,
+        best_of: mvMatchWithSamples.bestOf,
+        total_possible: mvMatchWithSamples.totalPossible,
+        total_occurred: mvMatchWithSamples.totalOccurred,
         total_never_occurred: mvMatchWithSamples.totalNeverOccurred,
-        completion_pct:       mvMatchWithSamples.completionPct,
-        samples:              mvMatchWithSamples.samples,
+        completion_pct: mvMatchWithSamples.completionPct,
+        samples: mvMatchWithSamples.samples,
       })
       .from(mvMatchWithSamples)
       .where(

@@ -10,7 +10,12 @@
       "Bash(npx storybook@latest init:*)",
       "Bash(pkill:*)",
       "Bash(npx playwright:*)",
-      "Bash(npm run typecheck:*)"
+      "Bash(npm run typecheck:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx next build:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run lint)",
+      "Bash(cat:*)"
     ],
     "deny": []
   },

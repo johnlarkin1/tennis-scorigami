@@ -45,7 +45,9 @@ export const selectedSexAtom = atom<SexType>("Men and Women");
 export const selectedSetsAtom = atom<3 | 5>(3);
 
 // Tournament-specific set mappings - check if it's a Grand Slam by event_abbr
-const isGrandSlamTournament = (tournament: { event_type?: { event_abbr?: string } }) => {
+const isGrandSlamTournament = (tournament: {
+  event_type?: { event_abbr?: string };
+}) => {
   return tournament?.event_type?.event_abbr === "G";
 };
 
@@ -95,9 +97,11 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
   }, [selectedTournament, selectedSex, setSelectedSets]);
 
   // Check if 5 sets should be disabled based on current selection
+  // 5 sets are only disabled for women, or for non-Grand Slam tournaments in 3D mode
   const isFiveSetsDisabled =
     selectedSex === "Women" ||
-    (selectedTournament.name !== "All Tournaments" &&
+    (graphLayout === "3d" &&
+      selectedTournament.name !== "All Tournaments" &&
       !isGrandSlamTournament(selectedTournament));
 
   return (
@@ -165,10 +169,12 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
               </span>
             </motion.button>
           </div>
-          {selectedSets === 5 && (
-            <div className="text-amber-400 text-sm flex items-center mt-2">
+          {selectedSets === 5 && graphLayout === "2d" && (
+            <div className="text-blue-400 text-sm flex items-center mt-2">
               <AlertCircle className="h-4 w-4 mr-1 flex-shrink-0" />
-              <span>3D view disabled for Best of 5 due to complexity</span>
+              <span>
+                Using 2D view for optimal performance with 5-set matches
+              </span>
             </div>
           )}
         </div>
@@ -385,8 +391,7 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
                 <SelectItem
                   value="5"
                   className={`${dropdownItemClass} ${isFiveSetsDisabled ? "opacity-50" : ""}`}
-                  // disabled={isFiveSetsDisabled}
-                  disabled={true}
+                  disabled={isFiveSetsDisabled}
                 >
                   Best of 5 Sets
                 </SelectItem>
@@ -398,8 +403,9 @@ export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
                 <span>
                   {selectedSex === "Women"
                     ? "Women's matches are best of 3 sets"
-                    : selectedTournament.name !== "All Tournaments"
-                      ? "This tournament uses best of 3 sets format"
+                    : graphLayout === "3d" &&
+                        selectedTournament.name !== "All Tournaments"
+                      ? "Switch to 2D view to explore 5-set matches for all tournaments"
                       : ""}
                 </span>
               </div>

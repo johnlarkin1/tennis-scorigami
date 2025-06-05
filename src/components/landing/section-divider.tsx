@@ -26,11 +26,15 @@ export const SectionDivider: React.FC<SectionDividerProps> = ({
           transition={{ duration: 0.8 }}
           className="flex items-center justify-center"
         >
-          <div className={`h-px bg-gray-700 flex-grow ${fullWidth ? '' : 'max-w-md md:max-w-xl lg:max-w-2xl'}`}></div>
+          <div
+            className={`h-px bg-gray-700 flex-grow ${fullWidth ? "" : "max-w-md md:max-w-xl lg:max-w-2xl"}`}
+          ></div>
           <h2 className="text-3xl md:text-4xl font-bold mx-6 text-center">
             {title}
           </h2>
-          <div className={`h-px bg-gray-700 flex-grow ${fullWidth ? '' : 'max-w-md md:max-w-xl lg:max-w-2xl'}`}></div>
+          <div
+            className={`h-px bg-gray-700 flex-grow ${fullWidth ? "" : "max-w-md md:max-w-xl lg:max-w-2xl"}`}
+          ></div>
         </motion.div>
       </div>
     </section>

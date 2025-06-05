@@ -115,7 +115,9 @@ export const TournamentDropdown = () => {
           className="text-white text-center"
         />
       </SelectTrigger>
-      <SelectContent className={`${dropdownContentClass} max-h-96 overflow-y-auto`}>
+      <SelectContent
+        className={`${dropdownContentClass} max-h-96 overflow-y-auto`}
+      >
         <SelectItem
           value={ALL_TOURNAMENTS_STRING}
           className={`${dropdownItemClass} font-semibold border-b border-gray-600 mb-2`}
