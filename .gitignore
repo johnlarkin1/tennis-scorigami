@@ -57,3 +57,8 @@ backend/visualizations/output/**
 # Ignore all repomix-output.xml files recursively
 **/repomix-output.xml
 public
+
+*storybook.log
+storybook-static
+
+*test-results

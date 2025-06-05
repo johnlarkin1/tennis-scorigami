@@ -4,7 +4,13 @@
       "Bash(grep:*)",
       "Bash(npm install:*)",
       "Bash(npm run dev:*)",
-      "mcp__postgres-tennis-scorigami__query"
+      "mcp__postgres-tennis-scorigami__query",
+      "Bash(mkdir:*)",
+      "Bash(npm test)",
+      "Bash(npx storybook@latest init:*)",
+      "Bash(pkill:*)",
+      "Bash(npx playwright:*)",
+      "Bash(npm run typecheck:*)"
     ],
     "deny": []
   },
