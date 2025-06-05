@@ -35,8 +35,8 @@ export const TreeVisualization = ({
   }: CustomNodeElementProps) => {
     const handleNodeClick = () => {
       const sequence = nodeDatum.attributes?.sequence;
-      if (nodeDatum.attributes?.isClickable && sequence) {
-        const setScores = String(sequence).split(" ").filter(Boolean);
+      if (nodeDatum.attributes?.isClickable && sequence && typeof sequence === 'string') {
+        const setScores = sequence.split(" ").filter(Boolean);
 
         // Check for match completion before expanding
         if (!isMatchComplete(setScores) && setScores.length < 5) {
@@ -49,12 +49,12 @@ export const TreeVisualization = ({
       }
     };
 
-    const count = nodeDatum.attributes?.count || 0;
+    const count = Number(nodeDatum.attributes?.count) || 0;
     const occurred = nodeDatum.attributes?.occurred;
     const isClickable = nodeDatum.attributes?.isClickable;
     const isDarkMode = resolvedTheme === "dark";
     const sequence = nodeDatum.attributes?.sequence;
-    const setScores = sequence ? sequence.split(" ").filter(Boolean) : [];
+    const setScores = sequence && typeof sequence === 'string' ? sequence.split(" ").filter(Boolean) : [];
     const isComplete = isMatchComplete(setScores);
     const isAtMaxSets = setScores.length >= 5;
 

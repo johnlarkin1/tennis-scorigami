@@ -200,7 +200,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
         let edges = rawEdges.slice();
 
         // Add love-all root node if missing
-        if (!nodes.some((n) => n.depth === 0)) {
+        if (!nodes.some((n: NodeDTO) => n.depth === 0)) {
           nodes = [
             {
               id: ROOT_ID,
@@ -214,8 +214,8 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
           ];
           // Connect root to all depth-1 nodes
           const rootEdges = nodes
-            .filter((n) => n.depth === 1)
-            .map((n) => ({ frm: ROOT_ID, to: n.id }));
+            .filter((n: NodeDTO) => n.depth === 1)
+            .map((n: NodeDTO) => ({ frm: ROOT_ID, to: n.id }));
           edges = [...rootEdges, ...edges];
         }
 
@@ -269,7 +269,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
         // Color by occurrence intensity within depth
         const scale = depthScales[node.depth];
         if (scale) {
-          const intensity = scale(node.occurrences);
+          const intensity = scale(node.occurrences) as number;
           const lightness = 90 - intensity * 60;
           return `hsl(220, 80%, ${lightness}%)`;
         }
@@ -396,7 +396,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
       }
 
       // Create sigma instance with enhanced settings
-      const sigma = new Sigma(graph, containerRef.current, {
+      const sigma = new Sigma(graph, containerRef.current as HTMLDivElement, {
         renderLabels: showLabels,
         renderEdgeLabels: false,
         defaultNodeColor: "#666",
@@ -405,9 +405,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
         labelSize: 12,
         labelWeight: "bold",
         zIndex: true,
-        enableEdgeClickEvents: false,
-        enableEdgeWheelEvents: false,
-        enableEdgeHoverEvents: false,
+        enableEdgeEvents: false,
         nodeReducer: (node, data) => {
           const res = { ...data };
           if (data.highlighted) {
@@ -437,7 +435,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
         if (!originalNode.played || originalNode.occurrences === 0) {
           // Launch confetti for discoveries
           import("canvas-confetti").then((confettiModule) => {
-            const confetti = confettiModule.default;
+            const confetti = confettiModule.default || confettiModule;
             confetti({
               particleCount: 100,
               spread: 70,

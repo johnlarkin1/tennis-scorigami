@@ -333,7 +333,7 @@ export const ForceGraph = () => {
         // Color by occurrence intensity
         const scale = depthScales[n.depth];
         if (scale) {
-          const intensity = scale(n.occurrences);
+          const intensity = scale(n.occurrences) as number;
           const L = 90 - intensity * 60;
           return `hsl(220,80%,${L}%)`;
         }
@@ -373,7 +373,7 @@ export const ForceGraph = () => {
       // -------- 3-D labels --------
       nodeThreeObject: showLabels
         ? (n: { slug: string | undefined }) => {
-            const sprite = new SpriteText(n.slug); // slug == score string
+            const sprite = new SpriteText(n.slug || ''); // slug == score string
             sprite.color = "#ffffff";
             sprite.textHeight = 6; // world-space units
             sprite.material.depthWrite = false; // keeps text on top
@@ -392,7 +392,7 @@ export const ForceGraph = () => {
             ctx: CanvasRenderingContext2D,
             globalScale: number
           ) => {
-            const label = n.slug;
+            const label = n.slug || '';
             const fontSizePx = 12 / globalScale; // don't grow when zooming
             ctx.font = `${fontSizePx}px Inter, sans-serif`;
             ctx.textAlign = "center";
@@ -548,21 +548,23 @@ export const ForceGraph = () => {
               className="w-full h-full"
             />
           ) : (
-            <ForceGraph3D
-              key={graphKey}
-              width={width}
-              height={height}
-              style={{ display: "block" }}
-              // @ts-expect-error - ForceGraph3D ref type incompatibility
-              ref={(inst) => (fgRef.current = inst!)}
+            <div style={{ display: "block" }}>
+              <ForceGraph3D
+                key={graphKey}
+                width={width}
+                height={height}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ref={fgRef as any}
               graphData={data}
-              {...graphProps}
-              onNodeClick={onNodeClick}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              {...(graphProps as any)}
+              onNodeClick={onNodeClick as (node: object) => void}
               showNavInfo={false}
               enableNodeDrag={true}
               nodeRelSize={nodeStrength / 10}
               // onEngineStop={onEngineStop}
-            />
+              />
+            </div>
           )}
 
           {/* Show banner if there are unscored nodes */}

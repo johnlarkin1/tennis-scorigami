@@ -16,7 +16,12 @@
       "Bash(npx tsc:*)",
       "Bash(npm run lint)",
       "Bash(cat:*)",
-      "Bash(npm run test:*)"
+      "Bash(npm run test:*)",
+      "Bash(npm ls:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(npm test:*)",
+      "Bash(rg:*)"
     ],
     "deny": []
   },

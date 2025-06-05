@@ -9,9 +9,10 @@ const GENDER = { men: "M", women: "F" } as const;
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const id = Number(params.id);
+  const { id: idParam } = await params;
+  const id = Number(idParam);
   if (!id) return bad("id must be numeric");
   const gRaw = new URL(req.url).searchParams.get("gender");
   const g = gRaw ? GENDER[gRaw as keyof typeof GENDER] : null;

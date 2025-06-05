@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/nextjs'
-import { fn } from '@storybook/test'
 import { Button } from './button'
 
 const meta: Meta<typeof Button> = {
@@ -19,7 +18,7 @@ const meta: Meta<typeof Button> = {
       options: ['default', 'sm', 'lg', 'icon'],
     },
   },
-  args: { onClick: fn() },
+  args: { onClick: () => {} },
 }
 
 export default meta

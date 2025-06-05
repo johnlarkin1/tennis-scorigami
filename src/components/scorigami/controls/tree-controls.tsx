@@ -35,7 +35,7 @@ type TreeControlsProps = {
   className?: string;
 };
 
-export const TreeControls: React.FC<TreeControlsProps> = ({ _className }) => {
+export const TreeControls: React.FC<TreeControlsProps> = ({ className: _className }) => {
   // View type controls
   const [viewType, setViewType] = useAtom(viewTypeAtom);
 

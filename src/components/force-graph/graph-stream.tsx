@@ -255,11 +255,12 @@ export const ForceGraphStream = () => {
             <ForceGraph3D
               width={width}
               height={height}
-              // @ts-expect-error - ForceGraph3D ref type incompatibility
-              ref={(inst) => (fgRef.current = inst!)}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              ref={fgRef as any}
               graphData={data}
-              {...graphProps}
-              onNodeClick={onNodeClick}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              {...(graphProps as any)}
+              onNodeClick={onNodeClick as (node: object) => void}
               showNavInfo={false}
               enableNodeDrag
               nodeRelSize={nodeStrength / 10}
