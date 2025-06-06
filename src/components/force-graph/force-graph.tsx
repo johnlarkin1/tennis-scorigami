@@ -228,7 +228,7 @@ export const ForceGraph = () => {
     return data.nodes.some((node) => !node.played && node.id !== ROOT_ID);
   }, [data.nodes]);
 
-  /* ─ Compute max depth for coloring ─ */
+  /* ─ Max depth is simply the number of sets ─ */
   const maxDepth = selectedSets;
 
   /* ─ Depth-based occurrence scales ─ */

@@ -175,10 +175,8 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
     return data.nodes.some((node) => !node.played && node.id !== ROOT_ID);
   }, [data.nodes]);
 
-  // Compute max depth for legend
-  const maxDepth = useMemo(() => {
-    return Math.max(...data.nodes.map((n) => n.depth), 0);
-  }, [data.nodes]);
+  // Max depth is simply the number of sets
+  const maxDepth = selectedSets;
 
   // Modal state
   const [selectedSequenceId, setSelectedSequenceId] = useState<number | null>(
