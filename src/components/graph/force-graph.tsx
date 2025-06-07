@@ -9,9 +9,9 @@ import {
   selectedYearAtom,
   showEdgesAtom,
   showLabelsAtom,
-} from "@/components/force-graph/controls";
-import { DiscoveryModal } from "@/components/force-graph/discovery-modal";
-import { MatchDetailsModal } from "@/components/force-graph/match-details-modal";
+} from "@/components/graph/controls";
+import { DiscoveryModal } from "@/components/graph/discovery-modal";
+import { MatchDetailsModal } from "@/components/graph/match-details-modal";
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
 import { selectedTournamentAtom } from "@/store/tournament";
 import { convertSexFilter, convertYearFilter } from "@/utils/filter-converters";
@@ -56,10 +56,10 @@ const ForceGraph3D = dynamic(() => import("react-force-graph-3d"), {
   ssr: false,
 });
 
-// Dynamic import for SigmaGraph to prevent SSR issues with WebGL
-const SigmaGraph = dynamic(
+// Dynamic import for SigmaGraphStream to prevent SSR issues with WebGL
+const SigmaGraphStream = dynamic(
   () =>
-    import("@/components/force-graph/sigma-graph").then((mod) => ({
+    import("@/components/graph/sigma-graph-stream").then((mod) => ({
       default: mod.SigmaGraph,
     })),
   {
@@ -373,7 +373,7 @@ export const ForceGraph = () => {
       // -------- 3-D labels --------
       nodeThreeObject: showLabels
         ? (n: { slug: string | undefined }) => {
-            const sprite = new SpriteText(n.slug || ''); // slug == score string
+            const sprite = new SpriteText(n.slug || ""); // slug == score string
             sprite.color = "#ffffff";
             sprite.textHeight = 6; // world-space units
             sprite.material.depthWrite = false; // keeps text on top
@@ -392,7 +392,7 @@ export const ForceGraph = () => {
             ctx: CanvasRenderingContext2D,
             globalScale: number
           ) => {
-            const label = n.slug || '';
+            const label = n.slug || "";
             const fontSizePx = 12 / globalScale; // don't grow when zooming
             ctx.font = `${fontSizePx}px Inter, sans-serif`;
             ctx.textAlign = "center";
@@ -541,7 +541,7 @@ export const ForceGraph = () => {
       {width && height && !loading && (
         <Fragment>
           {graphLayout === "2d" ? (
-            <SigmaGraph
+            <SigmaGraphStream
               selectedSets={selectedSets}
               selectedSex={selectedSex || ""}
               selectedYear={selectedYear || ""}
@@ -555,14 +555,14 @@ export const ForceGraph = () => {
                 height={height}
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 ref={fgRef as any}
-              graphData={data}
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              {...(graphProps as any)}
-              onNodeClick={onNodeClick as (node: object) => void}
-              showNavInfo={false}
-              enableNodeDrag={true}
-              nodeRelSize={nodeStrength / 10}
-              // onEngineStop={onEngineStop}
+                graphData={data}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                {...(graphProps as any)}
+                onNodeClick={onNodeClick as (node: object) => void}
+                showNavInfo={false}
+                enableNodeDrag={true}
+                nodeRelSize={nodeStrength / 10}
+                // onEngineStop={onEngineStop}
               />
             </div>
           )}

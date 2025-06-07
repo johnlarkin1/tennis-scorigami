@@ -1,7 +1,7 @@
 "use client";
 
-import { ForceGraphControls } from "@/components/force-graph/controls";
-import { ForceGraph } from "@/components/force-graph/force-graph";
+import { ForceGraphControls } from "@/components/graph/controls";
+import { ForceGraph } from "@/components/graph/force-graph";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { ChevronLeft, Settings } from "lucide-react";
