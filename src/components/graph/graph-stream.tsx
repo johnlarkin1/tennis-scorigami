@@ -13,7 +13,7 @@ import {
   selectedSexAtom,
   selectedYearAtom,
   showEdgesAtom,
-} from "@/components/force-graph/controls";
+} from "@/components/graph/controls";
 import type { NodeDTO } from "@/lib/types";
 
 /* ─── constants ────────────────────────────────────────────────────────────── */

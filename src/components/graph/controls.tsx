@@ -1,11 +1,11 @@
 "use client";
 
+import { TournamentDropdown } from "@/components/graph/controls/tournament-dropdown";
 import {
   dropdownContentClass,
   dropdownItemClass,
   dropdownTriggerClass,
 } from "@/components/lib/force-graph/styles";
-import { TournamentDropdown } from "@/components/scorigami/controls/tournament-dropdown";
 import {
   Select,
   SelectContent,

@@ -3,9 +3,9 @@
 import {
   graphColorModeAtom,
   showLabelsAtom,
-} from "@/components/force-graph/controls";
-import { DiscoveryModal } from "@/components/force-graph/discovery-modal";
-import { MatchDetailsModal } from "@/components/force-graph/match-details-modal";
+} from "@/components/graph/controls";
+import { DiscoveryModal } from "@/components/graph/discovery-modal";
+import { MatchDetailsModal } from "@/components/graph/match-details-modal";
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
 import { selectedTournamentAtom } from "@/store/tournament";
 import { convertSexFilter, convertYearFilter } from "@/utils/filter-converters";

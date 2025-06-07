@@ -4,6 +4,7 @@ import { Header } from '@/components/layout/header'
 jest.mock('next/image', () => ({
   __esModule: true,
   default: ({ src, alt, width, height, priority }: { src: string; alt: string; width: number; height: number; priority?: boolean }) => (
+    // eslint-disable-next-line @next/next/no-img-element
     <img 
       src={src} 
       alt={alt} 
