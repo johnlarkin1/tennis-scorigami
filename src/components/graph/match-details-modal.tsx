@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { SequenceInfo, SequenceMatch } from "@/types/sequence-matches/response";
 import {
   convertSetsFilter,
@@ -18,7 +19,6 @@ import {
   Award,
   CircleX,
   Clock,
-  Loader2,
   Sparkles,
   Star,
   TrendingUp,
@@ -349,7 +349,7 @@ export function MatchDetailsModal({
         {/* bottom spinner only when truly loading another page */}
         {loadingMore && hasMore && (
           <div className="flex justify-center py-4">
-            <Loader2 className="h-6 w-6 text-green-500 animate-spin" />
+            <LoadingSpinner size={6} />
           </div>
         )}
       </DialogContent>

@@ -8,7 +8,7 @@ import {
 } from "@/components/graph/controls/graph-controls";
 import { DiscoveryModal } from "@/components/graph/discovery-modal";
 import { GraphControls } from "@/components/graph/graph-controls";
-import { LoadingSpinner } from "@/components/graph/loading-spinner";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { MatchDetailsModal } from "@/components/graph/match-details-modal";
 import { UnscoredBanner } from "@/components/graph/unscored-banner";
 import { useGraphData } from "@/lib/hooks/use-graph-data";
@@ -54,12 +54,12 @@ export const GraphVisualization: React.FC = () => {
   return (
     <div className="relative w-full h-full overflow-hidden">
       {/* Loading overlay */}
-      {loading && <LoadingSpinner />}
+      {loading && <LoadingSpinner size={12} className="w-full h-full" text="Loading graph..." />}
 
       {/* Main visualization */}
       {!loading && (
         <Fragment>
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense fallback={<LoadingSpinner size={12} className="w-full h-full" text="Loading visualization..." />}>
             {graphLayout === "2d" ? <SigmaGraph2D /> : <ForceGraph3D />}
           </Suspense>
 

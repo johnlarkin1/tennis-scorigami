@@ -6,6 +6,7 @@ import {
 } from "@/components/graph/controls/graph-controls";
 import { DiscoveryModal } from "@/components/graph/discovery-modal";
 import { MatchDetailsModal } from "@/components/graph/match-details-modal";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
 import { selectedTournamentAtom } from "@/store/tournament";
 import { convertSexFilter, convertYearFilter } from "@/utils/filter-converters";
@@ -869,12 +870,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
     <div className={`relative ${className}`}>
       {loading && (
         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10 backdrop-blur-sm">
-          <div className="flex flex-col items-center">
-            <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin mb-4"></div>
-            <div className="text-white text-lg font-medium">
-              Loading graph...
-            </div>
-          </div>
+          <LoadingSpinner size={12} text="Loading graph..." />
         </div>
       )}
 

@@ -7,6 +7,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ForceGraphMethods } from "react-force-graph-3d";
 import { useResizeDetector } from "react-resize-detector";
 
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+
 import {
   graphColorModeAtom,
   selectedSetsAtom,
@@ -242,7 +244,10 @@ export const ForceGraphStream = () => {
     <div ref={wrapperRef} className="relative w-full h-full overflow-hidden">
       {loading && totalCount > 0 && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/50">
-          <progress max={totalCount} value={progress} className="w-2/3 h-2" />
+          <LoadingSpinner 
+            size={12} 
+            text={`Loading graph... ${Math.round((progress / totalCount) * 100)}%`} 
+          />
         </div>
       )}
 

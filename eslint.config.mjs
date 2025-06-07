@@ -14,55 +14,65 @@ const compat = new FlatCompat({
   allConfig: js.configs.all,
 });
 
-export default [// Global rules and settings
-...compat.extends(
-  "next",
-  "next/core-web-vitals",
-  "next/typescript",
-  "prettier"
-), {
-  settings: {
-    next: {
-      rootDir: "src",
+export default [
+  // Global rules and settings
+  ...compat.extends(
+    "next",
+    "next/core-web-vitals",
+    "next/typescript",
+    "prettier"
+  ),
+  {
+    settings: {
+      next: {
+        rootDir: "src",
+      },
+    },
+    rules: {
+      "import/no-unused-modules": "off", // Turn off unused-modules
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          varsIgnorePattern: "^_",
+          argsIgnorePattern: "^_",
+        },
+      ],
+    },
+  }, // File-specific rules and ignores
+  // {
+  //   files: ["src/**/*.ts", "src/**/*.tsx"],
+  //   ignores: [
+  //     "src/app/api/**",
+  //     "src/app/about/page.tsx",
+  //     "src/app/layout.tsx",
+  //     "src/app/page.tsx",
+  //     "src/components/ui/**",
+  //     "src/services/supabase/database.types.ts",
+  //   ],
+  //   rules: {
+  //     "import/no-unused-modules": "error",
+  //   },
+  // },
+  {
+    files: [
+      "src/app/api/**/*.ts",
+      "src/app/about/page.tsx",
+      "src/app/layout.tsx",
+      "src/app/page.tsx",
+      "src/components/ui/**",
+      "src/services/supabase/database.types.ts",
+    ],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off", // Allow `any` in API files
+      "@typescript-eslint/no-unused-vars": "off", // Ignore unused
+      "import/no-unused-modules": "off", // Turn off unused-modules
     },
   },
-  rules: {
-    "import/no-unused-modules": "off", // Turn off unused-modules
-    "@typescript-eslint/no-unused-vars": [
-      "warn",
-      {
-        varsIgnorePattern: "^_",
-        argsIgnorePattern: "^_",
-      },
-    ],
+  {
+    files: ["src/components/graph/force-graph-3d.tsx"], // or ["**/*.ts"] for broader scope
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
   },
-}, // File-specific rules and ignores
-// {
-//   files: ["src/**/*.ts", "src/**/*.tsx"],
-//   ignores: [
-//     "src/app/api/**",
-//     "src/app/about/page.tsx",
-//     "src/app/layout.tsx",
-//     "src/app/page.tsx",
-//     "src/components/ui/**",
-//     "src/services/supabase/database.types.ts",
-//   ],
-//   rules: {
-//     "import/no-unused-modules": "error",
-//   },
-// },
-{
-  files: [
-    "src/app/api/**/*.ts",
-    "src/app/about/page.tsx",
-    "src/app/layout.tsx",
-    "src/app/page.tsx",
-    "src/components/ui/**",
-    "src/services/supabase/database.types.ts",
-  ],
-  rules: {
-    "@typescript-eslint/no-explicit-any": "off", // Allow `any` in API files
-    "@typescript-eslint/no-unused-vars": "off", // Ignore unused
-    "import/no-unused-modules": "off", // Turn off unused-modules
-  },
-}, ...storybook.configs["flat/recommended"]];
+  ...storybook.configs["flat/recommended"],
+];

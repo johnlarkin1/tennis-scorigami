@@ -6,6 +6,7 @@ import {
   showLabelsAtom,
 } from "@/components/graph/controls/graph-controls";
 import { Legend } from "@/components/graph/legend";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import type { NodeDTO } from "@/lib/types";
 import { useGraphContext } from "@/providers/graph-provider";
 import { scaleLinear } from "d3-scale";
@@ -169,9 +170,9 @@ const ForceGraph3D: React.FC = () => {
       nodeThreeObject: showLabels
         ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (n: any) => {
-            // Dynamically import SpriteText to avoid SSR issues
-            // eslint-disable-next-line @typescript-eslint/no-require-imports
-            const SpriteText = require("three-spritetext");
+            const SpriteText =
+              require("three-spritetext").default ||
+              require("three-spritetext");
             const sprite = new SpriteText(n.slug || "");
             sprite.color = "#ffffff";
             sprite.textHeight = 6;
@@ -252,10 +253,11 @@ const ForceGraph3D: React.FC = () => {
           }}
         />
       ) : (
-        <div className="flex items-center justify-center w-full h-full text-white">
-          Loading graph... {actualWidth}x{actualHeight}, {data.nodes.length}{" "}
-          nodes
-        </div>
+        <LoadingSpinner
+          size={12}
+          className="w-full h-full"
+          text="Loading graph..."
+        />
       )}
       <Legend colorMode={colorMode} maxDepth={maxDepth} data={data} />
     </div>
