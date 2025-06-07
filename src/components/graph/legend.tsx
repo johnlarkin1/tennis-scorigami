@@ -1,23 +1,10 @@
 import type { GraphData } from "@/providers/graph-provider";
 import React, { useMemo } from "react";
-
-// Color constants
-const DEPTH_COLORS: Record<number, string> = {
-  0: "#FF3B30",
-  1: "#FF9500",
-  2: "#FFD60A",
-  3: "#30D158",
-  4: "#5AC8FA",
-  5: "#BF5AF2",
-};
-
-const NEVER_OCCURRED_COLOR = "#dc2626";
-
-const FREQUENCY_LEGEND = [
-  { label: "High frequency", color: "hsl(220,80%,30%)" },
-  { label: "Medium frequency", color: "hsl(220,80%,60%)" },
-  { label: "Low frequency", color: "hsl(220,80%,90%)" },
-];
+import {
+  DEPTH_COLORS,
+  NEVER_OCCURRED_COLOR,
+  FREQUENCY_LEGEND,
+} from "@/constants/graph-colors";
 
 interface LegendProps {
   colorMode: string;

@@ -18,21 +18,17 @@ import forceAtlas2 from "graphology-layout-forceatlas2";
 import { useAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EdgeArrowProgram } from "sigma/rendering";
+import {
+  DEPTH_COLORS,
+  NEVER_OCCURRED_COLOR,
+  FREQUENCY_LEGEND,
+  getOccurrenceIntensityColor,
+  getEdgeColorByDepth,
+  GRAPH_BACKGROUND_COLOR,
+} from "@/constants/graph-colors";
 
 // Create custom border program with visible borders
 const CustomNodeBorderProgram = createNodeBorderProgram({});
-
-// Color constants
-const DEPTH_COLORS: Record<number, string> = {
-  0: "#FF3B30", // Vibrant Red
-  1: "#FF9500", // Warm Orange
-  2: "#FFD60A", // Bright Yellow
-  3: "#30D158", // Spring Green
-  4: "#5AC8FA", // Electric Cyan
-  5: "#BF5AF2", // Electric Purple
-};
-
-const NEVER_OCCURRED_COLOR = "#dc2626"; // Bright red
 
 // Graph constants
 const ROOT_ID = 0;
@@ -88,27 +84,15 @@ const Legend = ({
         <div className="text-gray-400 text-xs mb-3">
           Color intensity shows how often each score occurs
         </div>
-        <div className="flex items-center gap-2 mb-1">
-          <div
-            className="w-4 h-4 rounded-full ring-1 ring-black"
-            style={{ backgroundColor: "hsl(220,80%,30%)" }}
-          />
-          <span className="text-gray-300 text-xs">High frequency</span>
-        </div>
-        <div className="flex items-center gap-2 mb-1">
-          <div
-            className="w-4 h-4 rounded-full ring-1 ring-black"
-            style={{ backgroundColor: "hsl(220,80%,60%)" }}
-          />
-          <span className="text-gray-300 text-xs">Medium frequency</span>
-        </div>
-        <div className="flex items-center gap-2 mb-1">
-          <div
-            className="w-4 h-4 rounded-full ring-1 ring-black"
-            style={{ backgroundColor: "hsl(220,80%,90%)" }}
-          />
-          <span className="text-gray-300 text-xs">Low frequency</span>
-        </div>
+        {FREQUENCY_LEGEND.map((item, i) => (
+          <div key={i} className="flex items-center gap-2 mb-1">
+            <div
+              className="w-4 h-4 rounded-full ring-1 ring-black"
+              style={{ backgroundColor: item.color }}
+            />
+            <span className="text-gray-300 text-xs">{item.label}</span>
+          </div>
+        ))}
         {hasUnscoredNodes && (
           <div className="mt-3 pt-3 border-t border-gray-700">
             <div className="flex items-center gap-2 mb-1">
@@ -279,8 +263,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
         const scale = depthScales[node.depth];
         if (scale) {
           const intensity = scale(node.occurrences) as number;
-          const lightness = 90 - intensity * 60;
-          return `hsl(220, 80%, ${lightness}%)`;
+          return getOccurrenceIntensityColor(intensity);
         }
         return `hsl(220, 80%, 50%)`;
       }
@@ -374,10 +357,9 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
           const fromNode = data.nodes.find((n) => n.id === edge.frm);
           const toNode = data.nodes.find((n) => n.id === edge.to);
           const maxDepth = Math.max(fromNode?.depth || 0, toNode?.depth || 0);
-          const brightness = 40 + maxDepth * 10;
 
           graph.addEdge(edge.frm.toString(), edge.to.toString(), {
-            color: `hsla(200, 60%, ${brightness}%, 0.8)`,
+            color: getEdgeColorByDepth(maxDepth).replace('hsl', 'hsla').replace(')', ', 0.8)'),
             size: 1 + maxDepth * 0.3,
             type: "arrow", // Use arrow edges
           });

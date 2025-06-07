@@ -17,17 +17,15 @@ import {
   showEdgesAtom,
 } from "@/components/graph/controls/graph-controls";
 import type { NodeDTO } from "@/lib/types";
+import {
+  DEPTH_COLORS,
+  NEVER_OCCURRED_COLOR,
+  getOccurrenceIntensityColor,
+  getEdgeColorByDepth,
+  GRAPH_BACKGROUND_COLOR,
+} from "@/constants/graph-colors";
 
 /* ─── constants ────────────────────────────────────────────────────────────── */
-const DEPTH_COLORS: Record<number, string> = {
-  0: "#FF3B30",
-  1: "#FF9500",
-  2: "#FFD60A",
-  3: "#30D158",
-  4: "#5AC8FA",
-  5: "#BF5AF2",
-};
-const NEVER_OCCURRED_COLOR = "#dc2626";
 const ROOT_ID = 0;
 const nodeStrength = 50;
 
@@ -174,8 +172,7 @@ export const ForceGraphStream = () => {
         return DEPTH_COLORS[n.depth] || "#64748b";
       }
       const intensity = depthScales[n.depth]?.(n.occurrences) ?? 0.5;
-      const L = 90 - intensity * 60;
-      return `hsl(220,80%,${L}%)`;
+      return getOccurrenceIntensityColor(intensity);
     },
     [colorMode, depthScales]
   );
@@ -208,7 +205,7 @@ export const ForceGraphStream = () => {
         const t = data.nodes.find((n) => n.id === (l.target as number));
         if (!s || !t) return "#666";
         const d = Math.max(s.depth, t.depth);
-        return `hsl(200,70%,${40 + d * 15}%)`;
+        return getEdgeColorByDepth(d);
       },
       linkWidth: (l: GraphLink) => {
         const s = data.nodes.find((n) => n.id === (l.source as number));
@@ -217,7 +214,7 @@ export const ForceGraphStream = () => {
         return 1 + Math.max(s.depth, t.depth) * 0.5;
       },
       linkVisibility: showEdges,
-      backgroundColor: "#0f172a",
+      backgroundColor: GRAPH_BACKGROUND_COLOR,
       nodeOpacity: 0.9,
       linkOpacity: 0.6,
       linkDirectionalParticles: showEdges ? 2 : 0,

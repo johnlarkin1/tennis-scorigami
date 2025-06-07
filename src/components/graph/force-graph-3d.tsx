@@ -15,18 +15,13 @@ import dynamic from "next/dynamic";
 import React, { useCallback, useMemo, useRef } from "react";
 import type { ForceGraphMethods } from "react-force-graph-3d";
 import { useResizeDetector } from "react-resize-detector";
-
-// Color constants
-const DEPTH_COLORS: Record<number, string> = {
-  0: "#FF3B30",
-  1: "#FF9500",
-  2: "#FFD60A",
-  3: "#30D158",
-  4: "#5AC8FA",
-  5: "#BF5AF2",
-};
-
-const NEVER_OCCURRED_COLOR = "#dc2626";
+import {
+  DEPTH_COLORS,
+  NEVER_OCCURRED_COLOR,
+  getOccurrenceIntensityColor,
+  getEdgeColorByDepth,
+  GRAPH_BACKGROUND_COLOR,
+} from "@/constants/graph-colors";
 const ROOT_ID = 0;
 
 // Dynamically import ForceGraph3D to avoid SSR issues
@@ -98,8 +93,7 @@ const ForceGraph3D: React.FC = () => {
         const scale = depthScales[n.depth];
         if (scale) {
           const intensity = scale(n.occurrences) as number;
-          const L = 90 - intensity * 60;
-          return `hsl(220,80%,${L}%)`;
+          return getOccurrenceIntensityColor(intensity);
         }
         return `hsl(220,80%,50%)`;
       }
@@ -195,8 +189,7 @@ const ForceGraph3D: React.FC = () => {
         if (!source || !target) return "#666";
 
         const maxDepth = Math.max(source.depth, target.depth);
-        const brightness = 40 + maxDepth * 15;
-        return `hsl(200, 70%, ${brightness}%)`;
+        return getEdgeColorByDepth(maxDepth);
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       linkWidth: (link: any) => {
@@ -212,7 +205,7 @@ const ForceGraph3D: React.FC = () => {
         return 1 + maxDepth * 0.5;
       },
       linkVisibility: showEdges,
-      backgroundColor: "#0f172a",
+      backgroundColor: GRAPH_BACKGROUND_COLOR,
       nodeOpacity: 0.9,
       linkOpacity: 0.6,
       linkDirectionalParticles: showEdges ? 2 : 0,
