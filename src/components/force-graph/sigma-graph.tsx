@@ -3,9 +3,9 @@
 import {
   graphColorModeAtom,
   showLabelsAtom,
-} from "@/components/graph/controls";
-import { DiscoveryModal } from "@/components/graph/discovery-modal";
-import { MatchDetailsModal } from "@/components/graph/match-details-modal";
+} from "@/components/force-graph/controls";
+import { DiscoveryModal } from "@/components/force-graph/discovery-modal";
+import { MatchDetailsModal } from "@/components/force-graph/match-details-modal";
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
 import { selectedTournamentAtom } from "@/store/tournament";
 import { convertSexFilter, convertYearFilter } from "@/utils/filter-converters";
@@ -342,12 +342,6 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
 
         const nodeId = node.id.toString();
 
-        // Check if node already exists to prevent duplicates
-        if (graph.hasNode(nodeId)) {
-          console.warn(`Node ${nodeId} already exists, skipping duplicate`);
-          return;
-        }
-
         graph.addNode(nodeId, {
           label: node.slug, // Always include label in node data
           size,
@@ -381,16 +375,11 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
           const maxDepth = Math.max(fromNode?.depth || 0, toNode?.depth || 0);
           const brightness = 40 + maxDepth * 10;
 
-          // Check if edge already exists before adding
-          if (!graph.hasEdge(edge.frm.toString(), edge.to.toString())) {
-            graph.addEdge(edge.frm.toString(), edge.to.toString(), {
-              color: `hsla(200, 60%, ${brightness}%, 0.8)`,
-              size: 1 + maxDepth * 0.3,
-              type: "arrow", // Use arrow edges
-            });
-          } else {
-            console.warn(`Edge ${edge.frm} -> ${edge.to} already exists, skipping`);
-          }
+          graph.addEdge(edge.frm.toString(), edge.to.toString(), {
+            color: `hsla(200, 60%, ${brightness}%, 0.8)`,
+            size: 1 + maxDepth * 0.3,
+            type: "arrow", // Use arrow edges
+          });
         }
       });
 
