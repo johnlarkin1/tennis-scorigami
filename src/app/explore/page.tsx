@@ -1,9 +1,9 @@
 "use client";
 
 import {
-  ForceGraphControls,
+  GraphControls,
   selectedSetsAtom,
-} from "@/components/graph/controls";
+} from "@/components/graph/controls/game-controls";
 import { GraphVisualization } from "@/components/graph/graph-visualization";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
@@ -43,7 +43,7 @@ export default function ExplorePage() {
           >
             {sidebarOpen && (
               <div className="p-4">
-                <ForceGraphControls />
+                <GraphControls />
               </div>
             )}
           </aside>

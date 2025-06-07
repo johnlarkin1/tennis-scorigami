@@ -4,7 +4,7 @@ import {
   graphColorModeAtom,
   showEdgesAtom,
   showLabelsAtom,
-} from "@/components/graph/controls";
+} from "@/components/graph/controls/game-controls";
 import { Legend } from "@/components/graph/legend";
 import type { NodeDTO } from "@/lib/types";
 import { useGraphContext } from "@/providers/graph-provider";
@@ -238,6 +238,15 @@ const ForceGraph3D: React.FC = () => {
           showNavInfo={false}
           enableNodeDrag={true}
           nodeRelSize={nodeStrength / 10}
+          // warmupTicks={1000}
+          // cooldownTicks={0}
+          // d3AlphaDecay={0.0228}
+          // d3VelocityDecay={0.4}
+          // d3Force={{
+          //   charge: { strength: -120, distanceMax: 2000 },
+          //   link: { distance: 30, iterations: 1 },
+          //   center: { x: 0, y: 0, z: 0 }
+          // }}
           onEngineStop={() => {
             // Physics simulation has stopped - no auto-zoom
           }}

@@ -55,7 +55,7 @@ type ForceGraphControlsProps = {
   className?: string;
 };
 
-export const ForceGraphControls: React.FC<ForceGraphControlsProps> = ({
+export const GraphControls: React.FC<ForceGraphControlsProps> = ({
   className,
 }) => {
   // Graph type and layout controls

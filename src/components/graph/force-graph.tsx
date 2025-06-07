@@ -9,7 +9,7 @@ import {
   selectedYearAtom,
   showEdgesAtom,
   showLabelsAtom,
-} from "@/components/graph/controls";
+} from "@/components/graph/controls/game-controls";
 import { DiscoveryModal } from "@/components/graph/discovery-modal";
 import { MatchDetailsModal } from "@/components/graph/match-details-modal";
 import type { EdgeDTO, NodeDTO } from "@/lib/types";

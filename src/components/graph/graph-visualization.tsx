@@ -5,13 +5,13 @@ import {
   selectedSetsAtom,
   selectedSexAtom,
   selectedYearAtom,
-} from "@/components/graph/controls";
+} from "@/components/graph/controls/game-controls";
 import { DiscoveryModal } from "@/components/graph/discovery-modal";
 import { GraphControls } from "@/components/graph/graph-controls";
-import { useGraphData } from "@/lib/hooks/use-graph-data";
 import { LoadingSpinner } from "@/components/graph/loading-spinner";
 import { MatchDetailsModal } from "@/components/graph/match-details-modal";
 import { UnscoredBanner } from "@/components/graph/unscored-banner";
+import { useGraphData } from "@/lib/hooks/use-graph-data";
 import { useGraphContext } from "@/providers/graph-provider";
 import { selectedTournamentAtom } from "@/store/tournament";
 import { useAtom } from "jotai";

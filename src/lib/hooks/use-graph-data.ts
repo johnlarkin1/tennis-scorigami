@@ -2,7 +2,7 @@ import {
   selectedSetsAtom,
   selectedSexAtom,
   selectedYearAtom,
-} from "@/components/graph/controls";
+} from "@/components/graph/controls/game-controls";
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
 import { useGraphContext } from "@/providers/graph-provider";
 import { selectedTournamentAtom } from "@/store/tournament";
