@@ -72,15 +72,6 @@ export const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/#concept"
-                  className="text-gray-300 hover:text-white transition flex items-center group"
-                >
-                  <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-green-400 transition-colors"></span>
-                  The Concept
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/#explore"
                   className="text-gray-300 hover:text-white transition flex items-center group"
                 >
