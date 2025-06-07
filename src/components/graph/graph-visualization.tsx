@@ -5,7 +5,7 @@ import {
   selectedSetsAtom,
   selectedSexAtom,
   selectedYearAtom,
-} from "@/components/graph/controls/game-controls";
+} from "@/components/graph/controls/graph-controls";
 import { DiscoveryModal } from "@/components/graph/discovery-modal";
 import { GraphControls } from "@/components/graph/graph-controls";
 import { LoadingSpinner } from "@/components/graph/loading-spinner";

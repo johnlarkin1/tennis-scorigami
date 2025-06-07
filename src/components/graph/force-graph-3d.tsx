@@ -4,7 +4,7 @@ import {
   graphColorModeAtom,
   showEdgesAtom,
   showLabelsAtom,
-} from "@/components/graph/controls/game-controls";
+} from "@/components/graph/controls/graph-controls";
 import { Legend } from "@/components/graph/legend";
 import type { NodeDTO } from "@/lib/types";
 import { useGraphContext } from "@/providers/graph-provider";

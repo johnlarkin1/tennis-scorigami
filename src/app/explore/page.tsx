@@ -3,7 +3,7 @@
 import {
   GraphControls,
   selectedSetsAtom,
-} from "@/components/graph/controls/game-controls";
+} from "@/components/graph/controls/graph-controls";
 import { GraphVisualization } from "@/components/graph/graph-visualization";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";

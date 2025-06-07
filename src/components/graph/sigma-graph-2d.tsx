@@ -4,7 +4,7 @@ import {
   selectedSetsAtom,
   selectedSexAtom,
   selectedYearAtom,
-} from "@/components/graph/controls/game-controls";
+} from "@/components/graph/controls/graph-controls";
 import { useAtom } from "jotai";
 import dynamic from "next/dynamic";
 import React from "react";

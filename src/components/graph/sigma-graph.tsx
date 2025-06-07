@@ -3,7 +3,7 @@
 import {
   graphColorModeAtom,
   showLabelsAtom,
-} from "@/components/graph/controls/game-controls";
+} from "@/components/graph/controls/graph-controls";
 import { DiscoveryModal } from "@/components/graph/discovery-modal";
 import { MatchDetailsModal } from "@/components/graph/match-details-modal";
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
