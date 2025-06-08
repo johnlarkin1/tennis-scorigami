@@ -8,12 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { SequenceInfo, SequenceMatch } from "@/types/sequence-matches/response";
-import {
-  convertSetsFilter,
-  convertSexFilter,
-  convertTournamentFilter,
-  convertYearFilter,
-} from "@/utils/filter-converters";
+import { fetchMatchesBySequence } from "@/lib/api-client";
 import { format } from "date-fns";
 import {
   Award,
@@ -83,29 +78,12 @@ export function MatchDetailsModal({
       setError(null);
 
       try {
-        const params = new URLSearchParams();
-        const yearValue = convertYearFilter(filters.year);
-        const sexValue = convertSexFilter(filters.sex);
-        const tournamentValue = convertTournamentFilter(filters.tournament);
-        const setsValue = convertSetsFilter(filters.sets);
-
-        if (yearValue) params.append("year", yearValue);
-        if (sexValue) params.append("sex", sexValue);
-        if (tournamentValue) params.append("tournament", tournamentValue);
-        if (setsValue) params.append("sets", setsValue);
-
-        params.append("page", page.toString());
-        params.append("limit", limit.toString());
-
-        const res = await fetch(
-          `/api/v1/matches/by-sequence/${sequenceId}?${params}`
-        );
-        if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.error || "Failed to fetch matches");
-        }
-
-        const data = await res.json();
+        const data = await fetchMatchesBySequence(sequenceId, {
+          year: filters.year,
+          sex: filters.sex,
+          tournament: filters.tournament,
+          sets: filters.sets,
+        }, page, limit);
         setSequence(data.sequence);
         setTotal(data.total);
 

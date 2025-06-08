@@ -3,7 +3,7 @@ import {
   selectedSexAtom,
   selectedYearAtom,
 } from "@/components/graph/controls/graph-controls";
-import { fetchGraphData } from "@/lib/utils/graph-data-fetcher";
+import { fetchGraphData } from "@/lib/api-client";
 import { useGraphContext } from "@/providers/graph-provider";
 import { selectedTournamentAtom } from "@/store/tournament";
 import { useAtom } from "jotai";

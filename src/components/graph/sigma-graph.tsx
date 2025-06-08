@@ -15,7 +15,7 @@ import {
   NEVER_OCCURRED_COLOR,
 } from "@/constants/graph-colors";
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
-import { fetchGraphData } from "@/lib/utils/graph-data-fetcher";
+import { fetchGraphData } from "@/lib/api-client";
 import { selectedTournamentAtom } from "@/store/tournament";
 import { createNodeBorderProgram } from "@sigma/node-border";
 import { scaleLinear } from "d3-scale";

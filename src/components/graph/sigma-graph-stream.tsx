@@ -10,6 +10,7 @@ import { MatchDetailsModal } from "@/components/graph/match-details-modal";
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
 import { selectedTournamentAtom } from "@/store/tournament";
 import { convertSexFilter, convertYearFilter } from "@/utils/filter-converters";
+import { fetchGraphStream } from "@/lib/api-client";
 import { createNodeBorderProgram } from "@sigma/node-border";
 import { scaleLinear } from "d3-scale";
 import Graph from "graphology";
@@ -244,7 +245,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
 
   // Fetch graph data with streaming
   useEffect(() => {
-    async function fetchGraphStream() {
+    async function loadGraphStreamData() {
       // Cancel previous request
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
@@ -259,19 +260,15 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
       setData({ nodes: [], edges: [] });
 
       try {
-        const qs = new URLSearchParams({
+        const response = await fetchGraphStream({
           year: selectedYear ? convertYearFilter(selectedYear.toString()) : "",
           sex: convertSexFilter(selectedSex ?? ""),
-          sets: selectedSets.toString(),
-          tournament:
-            selectedTournament && selectedTournament.tournament_id > 0
-              ? selectedTournament.tournament_id.toString()
-              : "all",
-          maxEdgesPerDepth: GRAPH_CONFIG.maxEdgesPerDepth.toString(),
-          minOccurrences: GRAPH_CONFIG.minOccurrences.toString(),
-        });
-
-        const response = await fetch(`/api/v1/graph-stream?${qs}`, {
+          sets: selectedSets,
+          tournament: selectedTournament && selectedTournament.tournament_id > 0
+            ? selectedTournament.tournament_id.toString()
+            : "all",
+          maxEdgesPerDepth: GRAPH_CONFIG.maxEdgesPerDepth,
+          minOccurrences: GRAPH_CONFIG.minOccurrences,
           signal: abortController.signal,
         });
 
@@ -358,7 +355,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
       }
     }
 
-    fetchGraphStream();
+    loadGraphStreamData();
 
     return () => {
       if (abortControllerRef.current) {

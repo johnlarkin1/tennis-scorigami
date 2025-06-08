@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/skeleton-loaders";
 import { START_DATA_COLLECTION_YEAR } from "@/constants";
 import type { MatchStatWithSamples } from "@/types/match-stats/response";
+import { fetchMatchStats } from "@/lib/api-client";
 
 const FLIP_NUMBERS_HEIGHT = 20;
 const FLIP_NUMBERS_WIDTH = 16;
@@ -42,9 +43,8 @@ export default function UnscoredMatchesSection({ className }: Props) {
   // Fetch live stats once on mount
   useEffect(() => {
     setIsLoading(true);
-    fetch("/api/v1/match-stats")
-      .then((res) => res.json())
-      .then((data: MatchStatWithSamples[]) => {
+    fetchMatchStats()
+      .then((data) => {
         setStats(data);
         setIsLoading(false);
       })

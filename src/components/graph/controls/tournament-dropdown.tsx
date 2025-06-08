@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { fetchTournamentGroups } from "@/services/api-utils";
+import { fetchTournamentGroups } from "@/lib/api-client";
 import {
   ALL_TOURNAMENTS_STRING,
   defaultAllTournament,
