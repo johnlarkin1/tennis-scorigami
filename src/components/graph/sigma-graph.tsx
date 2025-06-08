@@ -15,8 +15,8 @@ import {
   NEVER_OCCURRED_COLOR,
 } from "@/constants/graph-colors";
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
+import { fetchGraphData } from "@/lib/utils/graph-data-fetcher";
 import { selectedTournamentAtom } from "@/store/tournament";
-import { convertSexFilter, convertYearFilter } from "@/utils/filter-converters";
 import { createNodeBorderProgram } from "@sigma/node-border";
 import { scaleLinear } from "d3-scale";
 import Graph from "graphology";
@@ -171,47 +171,16 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
 
   // Fetch graph data
   useEffect(() => {
-    async function fetchGraph() {
+    async function loadGraphData() {
       setLoading(true);
       try {
-        const qs = new URLSearchParams({
-          year: selectedYear ? convertYearFilter(selectedYear.toString()) : "",
-          sex: convertSexFilter(selectedSex ?? ""),
-          sets: selectedSets.toString(),
-          tournament:
-            selectedTournament && selectedTournament.tournament_id > 0
-              ? selectedTournament.tournament_id.toString()
-              : "all",
+        const result = await fetchGraphData({
+          selectedYear,
+          selectedSex,
+          selectedSets,
+          selectedTournament,
         });
-
-        const response = await fetch(`/api/v1/graph?${qs}`);
-        const { nodes: rawNodes, edges: rawEdges } = await response.json();
-
-        // Process and enhance data
-        let nodes = rawNodes.slice();
-        let edges = rawEdges.slice();
-
-        // Add love-all root node if missing
-        if (!nodes.some((n: NodeDTO) => n.depth === 0)) {
-          nodes = [
-            {
-              id: ROOT_ID,
-              slug: "love-all",
-              played: true,
-              depth: 0,
-              occurrences: 1,
-              norm: 1,
-            },
-            ...nodes,
-          ];
-          // Connect root to all depth-1 nodes
-          const rootEdges = nodes
-            .filter((n: NodeDTO) => n.depth === 1)
-            .map((n: NodeDTO) => ({ frm: ROOT_ID, to: n.id }));
-          edges = [...rootEdges, ...edges];
-        }
-
-        setData({ nodes, edges });
+        setData(result);
       } catch (error) {
         console.error("Failed to fetch graph data:", error);
       } finally {
@@ -219,7 +188,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
       }
     }
 
-    fetchGraph();
+    loadGraphData();
   }, [selectedYear, selectedSex, selectedSets, selectedTournament]);
 
   // Depth-based occurrence scales for gradient mode

@@ -1,12 +1,13 @@
 "use client";
 
-import type { NodeDTO } from "@/lib/types";
+import type { EdgeDTO, NodeDTO } from "@/lib/types";
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 type GraphLink = { source: number; target: number };
 
 export interface GraphData {
   nodes: NodeDTO[];
+  edges: EdgeDTO[];
   links: GraphLink[];
 }
 
@@ -48,7 +49,7 @@ interface GraphProviderProps {
 }
 
 export const GraphProvider: React.FC<GraphProviderProps> = ({ children, maxDepth }) => {
-  const [data, setData] = useState<GraphData>({ nodes: [], links: [] });
+  const [data, setData] = useState<GraphData>({ nodes: [], edges: [], links: [] });
   const [loading, setLoading] = useState(false);
   const [selectedSequenceId, setSelectedSequenceId] = useState<number | null>(null);
   const [discoveryModalOpen, setDiscoveryModalOpen] = useState(false);

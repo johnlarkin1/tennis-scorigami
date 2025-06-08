@@ -158,7 +158,7 @@ export async function GET(req: NextRequest) {
 
   /* 6) fetch + assemble edges */
   const rawEdges = await db
-    .select({
+    .selectDistinct({
       frm: sql<number>`frm`,
       to: sql<number>`"to"`,
     })
