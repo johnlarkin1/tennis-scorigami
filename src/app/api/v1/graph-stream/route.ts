@@ -29,12 +29,25 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const sets = Number(url.searchParams.get("sets") ?? "5");
   const sex = (url.searchParams.get("sex") ?? "all").toLowerCase();
-  // const year = url.searchParams.get("year") ?? "";
-  // const tournament = url.searchParams.get("tournament") ?? "all";
+  const yearRaw = url.searchParams.get("year") ?? "all";
+  const tournRaw = url.searchParams.get("tournament") ?? "all";
 
-  // No edge filtering - render complete graph for maximum detail
+  let year: number | null = null;
+  if (yearRaw !== "all") {
+    const y = Number(yearRaw);
+    if (isNaN(y)) return bad("year must be a number or 'all'");
+    year = y;
+  }
+
+  let tournament: number | null = null;
+  if (tournRaw !== "all") {
+    const t = Number(tournRaw);
+    if (isNaN(t)) return bad("tournament must be a number or 'all'");
+    tournament = t;
+  }
+
   console.log(
-    `[Graph Stream] Edge filtering disabled - rendering complete graph`
+    `[Graph Stream] Processing graph data with potential filtering`
   );
 
   if (![3, 5].includes(sets)) return bad("sets must be 3 or 5");
@@ -43,16 +56,51 @@ export async function GET(req: NextRequest) {
   if (sets === 5 && sex === "women")
     return bad("women only play best of 3 sets");
 
-  // Select appropriate view based on parameters
-  // For now, use the hardcoded views as in the original
-  // TODO: Update this when you have views for other parameter combinations
-  const nodesView = "mv_graph_nodes_5_men_all";
-  const edgesView = "mv_graph_edges_5_men_all";
+  // Select appropriate views based on parameters
+  type ViewKey = "3-men" | "3-women" | "3-all" | "5-men" | "5-women" | "5-all";
+  const key = `${sets}-${sex}` as ViewKey;
+
+  const detNodes: Record<ViewKey, string> = {
+    "3-men": "mv_graph_nodes_3_men",
+    "3-women": "mv_graph_nodes_3_women",
+    "3-all": "mv_graph_nodes_3",
+    "5-men": "mv_graph_nodes_5_men",
+    "5-women": "mv_graph_nodes_5_women",
+    "5-all": "mv_graph_nodes_5_men",
+  };
+  const detEdges: Record<ViewKey, string> = {
+    "3-men": "mv_graph_edges_3_men",
+    "3-women": "mv_graph_edges_3_women",
+    "3-all": "mv_graph_edges_3",
+    "5-men": "mv_graph_edges_5_men",
+    "5-women": "mv_graph_edges_5_women",
+    "5-all": "mv_graph_edges_5_men",
+  };
+  const allNodesViews: Record<ViewKey, string> = {
+    "3-men": "mv_graph_nodes_3_men_all",
+    "3-women": "mv_graph_nodes_3_women_all",
+    "3-all": "mv_graph_nodes_3_all",
+    "5-men": "mv_graph_nodes_5_men_all",
+    "5-women": "mv_graph_nodes_5_women_all",
+    "5-all": "mv_graph_nodes_5_men_all",
+  };
+  const allEdgesViews: Record<ViewKey, string> = {
+    "3-men": "mv_graph_edges_3_men_all",
+    "3-women": "mv_graph_edges_3_women_all",
+    "3-all": "mv_graph_edges_3_all",
+    "5-men": "mv_graph_edges_5_men_all",
+    "5-women": "mv_graph_edges_5_women_all",
+    "5-all": "mv_graph_edges_5_men_all",
+  };
+
+  const useRollup = year === null && tournament === null;
+  const nodesView = useRollup ? allNodesViews[key] : detNodes[key];
+  const edgesView = useRollup ? allEdgesViews[key] : detEdges[key];
 
   // Log which views we're using
   console.log(`[Graph Stream] Using views: ${nodesView}, ${edgesView}`);
   console.log(
-    `[Graph Stream] Parameters: sets=${sets}, sex=${sex}, edge filtering=DISABLED`
+    `[Graph Stream] Parameters: sets=${sets}, sex=${sex}, year=${yearRaw}, tournament=${tournRaw}, useRollup=${useRollup}`
   );
 
   try {
@@ -63,17 +111,51 @@ export async function GET(req: NextRequest) {
     console.log(`[Graph Stream] Fetching nodes from ${nodesView}`);
     const nodeStartTime = Date.now();
 
-    const rawNodes = await db
-      .select({
-        id: sql<number>`id`,
-        slug: sql<string>`slug`,
-        depth: sql<number>`depth`,
-        played: sql<boolean>`played`,
-        occurrences: sql<number>`occurrences`,
-      })
-      .from(sql.raw(`${nodesView}`))
-      .orderBy(sql`depth`, sql`occurrences DESC`)
-      .execute();
+    let rawNodes;
+    if (useRollup) {
+      rawNodes = await db
+        .select({
+          id: sql<number>`id`,
+          slug: sql<string>`slug`,
+          depth: sql<number>`depth`,
+          played: sql<boolean>`played`,
+          occurrences: sql<number>`occurrences`,
+        })
+        .from(sql.raw(`${allNodesViews[key]}`))
+        .orderBy(sql`depth`, sql`occurrences DESC`)
+        .execute();
+    } else {
+      // detailed: inline the LEFT JOIN of aggregated stats
+      rawNodes = await db
+        .select({
+          id: sql<number>`b.id`,
+          slug: sql<string>`b.slug`,
+          depth: sql<number>`b.depth`,
+          played: sql<boolean>`COALESCE(f.played, FALSE)`,
+          occurrences: sql<number>`COALESCE(f.occurrences, 0)`,
+        })
+        .from(
+          sql.raw(`
+          ${allNodesViews[key]} AS b
+          LEFT JOIN (
+            SELECT
+              d.id,
+              BOOL_OR(d.played)   AS played,
+              SUM(d.occurrences)  AS occurrences
+            FROM ${detNodes[key]} AS d
+            INNER JOIN event AS e
+              ON d.event_id = e.event_id
+            WHERE
+              ${year !== null ? `e.event_year = ${year}::int` : `TRUE`}
+              AND ${tournament !== null ? `e.tournament_id = ${tournament}::int` : `TRUE`}
+            GROUP BY d.id
+          ) AS f
+            ON f.id = b.id
+        `)
+        )
+        .orderBy(sql`b.depth`, sql`COALESCE(f.occurrences, 0) DESC`)
+        .execute();
+    }
 
     console.log(
       `[Graph Stream] Nodes fetched in ${Date.now() - nodeStartTime}ms, count: ${rawNodes.length}`
@@ -93,14 +175,36 @@ export async function GET(req: NextRequest) {
     console.log(`[Graph Stream] Fetching edges from ${edgesView}`);
     const edgeStartTime = Date.now();
 
-    // Fetch all edges initially
-    const rawEdges = await db
-      .select({
-        frm: sql<number>`frm`,
-        to: sql<number>`"to"`,
-      })
-      .from(sql.raw(edgesView))
-      .execute();
+    let rawEdges;
+    if (useRollup) {
+      // Use pre-aggregated materialized view (no duplicates)
+      rawEdges = await db
+        .select({
+          frm: sql<number>`frm`,
+          to: sql<number>`"to"`,
+        })
+        .from(sql.raw(`${allEdgesViews[key]}`))
+        .execute();
+    } else {
+      // Filter and aggregate edges to prevent duplicates
+      rawEdges = await db
+        .select({
+          frm: sql<number>`d.frm`,
+          to: sql<number>`d."to"`,
+        })
+        .from(
+          sql.raw(`
+          ${detEdges[key]} AS d
+          INNER JOIN event AS e
+            ON d.event_id = e.event_id
+          WHERE
+            ${year !== null ? `e.event_year = ${year}::int` : `TRUE`}
+            AND ${tournament !== null ? `e.tournament_id = ${tournament}::int` : `TRUE`}
+          GROUP BY d.frm, d."to"
+        `)
+        )
+        .execute();
+    }
 
     console.log(
       `[Graph Stream] Raw edges fetched in ${Date.now() - edgeStartTime}ms, count: ${rawEdges.length}`
@@ -124,16 +228,15 @@ export async function GET(req: NextRequest) {
     const allEdges: EdgeDTO[] = [...rootEdges, ...rawEdges];
 
     // Skip positioning computation - let frontend handle it for now
-    console.log(`[Graph Stream] Skipping backend positioning - using frontend layout`);
-    
+    console.log(
+      `[Graph Stream] Skipping backend positioning - using frontend layout`
+    );
+
     // Just pass through nodes without positions
     const nodesWithPositions = nodes;
 
-    // Create node map for quick lookup
-    const nodeMap = new Map(nodesWithPositions.map((n) => [n.id, n]));
-    
     console.log(
-      `[Graph Stream] Using all ${allEdges.length} edges without filtering (${rawEdges.length} from DB + ${rootEdges.length} root edges)`
+      `[Graph Stream] Using ${allEdges.length} edges (${rawEdges.length} from DB + ${rootEdges.length} root edges) ${useRollup ? 'from materialized view' : 'with filtering and deduplication'}`
     );
 
     console.log(

@@ -19,26 +19,6 @@ const rootNode: NodeDTO = {
   norm: 0,
 };
 
-function assertNoCycles(nodes: NodeDTO[], edges: EdgeDTO[]) {
-  const adj = new Map<number, number[]>();
-  for (const { frm, to } of edges) {
-    if (frm === to) throw new Error(`Self-loop at node ${frm}`);
-    adj.set(frm, (adj.get(frm) || []).concat(to));
-  }
-  const visiting = new Set<number>();
-  const visited = new Set<number>();
-  function dfs(u: number) {
-    visiting.add(u);
-    for (const v of adj.get(u) || []) {
-      if (visiting.has(v)) throw new Error(`Cycle detected: ${u} → ${v}`);
-      if (!visited.has(v)) dfs(v);
-    }
-    visiting.delete(u);
-    visited.add(u);
-  }
-  for (const { id } of nodes) if (!visited.has(id)) dfs(id);
-}
-
 export async function GET(req: NextRequest) {
   /* 1) parse + validate */
   const url = new URL(req.url);
@@ -93,7 +73,7 @@ export async function GET(req: NextRequest) {
     "3-all": "mv_graph_nodes_3_all",
     "5-men": "mv_graph_nodes_5_men_all",
     "5-women": "mv_graph_nodes_5_women_all",
-    "5-all": "mv_graph_nodes_5_men",
+    "5-all": "mv_graph_nodes_5_men_all",
   };
   const allEdges: Record<ViewKey, string> = {
     "3-men": "mv_graph_edges_3_men_all",
@@ -101,7 +81,7 @@ export async function GET(req: NextRequest) {
     "3-all": "mv_graph_edges_3_all",
     "5-men": "mv_graph_edges_5_men_all",
     "5-women": "mv_graph_edges_5_women_all",
-    "5-all": "mv_graph_edges_5_men",
+    "5-all": "mv_graph_edges_5_men_all",
   };
 
   const useRollup = year === null && tournament === null;
