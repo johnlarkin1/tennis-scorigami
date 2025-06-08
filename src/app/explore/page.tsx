@@ -1,19 +1,14 @@
 "use client";
 
-import {
-  GraphControls,
-  selectedSetsAtom,
-} from "@/components/graph/controls/graph-controls";
-import { GraphVisualization } from "@/components/graph/graph-visualization";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { GraphProvider } from "@/providers/graph-provider";
+import { selectedSetsAtom } from "@/components/graph/controls/graph-controls";
 import { useAtom } from "jotai";
-import { ChevronLeft, Settings } from "lucide-react";
-import { useState } from "react";
+import { Suspense } from "react";
+import { ExplorePageContent } from "./explore-page-content";
 
 export default function ExplorePage() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedSets] = useAtom(selectedSetsAtom);
 
   return (
@@ -34,36 +29,9 @@ export default function ExplorePage() {
           </p>
         </div>
 
-        {/* Main Content with Sidebar and Graph */}
-        <div className="flex flex-1 relative">
-          {/* Sidebar Controls */}
-          <aside
-            className={`bg-gray-800 border-r border-gray-700 h-[calc(100vh-180px)] z-10 transition-all duration-300 overflow-y-auto
-              ${sidebarOpen ? "w-80 lg:w-96" : "w-0"}`}
-          >
-            {sidebarOpen && (
-              <div className="p-4">
-                <GraphControls />
-              </div>
-            )}
-          </aside>
-
-          {/* Toggle Button */}
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className={`absolute top-4 bg-gray-700 hover:bg-gray-600 z-20 p-2 rounded-r-lg shadow-lg transition-all duration-300
-              ${sidebarOpen ? "left-80 lg:left-96" : "left-0"}`}
-          >
-            {sidebarOpen ? <ChevronLeft size={18} /> : <Settings size={18} />}
-          </button>
-
-          {/* Main Graph Area */}
-          <div className="flex-1 bg-gray-850 relative">
-            <div className="absolute inset-0">
-              <GraphVisualization />
-            </div>
-          </div>
-        </div>
+        <Suspense fallback={<div>Loading...</div>}>
+          <ExplorePageContent />
+        </Suspense>
 
         <Footer />
       </main>
