@@ -17,6 +17,7 @@ import FA2Layout from "graphology-layout-forceatlas2/worker";
 import { useAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EdgeArrowProgram } from "sigma/rendering";
+import type { default as Sigma } from "sigma";
 
 // Constants
 const CustomNodeBorderProgram = createNodeBorderProgram({});
@@ -569,22 +570,8 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
         // Performance optimizations
         hideEdgesOnMove: isLargeGraph || isMassiveGraph,
         hideLabelsOnMove: true,
-        renderEdgeArrows: false, // Always disable for performance
-        // Reduce rendering precision for better performance
-        antiAliasingQuality: isMassiveGraph
-          ? "low" // Faster rendering for massive graphs
-          : isLargeGraph
-            ? "medium"
-            : "high",
-        pixelRatio: isMassiveGraph ? 0.75 : isLargeGraph ? 1.5 : 2, // Lower for better performance
         // Skip node reducer entirely for large graphs to improve performance
         nodeReducer: undefined,
-        // Additional optimizations for massive graphs
-        enableEdgeHoverEvents: false, // Always disable for better performance
-        enableNodeHoverEvents: !isMassiveGraph,
-        // WebGL optimizations for massive graphs
-        allowInvalidContainer: false,
-        renderEdgeLabels: false,
       });
 
       // Skip layout for massive graphs or use very fast settings
@@ -636,7 +623,8 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
         });
       } else {
         // For massive graphs, only set up click handler without hover effects
-        sigma.on("clickNode", (event: { node: string }) => {
+        sigma.on("clickNode", (...args: unknown[]) => {
+          const event = args[0] as { node: string };
           try {
             const nodeData = graph.getNodeAttributes(event.node);
             const originalNode = nodeData.originalNode as NodeDTO;
@@ -775,7 +763,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
 function createLabelRenderer(showLabels: boolean) {
   return function drawLabel(
     context: CanvasRenderingContext2D,
-    data: { x: number; y: number; size: number; label?: string },
+    data: { x: number; y: number; size: number; label?: string | null },
     settings: { labelWeight: string; labelFont: string }
   ) {
     const size = data.size;
@@ -875,7 +863,8 @@ function setupEventHandlers(
   }
 ) {
   // Click handler
-  sigma.on("clickNode", (event: { node: string }) => {
+  sigma.on("clickNode", (...args: unknown[]) => {
+    const event = args[0] as { node: string };
     try {
       const nodeData = graph.getNodeAttributes(event.node);
       const originalNode = nodeData.originalNode as NodeDTO;
@@ -922,7 +911,8 @@ function setupEventHandlers(
     sigma.refresh();
   }, GRAPH_CONFIG.rendering.refreshDebounce);
 
-  const handleNodeEnter = throttle((event: { node: string }) => {
+  const handleNodeEnter = throttle((...args: unknown[]) => {
+    const event = args[0] as { node: string };
     try {
       const node = event.node;
       if (!graph.hasNode(node)) return;
@@ -948,7 +938,8 @@ function setupEventHandlers(
 
   sigma.on("enterNode", handleNodeEnter);
 
-  const handleNodeLeave = throttle((event: { node: string }) => {
+  const handleNodeLeave = throttle((...args: unknown[]) => {
+    const event = args[0] as { node: string };
     try {
       const node = event.node;
       if (!graph.hasNode(node)) return;
