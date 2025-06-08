@@ -12,4 +12,6 @@ export interface NodeDTO {
   depth: number;
   occurrences: number; // raw count
   norm: number; // occurrences / maxOccurrences
+  x?: number; // Pre-computed x position (optional for backward compatibility)
+  y?: number; // Pre-computed y position (optional for backward compatibility)
 }

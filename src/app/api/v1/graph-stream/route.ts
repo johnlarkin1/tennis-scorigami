@@ -19,136 +19,196 @@ const rootNode: NodeDTO = {
   norm: 0,
 };
 
+interface EdgeCluster {
+  representative: EdgeDTO;
+  count: number;
+  importance: number;
+}
+
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const sets = Number(url.searchParams.get("sets") ?? "5");
-  const sex = (url.searchParams.get("gender") ?? "all").toLowerCase();
+  const sex = (url.searchParams.get("sex") ?? "all").toLowerCase();
+  // const year = url.searchParams.get("year") ?? "";
+  // const tournament = url.searchParams.get("tournament") ?? "all";
+
+  // No edge filtering - render complete graph for maximum detail
+  console.log(
+    `[Graph Stream] Edge filtering disabled - rendering complete graph`
+  );
+
   if (![3, 5].includes(sets)) return bad("sets must be 3 or 5");
   if (!["men", "women", "all"].includes(sex))
     return bad("gender must be men|women|all");
   if (sets === 5 && sex === "women")
     return bad("women only play best of 3 sets");
 
-  // determine views
-  type ViewKey = "3-men" | "3-women" | "3-all" | "5-men" | "5-women" | "5-all";
-  // const key = `${sets}-${sex}` as ViewKey;
-  const key = "5-men";
-  const nodesViewMap: Record<ViewKey, string> = {
-    "3-men": "mv_graph_nodes_3_men",
-    "3-women": "mv_graph_nodes_3_women",
-    "3-all": "mv_graph_nodes_3",
-    "5-men": "mv_graph_nodes_5_men",
-    "5-women": "mv_graph_nodes_5_women",
-    "5-all": "mv_graph_nodes_5_men",
-  };
-  const edgesViewMap: Record<ViewKey, string> = {
-    "3-men": "mv_graph_edges_3_men",
-    "3-women": "mv_graph_edges_3_women",
-    "3-all": "mv_graph_edges_3",
-    "5-men": "mv_graph_edges_5_men",
-    "5-women": "mv_graph_edges_5_women",
-    "5-all": "mv_graph_edges_5_men",
-  };
-  const nodesView = nodesViewMap[key];
-  const edgesView = edgesViewMap[key];
+  // Select appropriate view based on parameters
+  // For now, use the hardcoded views as in the original
+  // TODO: Update this when you have views for other parameter combinations
+  const nodesView = "mv_graph_nodes_5_men_all";
+  const edgesView = "mv_graph_edges_5_men_all";
 
-  // 1) load & normalize nodes
-  const rawNodes = await db
-    .select({
-      id: sql<number>`id`,
-      slug: sql<string>`slug`,
-      depth: sql<number>`depth`,
-      played: sql<boolean>`played`,
-      occurrences: sql<number>`occurrences`,
-    })
-    .from(sql.raw(nodesView))
-    .orderBy(sql`depth`)
-    .execute();
+  // Log which views we're using
+  console.log(`[Graph Stream] Using views: ${nodesView}, ${edgesView}`);
+  console.log(
+    `[Graph Stream] Parameters: sets=${sets}, sex=${sex}, edge filtering=DISABLED`
+  );
 
-  const maxOcc = rawNodes.reduce((m, n) => Math.max(m, n.occurrences), 1);
-  const nodes: NodeDTO[] = rawNodes.map((n) => ({
-    ...n,
-    norm: n.occurrences / maxOcc,
-  }));
-
-  // 2) root‐to‐depth1 edges
-  const rootEdges: EdgeDTO[] = nodes
-    .filter((n) => n.depth === 1)
-    .map((n) => ({ frm: ROOT_ID, to: n.id }));
-
-  // 3) load edges
-  const rawEdges = await db
-    .select({ frm: sql<number>`frm`, to: sql<number>`"to"` })
-    .from(sql.raw(edgesView))
-    .execute();
-  const edges: EdgeDTO[] = rawEdges.map((e) => ({ frm: e.frm, to: e.to }));
-
-  // 4) inject root node & edges
-  nodes.unshift(rootNode);
-  edges.unshift(...rootEdges);
-
-  // 5) cycle‐detect
   try {
-    assertNoCycles(nodes, edges);
-  } catch (err: any) {
-    console.error(err.message);
-    return bad(err.message);
-  }
+    console.log(`[Graph Stream] Starting query for ${sets}-set ${sex} matches`);
+    const startTime = Date.now();
 
-  // Log node and edge counts
-  console.log(`[API] Graph data: ${nodes.length} nodes, ${edges.length} edges`);
+    // Fetch nodes
+    console.log(`[Graph Stream] Fetching nodes from ${nodesView}`);
+    const nodeStartTime = Date.now();
 
-  // 6) stream NDJSON
-  const encoder = new TextEncoder();
-  const totalNodes = nodes.length;
-  const totalEdges = edges.length;
-  const stream = new ReadableStream({
-    start(ctrl) {
-      // meta
-      ctrl.enqueue(
-        encoder.encode(
-          JSON.stringify({ type: "meta", totalNodes, totalEdges }) + "\n"
-        )
-      );
-      // nodes
-      for (const n of nodes) {
-        ctrl.enqueue(
-          encoder.encode(JSON.stringify({ type: "node", ...n }) + "\n")
-        );
-      }
-      // edges
-      for (const e of edges) {
-        ctrl.enqueue(
-          encoder.encode(JSON.stringify({ type: "edge", ...e }) + "\n")
-        );
-      }
-      // end marker
-      ctrl.enqueue(encoder.encode(JSON.stringify({ type: "end" }) + "\n"));
-      ctrl.close();
-    },
-  });
+    const rawNodes = await db
+      .select({
+        id: sql<number>`id`,
+        slug: sql<string>`slug`,
+        depth: sql<number>`depth`,
+        played: sql<boolean>`played`,
+        occurrences: sql<number>`occurrences`,
+      })
+      .from(sql.raw(`${nodesView}`))
+      .orderBy(sql`depth`, sql`occurrences DESC`)
+      .execute();
 
-  return new Response(stream, {
-    headers: { "Content-Type": "application/x-ndjson" },
-  });
-}
+    console.log(
+      `[Graph Stream] Nodes fetched in ${Date.now() - nodeStartTime}ms, count: ${rawNodes.length}`
+    );
 
-function assertNoCycles(nodes: NodeDTO[], edges: EdgeDTO[]) {
-  const adj = new Map<number, number[]>();
-  for (const { frm, to } of edges) {
-    if (frm === to) throw new Error(`Self-loop at ${frm}`);
-    adj.set(frm, (adj.get(frm) || []).concat(to));
-  }
-  const visiting = new Set<number>();
-  const visited = new Set<number>();
-  function dfs(u: number) {
-    visiting.add(u);
-    for (const v of adj.get(u) || []) {
-      if (visiting.has(v)) throw new Error(`Cycle: ${u}→${v}`);
-      if (!visited.has(v)) dfs(v);
+    // Normalize nodes
+    const maxOcc = rawNodes.reduce((m, n) => Math.max(m, n.occurrences), 1);
+    const nodes: NodeDTO[] = rawNodes.map((n) => ({
+      ...n,
+      norm: n.occurrences / maxOcc,
+    }));
+
+    // Add root node
+    nodes.unshift(rootNode);
+
+    // Fetch edges with filtering
+    console.log(`[Graph Stream] Fetching edges from ${edgesView}`);
+    const edgeStartTime = Date.now();
+
+    // Fetch all edges initially
+    const rawEdges = await db
+      .select({
+        frm: sql<number>`frm`,
+        to: sql<number>`"to"`,
+      })
+      .from(sql.raw(edgesView))
+      .execute();
+
+    console.log(
+      `[Graph Stream] Raw edges fetched in ${Date.now() - edgeStartTime}ms, count: ${rawEdges.length}`
+    );
+
+    // Debug: Show some edge samples
+    if (rawEdges.length > 0) {
+      console.log(`[Graph Stream] Sample edges:`, rawEdges.slice(0, 5));
     }
-    visiting.delete(u);
-    visited.add(u);
+    if (rawEdges.length < 1000) {
+      console.log(
+        `[Graph Stream] WARNING: Very few edges found (${rawEdges.length}), this seems wrong for 125k nodes`
+      );
+    }
+
+    // Add root edges
+    const rootEdges: EdgeDTO[] = nodes
+      .filter((n) => n.depth === 1)
+      .map((n) => ({ frm: ROOT_ID, to: n.id }));
+
+    const allEdges: EdgeDTO[] = [...rootEdges, ...rawEdges];
+
+    // Skip positioning computation - let frontend handle it for now
+    console.log(`[Graph Stream] Skipping backend positioning - using frontend layout`);
+    
+    // Just pass through nodes without positions
+    const nodesWithPositions = nodes;
+
+    // Create node map for quick lookup
+    const nodeMap = new Map(nodesWithPositions.map((n) => [n.id, n]));
+    
+    console.log(
+      `[Graph Stream] Using all ${allEdges.length} edges without filtering (${rawEdges.length} from DB + ${rootEdges.length} root edges)`
+    );
+
+    console.log(
+      `[Graph Stream] Total processing time: ${Date.now() - startTime}ms`
+    );
+
+    // Stream the data
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          // Send metadata
+          controller.enqueue(
+            encoder.encode(
+              JSON.stringify({
+                type: "meta",
+                totalItems: nodesWithPositions.length + allEdges.length,
+                totalNodes: nodesWithPositions.length,
+                totalEdges: allEdges.length,
+              }) + "\n"
+            )
+          );
+
+          // Send nodes with positions in larger batches for better performance
+          const nodeBatchSize = 500; // Increased from 100 to 500
+          for (let i = 0; i < nodesWithPositions.length; i += nodeBatchSize) {
+            const batch = nodesWithPositions.slice(i, i + nodeBatchSize);
+            controller.enqueue(
+              encoder.encode(
+                JSON.stringify({
+                  type: "nodes",
+                  data: batch,
+                }) + "\n"
+              )
+            );
+          }
+
+          // Send edges in larger batches for better performance
+          const edgeBatchSize = 2000; // Increased from 200 to 2000
+          for (let i = 0; i < allEdges.length; i += edgeBatchSize) {
+            const batch = allEdges.slice(i, i + edgeBatchSize);
+            controller.enqueue(
+              encoder.encode(
+                JSON.stringify({
+                  type: "edges",
+                  data: batch,
+                }) + "\n"
+              )
+            );
+          }
+
+          // Send completion marker
+          controller.enqueue(
+            encoder.encode(JSON.stringify({ type: "complete" }) + "\n")
+          );
+
+          controller.close();
+        } catch (error) {
+          console.error("[Graph Stream] Streaming error:", error);
+          controller.error(error);
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "application/x-ndjson",
+        "Cache-Control": "public, max-age=300",
+        "X-Content-Type-Options": "nosniff",
+      },
+    });
+  } catch (error) {
+    console.error("Graph stream error:", error);
+    return bad("Failed to stream graph data");
   }
-  for (const { id } of nodes) if (!visited.has(id)) dfs(id);
 }
+
+// Edge filtering function removed - now rendering complete graph

@@ -85,7 +85,7 @@ export const ForceGraphStream = () => {
 
       const qs = new URLSearchParams({
         year: selectedYear?.toString() ?? "",
-        gender:
+        sex:
           selectedSex === "Men and Women"
             ? "all"
             : (selectedSex?.toLowerCase() ?? ""),
@@ -241,9 +241,9 @@ export const ForceGraphStream = () => {
     <div ref={wrapperRef} className="relative w-full h-full overflow-hidden">
       {loading && totalCount > 0 && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/50">
-          <LoadingSpinner 
-            size={12} 
-            text={`Loading graph... ${Math.round((progress / totalCount) * 100)}%`} 
+          <LoadingSpinner
+            size={12}
+            text={`Loading graph... ${Math.round((progress / totalCount) * 100)}%`}
           />
         </div>
       )}

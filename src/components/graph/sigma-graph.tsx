@@ -7,6 +7,13 @@ import {
 import { DiscoveryModal } from "@/components/graph/discovery-modal";
 import { MatchDetailsModal } from "@/components/graph/match-details-modal";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import {
+  DEPTH_COLORS,
+  FREQUENCY_LEGEND,
+  getEdgeColorByDepth,
+  getOccurrenceIntensityColor,
+  NEVER_OCCURRED_COLOR,
+} from "@/constants/graph-colors";
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
 import { selectedTournamentAtom } from "@/store/tournament";
 import { convertSexFilter, convertYearFilter } from "@/utils/filter-converters";
@@ -18,14 +25,6 @@ import forceAtlas2 from "graphology-layout-forceatlas2";
 import { useAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EdgeArrowProgram } from "sigma/rendering";
-import {
-  DEPTH_COLORS,
-  NEVER_OCCURRED_COLOR,
-  FREQUENCY_LEGEND,
-  getOccurrenceIntensityColor,
-  getEdgeColorByDepth,
-  GRAPH_BACKGROUND_COLOR,
-} from "@/constants/graph-colors";
 
 // Create custom border program with visible borders
 const CustomNodeBorderProgram = createNodeBorderProgram({});
@@ -326,6 +325,12 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
 
         const nodeId = node.id.toString();
 
+        // Check if node already exists to prevent duplicates
+        if (graph.hasNode(nodeId)) {
+          console.warn(`Node ${nodeId} already exists, skipping duplicate`);
+          return;
+        }
+
         graph.addNode(nodeId, {
           label: node.slug, // Always include label in node data
           size,
@@ -359,7 +364,9 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
           const maxDepth = Math.max(fromNode?.depth || 0, toNode?.depth || 0);
 
           graph.addEdge(edge.frm.toString(), edge.to.toString(), {
-            color: getEdgeColorByDepth(maxDepth).replace('hsl', 'hsla').replace(')', ', 0.8)'),
+            color: getEdgeColorByDepth(maxDepth)
+              .replace("hsl", "hsla")
+              .replace(")", ", 0.8)"),
             size: 1 + maxDepth * 0.3,
             type: "arrow", // Use arrow edges
           });
