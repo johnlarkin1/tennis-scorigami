@@ -7,6 +7,7 @@ import {
 } from "@/components/graph/controls/graph-controls";
 import { DiscoveryModal } from "@/components/graph/discovery-modal";
 import { MatchDetailsModal } from "@/components/graph/match-details-modal";
+import { GraphLoadingState } from "@/components/graph/graph-loading-state";
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
 import { selectedTournamentAtom } from "@/store/tournament";
 import { convertSexFilter, convertYearFilter } from "@/utils/filter-converters";
@@ -176,8 +177,12 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
   const [showLabels] = useAtom(showLabelsAtom);
 
   const [loading, setLoading] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState("Initializing...");
+  const [loadingStatus, setLoadingStatus] = useState<"connecting" | "loading-metadata" | "loading-nodes" | "loading-edges" | "rendering">("connecting");
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [totalNodes, setTotalNodes] = useState<number | undefined>();
+  const [totalEdges, setTotalEdges] = useState<number | undefined>();
+  const [loadedNodes, setLoadedNodes] = useState<number | undefined>();
+  const [loadedEdges, setLoadedEdges] = useState<number | undefined>();
   const [data, setData] = useState<{ nodes: NodeDTO[]; edges: EdgeDTO[] }>({
     nodes: [],
     edges: [],
@@ -215,8 +220,12 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
       abortControllerRef.current = abortController;
 
       setLoading(true);
-      setLoadingMessage("Connecting to server...");
+      setLoadingStatus("connecting");
       setLoadingProgress(0);
+      setTotalNodes(undefined);
+      setTotalEdges(undefined);
+      setLoadedNodes(undefined);
+      setLoadedEdges(undefined);
       setData({ nodes: [], edges: [] });
 
       try {
@@ -242,8 +251,12 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
 
         const tempNodes: NodeDTO[] = [];
         const tempEdges: EdgeDTO[] = [];
-        let totalNodes = 0;
-        let totalEdges = 0;
+        let streamTotalNodes = 0;
+        let streamTotalEdges = 0;
+
+        // Initial connection successful
+        setLoadingStatus("loading-metadata");
+        setLoadingProgress(5);
 
         while (true) {
           const { done, value } = await reader.read();
@@ -261,32 +274,31 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
 
               switch (message.type) {
                 case "meta":
-                  totalNodes = message.totalNodes;
-                  totalEdges = message.totalEdges;
-                  setLoadingMessage(
-                    `Loading ${totalNodes} nodes and ${totalEdges} edges...`
-                  );
+                  streamTotalNodes = message.totalNodes;
+                  streamTotalEdges = message.totalEdges;
+                  setTotalNodes(streamTotalNodes);
+                  setTotalEdges(streamTotalEdges);
+                  setLoadingStatus("loading-nodes");
                   setLoadingProgress(10);
                   break;
 
                 case "nodes":
                   tempNodes.push(...message.data);
+                  setLoadedNodes(tempNodes.length);
                   const nodeProgress =
-                    10 + (tempNodes.length / totalNodes) * 40;
+                    10 + (tempNodes.length / streamTotalNodes) * 40;
                   setLoadingProgress(nodeProgress);
-                  setLoadingMessage(
-                    `Loaded ${tempNodes.length}/${totalNodes} nodes...`
-                  );
+                  if (tempNodes.length >= streamTotalNodes) {
+                    setLoadingStatus("loading-edges");
+                  }
                   break;
 
                 case "edges":
                   tempEdges.push(...message.data);
+                  setLoadedEdges(tempEdges.length);
                   const edgeProgress =
-                    50 + (tempEdges.length / totalEdges) * 40;
+                    50 + (tempEdges.length / streamTotalEdges) * 40;
                   setLoadingProgress(edgeProgress);
-                  setLoadingMessage(
-                    `Loaded ${tempEdges.length}/${totalEdges} edges...`
-                  );
                   break;
 
                 case "complete":
@@ -294,8 +306,8 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
                     `[SigmaGraph Stream] Received ${tempNodes.length} nodes and ${tempEdges.length} edges`
                   );
                   setData({ nodes: tempNodes, edges: tempEdges });
-                  setLoadingProgress(100);
-                  setLoadingMessage("Rendering graph...");
+                  setLoadingStatus("rendering");
+                  setLoadingProgress(95);
                   break;
               }
             } catch (e) {
@@ -306,10 +318,6 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
       } catch (error) {
         if (error instanceof Error && error.name !== "AbortError") {
           console.error("Failed to fetch graph data:", error);
-          setLoadingMessage("Failed to load graph data");
-        }
-      } finally {
-        if (!abortController.signal.aborted) {
           setLoading(false);
         }
       }
@@ -617,6 +625,11 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
       // Center camera after a short delay
       setTimeout(() => {
         sigma.getCamera().animatedReset({ duration: 500 });
+        // Complete loading after rendering
+        setLoadingProgress(100);
+        setTimeout(() => {
+          setLoading(false);
+        }, 300);
       }, 1000);
     });
 
@@ -668,22 +681,14 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
   return (
     <div className={`relative ${className}`}>
       {loading && (
-        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10 backdrop-blur-sm">
-          <div className="flex flex-col items-center">
-            <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin mb-4"></div>
-            <div className="text-white text-lg font-medium mb-2">
-              {loadingMessage}
-            </div>
-            <div className="w-64">
-              <div className="bg-gray-700 rounded-full h-2 overflow-hidden">
-                <div
-                  className="bg-green-500 h-full transition-all duration-300"
-                  style={{ width: `${loadingProgress}%` }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+        <GraphLoadingState
+          status={loadingStatus}
+          progress={loadingProgress}
+          totalNodes={totalNodes}
+          totalEdges={totalEdges}
+          loadedNodes={loadedNodes}
+          loadedEdges={loadedEdges}
+        />
       )}
 
       <div

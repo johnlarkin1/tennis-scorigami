@@ -144,7 +144,15 @@ export default function UnscoredMatchesSection({ className }: Props) {
                       <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
                         <span className="text-gray-300">Out of</span>
                         <SkeletonFlipNumber />
-                        <span className="text-gray-300">possible score.</span>
+                        <span className="text-gray-300">possible scores.</span>
+                      </div>
+                    </div>
+
+                    {/* Completion percentage - Skeleton */}
+                    <div className="flex items-center justify-center text-lg md:text-xl">
+                      <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+                        <SkeletonFlipNumber />
+                        <span className="text-gray-300">of all possible scores have been played.</span>
                       </div>
                     </div>
                   </div>
@@ -315,7 +323,27 @@ export default function UnscoredMatchesSection({ className }: Props) {
                           duration={FLIP_NUMBERS_DURATION}
                         />
                       </span>
-                      <span className="text-gray-300">possible score.</span>
+                      <span className="text-gray-300">possible scores.</span>
+                    </div>
+                  </div>
+
+                  {/* Completion percentage */}
+                  <div className="flex items-center justify-center text-lg md:text-xl">
+                    <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+                      <span className="inline-flex items-center h-9 w-[100px] px-4 bg-gradient-to-r from-green-500/10 to-green-400/10 rounded-lg justify-center">
+                        <FlipNumbers
+                          height={FLIP_NUMBERS_HEIGHT}
+                          width={FLIP_NUMBERS_WIDTH}
+                          color="#4ade80"
+                          background="transparent"
+                          play
+                          numbers={`${parseFloat(currentStat.completion_pct).toFixed(1)}%`}
+                          nonNumberStyle={FLIP_TEXT_STYLE}
+                          numberStyle={FLIP_TEXT_STYLE}
+                          duration={FLIP_NUMBERS_DURATION}
+                        />
+                      </span>
+                      <span className="text-gray-300">of all possible scores have been played.</span>
                     </div>
                   </div>
                 </div>

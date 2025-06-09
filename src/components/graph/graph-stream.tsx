@@ -8,6 +8,7 @@ import type { ForceGraphMethods } from "react-force-graph-3d";
 import { useResizeDetector } from "react-resize-detector";
 
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { GraphLoadingState } from "@/components/graph/graph-loading-state";
 
 import {
   graphColorModeAtom,
@@ -59,8 +60,12 @@ export const ForceGraphStream = () => {
 
   /* streaming state */
   const [loading, setLoading] = useState(true);
+  const [loadingStatus, setLoadingStatus] = useState<"connecting" | "loading-metadata" | "loading-nodes" | "loading-edges" | "rendering">("connecting");
   const [progress, setProgress] = useState(0);
-  const [totalCount, setTotalCount] = useState(0);
+  const [totalNodes, setTotalNodes] = useState(0);
+  const [totalEdges, setTotalEdges] = useState(0);
+  const [loadedNodes, setLoadedNodes] = useState(0);
+  const [loadedEdges, setLoadedEdges] = useState(0);
   const [data, setData] = useState<GraphData>({ nodes: [], links: [] });
 
   /* per-depth occurrence scales */
@@ -82,8 +87,12 @@ export const ForceGraphStream = () => {
 
     (async () => {
       setProgress(0);
-      setTotalCount(0);
+      setTotalNodes(0);
+      setTotalEdges(0);
+      setLoadedNodes(0);
+      setLoadedEdges(0);
       setLoading(true);
+      setLoadingStatus("connecting");
 
       const qs = new URLSearchParams({
         year: selectedYear?.toString() ?? "",
@@ -103,6 +112,11 @@ export const ForceGraphStream = () => {
       let buf = "";
       const nodes: NodeDTO[] = [];
       const links: GraphLink[] = [];
+      let metaTotalNodes = 0;
+      let metaTotalEdges = 0;
+      
+      setLoadingStatus("loading-metadata");
+      setProgress(5);
 
       while (true) {
         const { value, done } = await reader.read();
@@ -118,7 +132,12 @@ export const ForceGraphStream = () => {
 
           switch (obj.type) {
             case "meta":
-              setTotalCount(obj.totalNodes + obj.totalEdges);
+              metaTotalNodes = obj.totalNodes;
+              metaTotalEdges = obj.totalEdges;
+              setTotalNodes(metaTotalNodes);
+              setTotalEdges(metaTotalEdges);
+              setLoadingStatus("loading-nodes");
+              setProgress(10);
               break;
             case "node":
               nodes.push({
@@ -129,11 +148,22 @@ export const ForceGraphStream = () => {
                 occurrences: obj.occurrences,
                 norm: obj.norm,
               });
-              setProgress((p) => p + 1);
+              setLoadedNodes(nodes.length);
+              if (metaTotalNodes > 0) {
+                const nodeProgress = 10 + (nodes.length / metaTotalNodes) * 40;
+                setProgress(nodeProgress);
+                if (nodes.length >= metaTotalNodes) {
+                  setLoadingStatus("loading-edges");
+                }
+              }
               break;
             case "edge":
               links.push({ source: obj.frm, target: obj.to });
-              setProgress((p) => p + 1);
+              setLoadedEdges(links.length);
+              if (metaTotalEdges > 0) {
+                const edgeProgress = 50 + (links.length / metaTotalEdges) * 40;
+                setProgress(edgeProgress);
+              }
               break;
           }
         }
@@ -148,7 +178,16 @@ export const ForceGraphStream = () => {
 
       if (!cancel) {
         setData({ nodes, links: cleanLinks });
-        setLoading(false);
+        setLoadingStatus("rendering");
+        setProgress(95);
+        
+        // Complete loading after a short delay
+        setTimeout(() => {
+          setProgress(100);
+          setTimeout(() => {
+            setLoading(false);
+          }, 300);
+        }, 500);
       }
     })().catch(console.error);
 
@@ -241,13 +280,15 @@ export const ForceGraphStream = () => {
   /* ─── render ─────────────────────────────────────────────────────────────── */
   return (
     <div ref={wrapperRef} className="relative w-full h-full overflow-hidden">
-      {loading && totalCount > 0 && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/50">
-          <LoadingSpinner
-            size={12}
-            text={`Loading graph... ${Math.round((progress / totalCount) * 100)}%`}
-          />
-        </div>
+      {loading && (
+        <GraphLoadingState
+          status={loadingStatus}
+          progress={progress}
+          totalNodes={totalNodes}
+          totalEdges={totalEdges}
+          loadedNodes={loadedNodes}
+          loadedEdges={loadedEdges}
+        />
       )}
 
       {!loading &&
