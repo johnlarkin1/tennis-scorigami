@@ -7,7 +7,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ForceGraphMethods } from "react-force-graph-3d";
 import { useResizeDetector } from "react-resize-detector";
 
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { GraphLoadingState } from "@/components/graph/graph-loading-state";
 
 import {
