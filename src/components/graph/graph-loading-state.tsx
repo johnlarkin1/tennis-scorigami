@@ -2,7 +2,12 @@ import { motion } from "framer-motion";
 import FlipNumbers from "react-flip-numbers";
 
 interface GraphLoadingStateProps {
-  status: "connecting" | "loading-metadata" | "loading-nodes" | "loading-edges" | "rendering";
+  status:
+    | "connecting"
+    | "loading-metadata"
+    | "loading-nodes"
+    | "loading-edges"
+    | "rendering";
   progress: number;
   totalNodes?: number;
   totalEdges?: number;
@@ -21,13 +26,17 @@ export const GraphLoadingState: React.FC<GraphLoadingStateProps> = ({
   const getStatusMessage = () => {
     switch (status) {
       case "connecting":
-        return "Connecting to server...";
+        return "Fetching tennis data...";
       case "loading-metadata":
         return "Loading graph metadata...";
       case "loading-nodes":
-        return totalNodes ? `Loading nodes (${loadedNodes ?? 0} of ${totalNodes})` : "Loading nodes...";
+        return totalNodes
+          ? `Loading nodes (${loadedNodes ?? 0} of ${totalNodes})`
+          : "Loading nodes...";
       case "loading-edges":
-        return totalEdges ? `Loading edges (${loadedEdges ?? 0} of ${totalEdges})` : "Loading edges...";
+        return totalEdges
+          ? `Loading edges (${loadedEdges ?? 0} of ${totalEdges})`
+          : "Loading edges...";
       case "rendering":
         return "Rendering graph...";
       default:
@@ -61,7 +70,7 @@ export const GraphLoadingState: React.FC<GraphLoadingStateProps> = ({
     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-10">
       <div className="bg-gray-900/95 rounded-2xl p-8 shadow-2xl border border-gray-800/50 max-w-md w-full mx-4">
         {/* Status Message */}
-        <motion.h3 
+        <motion.h3
           className="text-white text-lg font-semibold mb-6 text-center"
           key={status}
           initial={{ opacity: 0, y: -10 }}
@@ -83,7 +92,7 @@ export const GraphLoadingState: React.FC<GraphLoadingStateProps> = ({
               {/* Animated shimmer effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer" />
             </motion.div>
-            
+
             {/* Progress Percentage */}
             <div className="absolute inset-0 flex items-center justify-center">
               <span className="text-white font-semibold text-sm flex items-center drop-shadow-md">
@@ -105,7 +114,7 @@ export const GraphLoadingState: React.FC<GraphLoadingStateProps> = ({
 
         {/* Metadata Stats */}
         {(totalNodes || totalEdges) && (
-          <motion.div 
+          <motion.div
             className="grid grid-cols-2 gap-4 mt-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -113,14 +122,22 @@ export const GraphLoadingState: React.FC<GraphLoadingStateProps> = ({
           >
             {totalNodes && (
               <div className="bg-gray-800/40 rounded-lg p-3 border border-gray-700/20">
-                <p className="text-gray-400 text-xs font-medium mb-1">Total Nodes</p>
-                <p className="text-white text-lg font-bold">{totalNodes.toLocaleString()}</p>
+                <p className="text-gray-400 text-xs font-medium mb-1">
+                  Total Nodes
+                </p>
+                <p className="text-white text-lg font-bold">
+                  {totalNodes.toLocaleString()}
+                </p>
               </div>
             )}
             {totalEdges && (
               <div className="bg-gray-800/40 rounded-lg p-3 border border-gray-700/20">
-                <p className="text-gray-400 text-xs font-medium mb-1">Total Edges</p>
-                <p className="text-white text-lg font-bold">{totalEdges.toLocaleString()}</p>
+                <p className="text-gray-400 text-xs font-medium mb-1">
+                  Total Edges
+                </p>
+                <p className="text-white text-lg font-bold">
+                  {totalEdges.toLocaleString()}
+                </p>
               </div>
             )}
           </motion.div>
@@ -130,7 +147,7 @@ export const GraphLoadingState: React.FC<GraphLoadingStateProps> = ({
         <div className="flex justify-center mt-6">
           <div className="relative">
             <div className="w-12 h-12 border-4 border-gray-700 rounded-full" />
-            <motion.div 
+            <motion.div
               className="absolute inset-0 w-12 h-12 border-4 border-transparent border-t-white rounded-full"
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
