@@ -677,6 +677,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
       const tooltip = document.createElement("div");
       tooltip.style.position = "absolute";
       tooltip.style.pointerEvents = "none";
+      tooltip.style.cursor = "pointer";
       tooltip.style.backgroundColor = "rgba(0, 0, 0, 0.95)";
       tooltip.style.backdropFilter = "blur(10px)";
       tooltip.style.color = "white";
@@ -700,6 +701,11 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
           const originalNode = nodeData.originalNode as NodeDTO;
 
           if (!originalNode) return;
+
+          // Change cursor to pointer
+          if (containerRef.current) {
+            containerRef.current.style.cursor = "pointer";
+          }
 
           // Subtle hover effect
           graph.setNodeAttribute(node, "highlighted", true);
@@ -751,6 +757,11 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
         try {
           const node = event.node;
           if (!graph.hasNode(node)) return;
+
+          // Reset cursor to default
+          if (containerRef.current) {
+            containerRef.current.style.cursor = "default";
+          }
 
           graph.setNodeAttribute(node, "highlighted", false);
 
@@ -839,6 +850,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
           minHeight: "600px",
           background:
             "radial-gradient(ellipse at center, #1e293b 0%, #0f172a 50%, #020617 100%)",
+          cursor: "default",
         }}
       />
 

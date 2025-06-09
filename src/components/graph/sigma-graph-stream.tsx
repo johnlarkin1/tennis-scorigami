@@ -607,7 +607,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
 
       // Event handlers - skip hover for massive graphs
       if (!isMassiveGraph) {
-        setupEventHandlers(sigma, graph, {
+        setupEventHandlers(sigma, graph, containerRef.current, {
           onNodeClick: (node: NodeDTO) => {
             if (node.id === ROOT_ID) return;
 
@@ -634,6 +634,19 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
             }
           } catch (error) {
             console.error("Error in clickNode handler:", error);
+          }
+        });
+
+        // Add basic hover cursor effects for massive graphs
+        sigma.on("enterNode", () => {
+          if (containerRef.current) {
+            containerRef.current.style.cursor = "pointer";
+          }
+        });
+
+        sigma.on("leaveNode", () => {
+          if (containerRef.current) {
+            containerRef.current.style.cursor = "default";
           }
         });
       }
@@ -720,6 +733,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
           minHeight: "600px",
           background:
             "radial-gradient(ellipse at center, #1e293b 0%, #0f172a 50%, #020617 100%)",
+          cursor: "default",
         }}
       />
 
@@ -855,6 +869,7 @@ function debounce<T extends (...args: unknown[]) => unknown>(
 function setupEventHandlers(
   sigma: Sigma,
   graph: Graph,
+  container: HTMLDivElement | null,
   callbacks: {
     onNodeClick: (node: NodeDTO) => void;
   }
@@ -919,6 +934,11 @@ function setupEventHandlers(
 
       if (!originalNode) return;
 
+      // Change cursor to pointer
+      if (container) {
+        container.style.cursor = "pointer";
+      }
+
       // Queue highlight change
       pendingHighlights.add(node);
       pendingUnhighlights.delete(node);
@@ -940,6 +960,11 @@ function setupEventHandlers(
     try {
       const node = event.node;
       if (!graph.hasNode(node)) return;
+
+      // Reset cursor to default
+      if (container) {
+        container.style.cursor = "default";
+      }
 
       // Queue unhighlight change
       pendingUnhighlights.add(node);
