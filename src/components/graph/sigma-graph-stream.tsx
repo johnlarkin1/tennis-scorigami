@@ -6,23 +6,23 @@ import {
   showLabelsAtom,
 } from "@/components/graph/controls/graph-controls";
 import { DiscoveryModal } from "@/components/graph/discovery-modal";
-import { MatchDetailsModal } from "@/components/graph/match-details-modal";
 import { GraphLoadingState } from "@/components/graph/graph-loading-state";
+import { MatchDetailsModal } from "@/components/graph/match-details-modal";
+import { fetchGraphStream } from "@/lib/api-client";
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
 import { selectedTournamentAtom } from "@/store/tournament";
 import { convertSexFilter, convertYearFilter } from "@/utils/filter-converters";
-import { fetchGraphStream } from "@/lib/api-client";
-import { createNodeBorderProgram } from "@sigma/node-border";
 import {
   createDepthScales,
   getNodeColor as getNodeColorUtil,
 } from "@/utils/graph-utils";
+import { createNodeBorderProgram } from "@sigma/node-border";
 import Graph from "graphology";
 import FA2Layout from "graphology-layout-forceatlas2/worker";
 import { useAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { EdgeArrowProgram } from "sigma/rendering";
 import type { default as Sigma } from "sigma";
+import { EdgeArrowProgram } from "sigma/rendering";
 
 import { DEPTH_COLORS, NEVER_OCCURRED_COLOR } from "@/constants/graph-colors";
 
@@ -177,7 +177,13 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
   const [showLabels] = useAtom(showLabelsAtom);
 
   const [loading, setLoading] = useState(false);
-  const [loadingStatus, setLoadingStatus] = useState<"connecting" | "loading-metadata" | "loading-nodes" | "loading-edges" | "rendering">("connecting");
+  const [loadingStatus, setLoadingStatus] = useState<
+    | "connecting"
+    | "loading-metadata"
+    | "loading-nodes"
+    | "loading-edges"
+    | "rendering"
+  >("connecting");
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [totalNodes, setTotalNodes] = useState<number | undefined>();
   const [totalEdges, setTotalEdges] = useState<number | undefined>();
@@ -201,7 +207,10 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
   const [discoveredNode, setDiscoveredNode] = useState<NodeDTO | null>(null);
 
   // Depth-based occurrence scales
-  const depthScales = useMemo(() => createDepthScales(data.nodes), [data.nodes]);
+  const depthScales = useMemo(
+    () => createDepthScales(data.nodes),
+    [data.nodes]
+  );
 
   const getNodeColor = useCallback(
     (node: NodeDTO) => getNodeColorUtil(node, colorMode, depthScales),
@@ -233,9 +242,10 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
           year: selectedYear ? convertYearFilter(selectedYear.toString()) : "",
           sex: convertSexFilter(selectedSex ?? ""),
           sets: selectedSets,
-          tournament: selectedTournament && selectedTournament.tournament_id > 0
-            ? selectedTournament.tournament_id.toString()
-            : "all",
+          tournament:
+            selectedTournament && selectedTournament.tournament_id > 0
+              ? selectedTournament.tournament_id.toString()
+              : "all",
           maxEdgesPerDepth: GRAPH_CONFIG.maxEdgesPerDepth,
           minOccurrences: GRAPH_CONFIG.minOccurrences,
           signal: abortController.signal,
@@ -349,10 +359,12 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
 
       // Get node count early for performance decisions
       const nodeCount = data.nodes.length;
-      const isLargeGraph = nodeCount > GRAPH_CONFIG.performanceThresholds.highNodeCount;
-      const isExtremeGraph = nodeCount > GRAPH_CONFIG.performanceThresholds.extremeNodeCount;
-      const isMassiveGraph = nodeCount > GRAPH_CONFIG.performanceThresholds.massiveNodeCount;
-
+      const isLargeGraph =
+        nodeCount > GRAPH_CONFIG.performanceThresholds.highNodeCount;
+      const isExtremeGraph =
+        nodeCount > GRAPH_CONFIG.performanceThresholds.extremeNodeCount;
+      const isMassiveGraph =
+        nodeCount > GRAPH_CONFIG.performanceThresholds.massiveNodeCount;
 
       // Simple radial positioning by depth
       const positionNodes = () => {
@@ -369,7 +381,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
         });
 
         // Sort nodes within each depth by slug for consistent ordering
-        Object.values(nodesByDepth).forEach(nodes => {
+        Object.values(nodesByDepth).forEach((nodes) => {
           nodes.sort((a, b) => a.slug.localeCompare(b.slug));
         });
 
@@ -410,7 +422,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
           // Maintain good sizes even for massive graphs
           const sizeMultiplier =
             nodeCount > GRAPH_CONFIG.performanceThresholds.massiveNodeCount
-              ? 0.8  // Changed from 0.5 to 0.8
+              ? 0.8 // Changed from 0.5 to 0.8
               : 1;
           const baseSize = Math.max(node.norm * 80 * sizeMultiplier, 2); // Increased from 60 to 80
           const occurrenceBonus =
@@ -443,45 +455,48 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
 
       // Add edges with smart reduction for massive graphs
       let edgesToRender = data.edges;
-      
+
       // For massive graphs, intelligently reduce edges while keeping structure
       if (isMassiveGraph && data.edges.length > 50000) {
-        console.log(`[SigmaGraph] Reducing edges from ${data.edges.length} for better performance`);
-        
+        console.log(
+          `[SigmaGraph] Reducing edges from ${data.edges.length} for better performance`
+        );
+
         // Create node lookup for importance scoring
-        const nodeMap = new Map(data.nodes.map(n => [n.id, n]));
-        
+        const nodeMap = new Map(data.nodes.map((n) => [n.id, n]));
+
         // Keep edges by importance: high occurrence nodes, unscored nodes, early depths
-        edgesToRender = data.edges.filter(edge => {
+        edgesToRender = data.edges.filter((edge) => {
           const fromNode = nodeMap.get(edge.frm);
           const toNode = nodeMap.get(edge.to);
-          
+
           if (!fromNode || !toNode) return false;
-          
+
           // Always keep early depth edges (structure)
           if (Math.max(fromNode.depth, toNode.depth) <= 2) return true;
-          
+
           // Keep edges to/from unscored nodes (discovery)
           if (!fromNode.played || !toNode.played) return true;
-          
+
           // Keep edges with high occurrence nodes
-          if (fromNode.occurrences > 100 || toNode.occurrences > 100) return true;
-          
+          if (fromNode.occurrences > 100 || toNode.occurrences > 100)
+            return true;
+
           // For deeper levels, only keep a sample
           return Math.random() < 0.1; // Keep 10% of remaining edges
         });
-        
+
         console.log(`[SigmaGraph] Reduced edges to ${edgesToRender.length}`);
       }
-      
+
       console.log(`[SigmaGraph] Adding ${edgesToRender.length} edges to graph`);
-      
+
       // Note: nodeDepthMap not needed since we're using simplified black edges
-      
+
       // Simplified edge properties for better performance
       const edgeColor = "#000000"; // Black edges for all graphs
       const edgeSize = isMassiveGraph ? 0.8 : 1; // Slightly thinner for massive graphs
-      
+
       edgesToRender.forEach((edge) => {
         if (
           graph.hasNode(edge.frm.toString()) &&
@@ -494,7 +509,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
           });
         }
       });
-      
+
       console.log(`[SigmaGraph] Graph now has ${graph.edges().length} edges`);
 
       // Clear previous sigma instance
