@@ -12,7 +12,10 @@ import { selectedTournamentAtom } from "@/store/tournament";
 import { convertSexFilter, convertYearFilter } from "@/utils/filter-converters";
 import { fetchGraphStream } from "@/lib/api-client";
 import { createNodeBorderProgram } from "@sigma/node-border";
-import { scaleLinear } from "d3-scale";
+import {
+  createDepthScales,
+  getNodeColor as getNodeColorUtil,
+} from "@/utils/graph-utils";
 import Graph from "graphology";
 import FA2Layout from "graphology-layout-forceatlas2/worker";
 import { useAtom } from "jotai";
@@ -20,17 +23,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EdgeArrowProgram } from "sigma/rendering";
 import type { default as Sigma } from "sigma";
 
+import { DEPTH_COLORS, NEVER_OCCURRED_COLOR } from "@/constants/graph-colors";
+
 // Constants
 const CustomNodeBorderProgram = createNodeBorderProgram({});
-const DEPTH_COLORS: Record<number, string> = {
-  0: "#FF3B30",
-  1: "#FF9500",
-  2: "#FFD60A",
-  3: "#30D158",
-  4: "#5AC8FA",
-  5: "#BF5AF2",
-};
-const NEVER_OCCURRED_COLOR = "#dc2626";
 const ROOT_ID = 0;
 
 // Configuration for edge reduction
@@ -200,46 +196,10 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
   const [discoveredNode, setDiscoveredNode] = useState<NodeDTO | null>(null);
 
   // Depth-based occurrence scales
-  const depthScales = useMemo(() => {
-    const scales: Record<number, ReturnType<typeof scaleLinear>> = {};
-    const nodesByDepth = data.nodes.reduce(
-      (acc, node) => {
-        if (!acc[node.depth]) acc[node.depth] = [];
-        acc[node.depth].push(node);
-        return acc;
-      },
-      {} as Record<number, NodeDTO[]>
-    );
-
-    Object.entries(nodesByDepth).forEach(([depth, nodes]) => {
-      const maxOccurrence = Math.max(...nodes.map((n) => n.occurrences));
-      scales[parseInt(depth)] = scaleLinear()
-        .domain([0, maxOccurrence])
-        .range([0.2, 1]);
-    });
-
-    return scales;
-  }, [data.nodes]);
+  const depthScales = useMemo(() => createDepthScales(data.nodes), [data.nodes]);
 
   const getNodeColor = useCallback(
-    (node: NodeDTO) => {
-      if (node.id === ROOT_ID) return DEPTH_COLORS[0];
-      if (!node.played || node.occurrences === 0) {
-        return NEVER_OCCURRED_COLOR;
-      }
-
-      if (colorMode === "category") {
-        return DEPTH_COLORS[node.depth] || "#666";
-      } else {
-        const scale = depthScales[node.depth];
-        if (scale) {
-          const intensity = scale(node.occurrences) as number;
-          const lightness = 90 - intensity * 60;
-          return `hsl(220, 80%, ${lightness}%)`;
-        }
-        return `hsl(220, 80%, 50%)`;
-      }
-    },
+    (node: NodeDTO) => getNodeColorUtil(node, colorMode, depthScales),
     [colorMode, depthScales]
   );
 

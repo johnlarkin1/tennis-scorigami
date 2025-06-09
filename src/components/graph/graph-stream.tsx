@@ -16,14 +16,16 @@ import {
   selectedYearAtom,
   showEdgesAtom,
 } from "@/components/graph/controls/graph-controls";
-import type { NodeDTO } from "@/lib/types";
 import {
   DEPTH_COLORS,
-  NEVER_OCCURRED_COLOR,
-  getOccurrenceIntensityColor,
-  getEdgeColorByDepth,
   GRAPH_BACKGROUND_COLOR,
+  NEVER_OCCURRED_COLOR,
 } from "@/constants/graph-colors";
+import type { NodeDTO } from "@/lib/types";
+import {
+  getEdgeColorByDepth,
+  getOccurrenceIntensityColor,
+} from "@/utils/graph-utils";
 
 /* ─── constants ────────────────────────────────────────────────────────────── */
 const ROOT_ID = 0;

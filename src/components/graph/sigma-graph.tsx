@@ -10,15 +10,17 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import {
   DEPTH_COLORS,
   FREQUENCY_LEGEND,
-  getEdgeColorByDepth,
-  getOccurrenceIntensityColor,
   NEVER_OCCURRED_COLOR,
 } from "@/constants/graph-colors";
-import type { EdgeDTO, NodeDTO } from "@/lib/types";
 import { fetchGraphData } from "@/lib/api-client";
+import type { EdgeDTO, NodeDTO } from "@/lib/types";
 import { selectedTournamentAtom } from "@/store/tournament";
+import {
+  createDepthScales,
+  getEdgeColorByDepth,
+  getNodeColor as getNodeColorUtil,
+} from "@/utils/graph-utils";
 import { createNodeBorderProgram } from "@sigma/node-border";
-import { scaleLinear } from "d3-scale";
 import Graph from "graphology";
 import { circular } from "graphology-layout";
 import forceAtlas2 from "graphology-layout-forceatlas2";
@@ -192,50 +194,14 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
   }, [selectedYear, selectedSex, selectedSets, selectedTournament]);
 
   // Depth-based occurrence scales for gradient mode
-  const depthScales = useMemo(() => {
-    const scales: Record<number, ReturnType<typeof scaleLinear>> = {};
-    const nodesByDepth = data.nodes.reduce(
-      (acc, node) => {
-        if (!acc[node.depth]) acc[node.depth] = [];
-        acc[node.depth].push(node);
-        return acc;
-      },
-      {} as Record<number, NodeDTO[]>
-    );
-
-    Object.entries(nodesByDepth).forEach(([depth, nodes]) => {
-      const maxOccurrence = Math.max(...nodes.map((n) => n.occurrences));
-      scales[parseInt(depth)] = scaleLinear()
-        .domain([0, maxOccurrence])
-        .range([0.2, 1]);
-    });
-
-    return scales;
-  }, [data.nodes]);
+  const depthScales = useMemo(
+    () => createDepthScales(data.nodes),
+    [data.nodes]
+  );
 
   // Node color function
   const getNodeColor = useCallback(
-    (node: NodeDTO) => {
-      // Root node gets special treatment
-      if (node.id === ROOT_ID) return DEPTH_COLORS[0];
-
-      // Highlight nodes that have never occurred
-      if (!node.played || node.occurrences === 0) {
-        return NEVER_OCCURRED_COLOR;
-      }
-
-      if (colorMode === "category") {
-        return DEPTH_COLORS[node.depth] || "#666";
-      } else {
-        // Color by occurrence intensity within depth
-        const scale = depthScales[node.depth];
-        if (scale) {
-          const intensity = scale(node.occurrences) as number;
-          return getOccurrenceIntensityColor(intensity);
-        }
-        return `hsl(220, 80%, 50%)`;
-      }
-    },
+    (node: NodeDTO) => getNodeColorUtil(node, colorMode, depthScales),
     [colorMode, depthScales]
   );
 
@@ -300,10 +266,12 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
           return;
         }
 
+        const nodeColor = getNodeColor(node);
+
         graph.addNode(nodeId, {
           label: node.slug, // Always include label in node data
           size,
-          color: getNodeColor(node),
+          color: nodeColor,
           borderColor:
             node.id === ROOT_ID || !node.played || node.occurrences === 0
               ? "#ffffff" // White border for root and unplayed nodes

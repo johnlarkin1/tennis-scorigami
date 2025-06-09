@@ -7,21 +7,23 @@ import {
 } from "@/components/graph/controls/graph-controls";
 import { Legend } from "@/components/graph/legend";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import {
+  DEPTH_COLORS,
+  GRAPH_BACKGROUND_COLOR,
+  NEVER_OCCURRED_COLOR,
+} from "@/constants/graph-colors";
 import type { NodeDTO } from "@/lib/types";
 import { useGraphContext } from "@/providers/graph-provider";
+import {
+  getEdgeColorByDepth,
+  getOccurrenceIntensityColor,
+} from "@/utils/graph-utils";
 import { scaleLinear } from "d3-scale";
 import { useAtom } from "jotai";
 import dynamic from "next/dynamic";
 import React, { useCallback, useMemo, useRef } from "react";
 import type { ForceGraphMethods } from "react-force-graph-3d";
 import { useResizeDetector } from "react-resize-detector";
-import {
-  DEPTH_COLORS,
-  NEVER_OCCURRED_COLOR,
-  getOccurrenceIntensityColor,
-  getEdgeColorByDepth,
-  GRAPH_BACKGROUND_COLOR,
-} from "@/constants/graph-colors";
 const ROOT_ID = 0;
 
 // Dynamically import ForceGraph3D to avoid SSR issues
