@@ -46,9 +46,7 @@ export async function GET(req: NextRequest) {
     tournament = t;
   }
 
-  console.log(
-    `[Graph Stream] Processing graph data with potential filtering`
-  );
+  console.log(`[Graph Stream] Processing graph data with potential filtering`);
 
   if (![3, 5].includes(sets)) return bad("sets must be 3 or 5");
   if (!["men", "women", "all"].includes(sex))
@@ -210,10 +208,6 @@ export async function GET(req: NextRequest) {
       `[Graph Stream] Raw edges fetched in ${Date.now() - edgeStartTime}ms, count: ${rawEdges.length}`
     );
 
-    // Debug: Show some edge samples
-    if (rawEdges.length > 0) {
-      console.log(`[Graph Stream] Sample edges:`, rawEdges.slice(0, 5));
-    }
     if (rawEdges.length < 1000) {
       console.log(
         `[Graph Stream] WARNING: Very few edges found (${rawEdges.length}), this seems wrong for 125k nodes`
@@ -236,7 +230,7 @@ export async function GET(req: NextRequest) {
     const nodesWithPositions = nodes;
 
     console.log(
-      `[Graph Stream] Using ${allEdges.length} edges (${rawEdges.length} from DB + ${rootEdges.length} root edges) ${useRollup ? 'from materialized view' : 'with filtering and deduplication'}`
+      `[Graph Stream] Using ${allEdges.length} edges (${rawEdges.length} from DB + ${rootEdges.length} root edges) ${useRollup ? "from materialized view" : "with filtering and deduplication"}`
     );
 
     console.log(
