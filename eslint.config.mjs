@@ -74,5 +74,11 @@ export default [
       "@typescript-eslint/no-require-imports": "off",
     },
   },
+  {
+    files: ["scripts/**/*.js"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
   ...storybook.configs["flat/recommended"],
 ];

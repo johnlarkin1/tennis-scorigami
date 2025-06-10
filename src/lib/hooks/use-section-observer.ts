@@ -1,10 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useCallback } from "react";
 
 export const useSectionObserver = (sectionIds: string[]) => {
-  const router = useRouter();
   const observerRef = useRef<IntersectionObserver | null>(null);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastUrlRef = useRef<string>('');

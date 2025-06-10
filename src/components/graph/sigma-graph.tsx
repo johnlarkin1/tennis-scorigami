@@ -133,6 +133,7 @@ type SigmaGraphProps = {
   selectedSex: string;
   selectedYear: string;
   className?: string;
+  hideLegend?: boolean;
 };
 
 export const SigmaGraph: React.FC<SigmaGraphProps> = ({
@@ -140,6 +141,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
   selectedSex,
   selectedYear,
   className,
+  hideLegend = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const sigmaRef = useRef<import("sigma").default | null>(null);
@@ -823,14 +825,16 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
       />
 
       {/* Legend */}
-      <Legend
-        colorMode={colorMode}
-        maxDepth={maxDepth}
-        hasUnscoredNodes={hasUnscoredNodes}
-      />
+      {!hideLegend && (
+        <Legend
+          colorMode={colorMode}
+          maxDepth={maxDepth}
+          hasUnscoredNodes={hasUnscoredNodes}
+        />
+      )}
 
       {/* Unscored banner */}
-      <UnscoredBanner visible={hasUnscoredNodes} />
+      {!hideLegend && <UnscoredBanner visible={hasUnscoredNodes} />}
 
       {/* Modals */}
       {discoveryModalOpen && discoveredNode && (

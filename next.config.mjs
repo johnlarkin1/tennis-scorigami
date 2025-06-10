@@ -16,6 +16,19 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    // Redirect unfurl route to home page in production
+    if (process.env.NODE_ENV === 'production') {
+      return [
+        {
+          source: '/unfurl',
+          destination: '/',
+          permanent: false,
+        },
+      ];
+    }
+    return [];
+  },
   // This is required to support PostHog trailing slash API requests
   skipTrailingSlashRedirect: true,
 };

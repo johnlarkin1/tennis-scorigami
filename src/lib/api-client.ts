@@ -1,5 +1,4 @@
 import type { EdgeDTO, NodeDTO } from "@/lib/types";
-import type { InitialScore } from "@/types/initial-score";
 import type { MatchStatWithSamples } from "@/types/match-stats/response";
 import type {
   SequenceInfo,
@@ -231,39 +230,6 @@ export async function fetchScoreMatches(
   );
   if (!response.ok) {
     throw new Error(`Error fetching matches for set ${setNumber}`);
-  }
-
-  return response.json();
-}
-
-/**
- * Fetch initial scores with filters
- */
-export async function fetchInitialScores(
-  tournament?: Tournament,
-  eventYear?: string,
-  eventGender?: SexType
-): Promise<InitialScore[]> {
-  const params = new URLSearchParams();
-
-  if (tournament && tournament.tournament_id > 0) {
-    params.append("tournament_id", tournament.tournament_id.toString());
-  }
-
-  if (eventYear && !isNaN(+eventYear)) {
-    params.append("event_year", eventYear);
-  }
-
-  const mappedGender = eventGender ? mapSexTypeToApi(eventGender) : undefined;
-  if (mappedGender) {
-    params.append("event_gender", mappedGender);
-  }
-
-  const response = await fetch(
-    `/api/v1/scores/initial-scores?${params.toString()}`
-  );
-  if (!response.ok) {
-    throw new Error("Failed to fetch initial scores");
   }
 
   return response.json();

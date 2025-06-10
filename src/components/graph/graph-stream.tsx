@@ -59,7 +59,13 @@ export const ForceGraphStream = () => {
 
   /* streaming state */
   const [loading, setLoading] = useState(true);
-  const [loadingStatus, setLoadingStatus] = useState<"connecting" | "loading-metadata" | "loading-nodes" | "loading-edges" | "rendering">("connecting");
+  const [loadingStatus, setLoadingStatus] = useState<
+    | "connecting"
+    | "loading-metadata"
+    | "loading-nodes"
+    | "loading-edges"
+    | "rendering"
+  >("connecting");
   const [progress, setProgress] = useState(0);
   const [totalNodes, setTotalNodes] = useState(0);
   const [totalEdges, setTotalEdges] = useState(0);
@@ -113,7 +119,7 @@ export const ForceGraphStream = () => {
       const links: GraphLink[] = [];
       let metaTotalNodes = 0;
       let metaTotalEdges = 0;
-      
+
       setLoadingStatus("loading-metadata");
       setProgress(5);
 
@@ -179,14 +185,14 @@ export const ForceGraphStream = () => {
         setData({ nodes, links: cleanLinks });
         setLoadingStatus("rendering");
         setProgress(95);
-        
+
         // Complete loading after a short delay
         setTimeout(() => {
           setProgress(100);
           setTimeout(() => {
             setLoading(false);
-          }, 300);
-        }, 500);
+          }, 100);
+        }, 200);
       }
     })().catch(console.error);
 
