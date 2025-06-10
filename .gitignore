@@ -56,7 +56,8 @@ backend/visualizations/output/**
 
 # Ignore all repomix-output.xml files recursively
 **/repomix-output.xml
-public
+# public
+public/screenshots
 
 *storybook.log
 storybook-static
