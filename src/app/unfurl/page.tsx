@@ -1,15 +1,23 @@
 "use client";
 
-import { GraphProvider } from "@/providers/graph-provider";
 import { useGraphData } from "@/lib/hooks/use-graph-data";
+import { GraphProvider } from "@/providers/graph-provider";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import React from "react";
 
 // Dynamic imports for development-only components
-const UnfurlForceGraph3D = React.lazy(() => import("@/components/graph/unfurl-force-graph-3d"));
-const UnfurlSigmaGraph2D = React.lazy(() => import("@/components/graph/unfurl-sigma-graph-2d"));
-const UnfurlParticleCanvas = React.lazy(() => import("@/components/ui/unfurl-particle-canvas").then(mod => ({ default: mod.UnfurlParticleCanvas })));
+const UnfurlForceGraph3D = React.lazy(
+  () => import("@/components/graph/unfurl-force-graph-3d")
+);
+const UnfurlSigmaGraph2D = React.lazy(
+  () => import("@/components/graph/unfurl-sigma-graph-2d")
+);
+const UnfurlParticleCanvas = React.lazy(() =>
+  import("@/components/ui/unfurl-particle-canvas").then((mod) => ({
+    default: mod.UnfurlParticleCanvas,
+  }))
+);
 
 // Component to load real graph data
 const GraphDataLoader: React.FC<{ children: React.ReactNode }> = ({
@@ -17,19 +25,39 @@ const GraphDataLoader: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   // This hook will fetch and load real graph data into the context
   useGraphData();
-  
+
   return <>{children}</>;
 };
 
 const UnfurlPreviewPage = () => {
+  // Hide cursor on mount
+  React.useEffect(() => {
+    const style = document.createElement("style");
+    style.textContent = `
+      * {
+        cursor: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   // Prevent access in production
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === "production") {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Page Not Available</h1>
-          <p className="text-gray-400">This development tool is not available in production.</p>
-          <Link href="/" className="text-green-400 hover:text-green-300 mt-4 inline-block">
+          <p className="text-gray-400">
+            This development tool is not available in production.
+          </p>
+          <Link
+            href="/"
+            className="text-green-400 hover:text-green-300 mt-4 inline-block"
+          >
             Go to Home
           </Link>
         </div>
@@ -38,17 +66,26 @@ const UnfurlPreviewPage = () => {
   }
 
   return (
-    <div className="bg-gray-900 text-white flex flex-col items-center p-8 gap-8">
+    <div
+      className="bg-gray-900 text-white flex flex-col items-center p-8 gap-8 cursor-none"
+      style={{ cursor: "none" }}
+    >
       {/* 1. Particle Animation Preview */}
       <div
         className="relative overflow-hidden bg-gradient-to-br from-gray-900 to-black border-b-4 border-green-500 rounded-lg"
         style={{ width: "1200px", height: "630px" }}
       >
-        <React.Suspense fallback={<div className="w-full h-full bg-gray-800 flex items-center justify-center text-white">Loading...</div>}>
+        <React.Suspense
+          fallback={
+            <div className="w-full h-full bg-gray-800 flex items-center justify-center text-white">
+              Loading...
+            </div>
+          }
+        >
           <UnfurlParticleCanvas className="w-full h-full" />
         </React.Suspense>
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-          <p className="text-lg font-bold text-green-400 font-['Inter']">
+          <p className="text-3xl font-bold text-green-400 font-['Inter']">
             EXPLORE NEVER-PLAYED TENNIS SCORES
           </p>
         </div>
@@ -61,7 +98,13 @@ const UnfurlPreviewPage = () => {
       >
         <GraphProvider maxDepth={3}>
           <GraphDataLoader>
-            <React.Suspense fallback={<div className="w-full h-full bg-gray-700 flex items-center justify-center text-white">Loading Graph...</div>}>
+            <React.Suspense
+              fallback={
+                <div className="w-full h-full bg-gray-700 flex items-center justify-center text-white">
+                  Loading Graph...
+                </div>
+              }
+            >
               <UnfurlSigmaGraph2D />
             </React.Suspense>
           </GraphDataLoader>
@@ -86,7 +129,13 @@ const UnfurlPreviewPage = () => {
       >
         <GraphProvider maxDepth={3}>
           <GraphDataLoader>
-            <React.Suspense fallback={<div className="w-full h-full bg-gray-600 flex items-center justify-center text-white">Loading 3D Graph...</div>}>
+            <React.Suspense
+              fallback={
+                <div className="w-full h-full bg-gray-600 flex items-center justify-center text-white">
+                  Loading 3D Graph...
+                </div>
+              }
+            >
               <UnfurlForceGraph3D />
             </React.Suspense>
           </GraphDataLoader>
