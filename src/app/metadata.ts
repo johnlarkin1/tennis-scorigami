@@ -65,6 +65,12 @@ export function generateMetadata(): Metadata {
     },
     // Additional platform-specific metadata
     other: {
+      // Discord specific - explicitly specify GIF support
+      "discord:image": `${baseUrl}/unfurls/hero-section.gif`,
+      "discord:image:width": "1200",
+      "discord:image:height": "630",
+      "discord:image:type": "image/gif",
+
       // LinkedIn specific
       "linkedin:image": `${baseUrl}/unfurls/hero-section.gif`,
       "linkedin:image:type": "image/gif",
@@ -80,6 +86,12 @@ export function generateMetadata(): Metadata {
       "twitter:data1": "Sports Analytics",
       "twitter:label2": "Reading time",
       "twitter:data2": "Interactive experience",
+
+      // Explicit GIF support declarations
+      "og:video": `${baseUrl}/unfurls/hero-section.gif`,
+      "og:video:type": "image/gif",
+      "og:video:width": "1200",
+      "og:video:height": "630",
     },
   };
 }
@@ -115,6 +127,8 @@ export function getPlatformSpecificImage(
     if (ua.includes("discordbot") || ua.includes("discord")) {
       imageUrl = images[imageType].gif;
       mimeType = "image/gif";
+      // Return early to ensure Discord gets GIF
+      return { url: imageUrl, type: mimeType };
     }
     // Platforms that don't support GIFs - use static image
     else if (

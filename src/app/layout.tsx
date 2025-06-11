@@ -84,6 +84,17 @@ export async function generateMetadata(): Promise<Metadata> {
       creator: "@tennisscorigami",
     },
     other: {
+      // Discord specific - always use GIF for Discord
+      ...(userAgent.includes("discord") || userAgent.includes("Discord")
+        ? {
+            "og:video": "https://tennis-scorigami.com/unfurls/hero-section.gif",
+            "og:video:type": "image/gif",
+            "og:video:width": "1200",
+            "og:video:height": "630",
+            "og:video:secure_url":
+              "https://tennis-scorigami.com/unfurls/hero-section.gif",
+          }
+        : {}),
       // LinkedIn specific - always use GIF for LinkedIn
       "linkedin:image": "https://tennis-scorigami.com/unfurls/hero-section.gif",
       "linkedin:image:type": "image/gif",
@@ -124,6 +135,16 @@ export default function RootLayout({
         {/* Additional meta tags for better social sharing */}
         <meta name="twitter:creator" content="@tennisscorigami" />
         <meta name="twitter:site" content="@tennisscorigami" />
+
+        {/* Discord-specific meta tags */}
+        <meta property="og:image:type" content="image/gif" />
+        <meta
+          property="og:video"
+          content="https://tennis-scorigami.com/unfurls/hero-section.gif"
+        />
+        <meta property="og:video:type" content="image/gif" />
+        <meta property="og:video:width" content="1200" />
+        <meta property="og:video:height" content="630" />
       </head>
       <body
         className={`${roboto.className} ${geistSans.variable} ${geistMono.variable} antialiased`}
