@@ -45,8 +45,8 @@ export async function generateMetadata(): Promise<Metadata> {
     ],
     authors: [
       { name: "John Larkin", url: "https://johnlarkin1.github.io/" },
-      { name: "Henry Carscadden" },
-      { name: "Sebastian Tota" },
+      { name: "Henry Head" },
+      { name: "Sebastian Hoar" },
     ],
     icons: {
       icon: "/favicon/favicon.svg",
@@ -145,9 +145,20 @@ export default function RootLayout({
         <meta property="og:video:type" content="image/gif" />
         <meta property="og:video:width" content="1200" />
         <meta property="og:video:height" content="630" />
+        <meta property="og:site_name" content="Tennis Scorigami" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta
+          property="og:image:alt"
+          content="Tennis Scorigami - Explore never-played tennis scores"
+        />
+        <meta
+          name="twitter:image:alt"
+          content="Tennis Scorigami - Explore never-played tennis scores"
+        />
       </head>
       <body
-        className={`${roboto.className} ${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${roboto.className} ${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
       >
         <Providers
           attribute="class"

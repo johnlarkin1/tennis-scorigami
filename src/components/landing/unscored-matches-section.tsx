@@ -13,11 +13,9 @@ import {
   SkeletonScoreboard,
 } from "@/components/ui/skeleton-loaders";
 import { START_DATA_COLLECTION_YEAR } from "@/constants";
-import type { MatchStatWithSamples } from "@/types/match-stats/response";
 import { fetchMatchStats } from "@/lib/api-client";
+import type { MatchStatWithSamples } from "@/types/match-stats/response";
 
-const FLIP_NUMBERS_HEIGHT = 20;
-const FLIP_NUMBERS_WIDTH = 16;
 const FLIP_NUMBERS_DURATION = 1;
 const CATEGORY_ANIMATION_TIME_SEC = 5;
 
@@ -92,9 +90,9 @@ export default function UnscoredMatchesSection({ className }: Props) {
       <section className={`${className} bg-gray-900 overflow-hidden`}>
         <div className="mx-auto max-w-none">
           {/* Title with glow effect */}
-          <div className="flex justify-center mt-16 mb-8">
+          <div className="flex justify-center mt-8 sm:mt-16 mb-6 sm:mb-8 px-4">
             <div className="max-w-4xl w-full">
-              <h2 className="text-2xl md:text-3xl font-bold text-white text-center border border-gray-700 rounded-lg px-8 py-6 shadow-[0_0_30px_rgba(68,219,94,0.3),inset_0_0_30px_rgba(68,219,94,0.1)] bg-gray-900/50 backdrop-blur-sm">
+              <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-white text-center border border-gray-700 rounded-lg px-4 sm:px-8 py-4 sm:py-6 shadow-[0_0_30px_rgba(68,219,94,0.3),inset_0_0_30px_rgba(68,219,94,0.1)] bg-gray-900/50 backdrop-blur-sm">
                 In the past{" "}
                 <span className="text-green-400">{yearsSinceStart}</span> years
                 of tennis matches since{" "}
@@ -109,16 +107,16 @@ export default function UnscoredMatchesSection({ className }: Props) {
           </div>
 
           {/* Stats & Nav - Skeleton */}
-          <div className="flex justify-center mb-12">
-            <div className="max-w-5xl w-full border border-gray-700 rounded-lg px-6 py-8 shadow-[0_0_30px_rgba(68,219,94,0.3),inset_0_0_30px_rgba(68,219,94,0.1)] bg-gray-900/50 backdrop-blur-sm">
-              <div className="flex items-center justify-between gap-4">
+          <div className="flex justify-center mb-8 sm:mb-12 px-4">
+            <div className="max-w-5xl w-full border border-gray-700 rounded-lg px-3 sm:px-6 py-6 sm:py-8 shadow-[0_0_30px_rgba(68,219,94,0.3),inset_0_0_30px_rgba(68,219,94,0.1)] bg-gray-900/50 backdrop-blur-sm">
+              <div className="flex items-center justify-between gap-2 sm:gap-4">
                 <button
                   disabled
-                  className="shrink-0 group flex items-center gap-2 px-4 py-2 bg-[#c5c75a]/50 text-black rounded-lg opacity-50"
+                  className="shrink-0 group flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 bg-[#c5c75a]/50 text-black rounded-lg opacity-50"
                   aria-label="Previous format"
                 >
-                  <ChevronLeft size={20} />
-                  <span className="hidden sm:inline text-sm font-medium">
+                  <ChevronLeft size={16} className="sm:w-5 sm:h-5" />
+                  <span className="hidden md:inline text-sm font-medium">
                     Previous
                   </span>
                 </button>
@@ -126,8 +124,8 @@ export default function UnscoredMatchesSection({ className }: Props) {
                 <div className="flex-1 text-center">
                   <div className="space-y-6">
                     {/* Never-played - Skeleton */}
-                    <div className="flex items-center justify-center text-lg md:text-xl">
-                      <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+                    <div className="flex items-center justify-center text-sm sm:text-lg md:text-xl">
+                      <div className="flex flex-wrap items-center justify-center gap-x-1 sm:gap-x-2 gap-y-1">
                         <span className="text-gray-300">There are</span>
                         <SkeletonFlipNumber />
                         <span className="text-gray-300">
@@ -140,8 +138,8 @@ export default function UnscoredMatchesSection({ className }: Props) {
                     </div>
 
                     {/* Total possible - Skeleton */}
-                    <div className="flex items-center justify-center text-lg md:text-xl">
-                      <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+                    <div className="flex items-center justify-center text-sm sm:text-lg md:text-xl">
+                      <div className="flex flex-wrap items-center justify-center gap-x-1 sm:gap-x-2 gap-y-1">
                         <span className="text-gray-300">Out of</span>
                         <SkeletonFlipNumber />
                         <span className="text-gray-300">possible scores.</span>
@@ -149,16 +147,18 @@ export default function UnscoredMatchesSection({ className }: Props) {
                     </div>
 
                     {/* Completion percentage - Skeleton */}
-                    <div className="flex items-center justify-center text-lg md:text-xl">
-                      <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+                    <div className="flex items-center justify-center text-sm sm:text-lg md:text-xl">
+                      <div className="flex flex-wrap items-center justify-center gap-x-1 sm:gap-x-2 gap-y-1">
                         <SkeletonFlipNumber />
-                        <span className="text-gray-300">of all possible scores have been played.</span>
+                        <span className="text-gray-300">
+                          of all possible scores have been played.
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   {/* Dots - Skeleton */}
-                  <div className="flex items-center justify-center gap-8 mt-8">
+                  <div className="flex items-center justify-center gap-4 sm:gap-8 mt-6 sm:mt-8">
                     {Array(3)
                       .fill(0)
                       .map((_, idx) => (
@@ -169,13 +169,13 @@ export default function UnscoredMatchesSection({ className }: Props) {
 
                 <button
                   disabled
-                  className="shrink-0 group flex items-center gap-2 px-4 py-2 bg-[#c5c75a]/50 text-black rounded-lg opacity-50"
+                  className="shrink-0 group flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 bg-[#c5c75a]/50 text-black rounded-lg opacity-50"
                   aria-label="Next format"
                 >
-                  <span className="hidden sm:inline text-sm font-medium">
+                  <span className="hidden md:inline text-sm font-medium">
                     Next
                   </span>
-                  <ChevronRight size={20} />
+                  <ChevronRight size={16} className="sm:w-5 sm:h-5" />
                 </button>
               </div>
             </div>
@@ -185,8 +185,8 @@ export default function UnscoredMatchesSection({ className }: Props) {
           <ExploreButton className="mb-8" />
 
           {/* Scoreboards Header - Skeleton */}
-          <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-green-400 mb-2">
+          <div className="text-center mb-6 sm:mb-8 px-4">
+            <h3 className="text-xl sm:text-2xl font-bold text-green-400 mb-2">
               Never-Occurred Scorelines
             </h3>
             <div className="max-w-2xl mx-auto">
@@ -197,7 +197,7 @@ export default function UnscoredMatchesSection({ className }: Props) {
           </div>
 
           {/* Scoreboards - Skeleton */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-[90%] mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 w-[95%] sm:w-[90%] mx-auto">
             {Array(6)
               .fill(0)
               .map((_, idx) => (
@@ -218,52 +218,53 @@ export default function UnscoredMatchesSection({ className }: Props) {
     (_, i) => displayPatterns[i] || dashRow
   );
 
-  const startDataCollectionYear = 1981;
   const currentYear = new Date().getFullYear();
-  const yearsSinceStart = currentYear - startDataCollectionYear;
+  const yearsSinceStart = currentYear - START_DATA_COLLECTION_YEAR;
 
   return (
     <section className={`${className} bg-gray-900 overflow-hidden`}>
       <div className="mx-auto max-w-none">
         {/* Title with glow effect */}
-        <div className="flex justify-center mt-16 mb-8">
+        <div className="flex justify-center mt-8 sm:mt-16 mb-6 sm:mb-8 px-4">
           <div className="max-w-4xl w-full">
-            <h2 className="text-2xl md:text-3xl font-bold text-white text-center border border-gray-700 rounded-lg px-8 py-6 shadow-[0_0_30px_rgba(68,219,94,0.3),inset_0_0_30px_rgba(68,219,94,0.1)] bg-gray-900/50 backdrop-blur-sm">
+            <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-white text-center border border-gray-700 rounded-lg px-4 sm:px-8 py-4 sm:py-6 shadow-[0_0_30px_rgba(68,219,94,0.3),inset_0_0_30px_rgba(68,219,94,0.1)] bg-gray-900/50 backdrop-blur-sm">
               In the past{" "}
               <span className="text-green-400">{yearsSinceStart}</span> years of
               tennis matches since{" "}
-              <span className="text-green-400">{startDataCollectionYear}</span>,
-              some score combinations have still never occurred. This project is
-              designed to track and discover these missing scorelines.
+              <span className="text-green-400">
+                {START_DATA_COLLECTION_YEAR}
+              </span>
+              , some score combinations have still never occurred. This project
+              is designed to track and discover these missing scorelines.
             </h2>
           </div>
         </div>
 
         {/* Stats & Nav */}
-        <div className="flex justify-center mb-12">
-          <div className="max-w-5xl w-full border border-gray-700 rounded-lg px-6 py-8 shadow-[0_0_30px_rgba(68,219,94,0.3),inset_0_0_30px_rgba(68,219,94,0.1)] bg-gray-900/50 backdrop-blur-sm">
-            <div className="flex items-center justify-between gap-4">
+        <div className="flex justify-center mb-8 sm:mb-12 px-4">
+          <div className="max-w-5xl w-full border border-gray-700 rounded-lg px-3 sm:px-6 py-6 sm:py-8 shadow-[0_0_30px_rgba(68,219,94,0.3),inset_0_0_30px_rgba(68,219,94,0.1)] bg-gray-900/50 backdrop-blur-sm">
+            <div className="flex items-center justify-between gap-2 sm:gap-4">
               <button
                 onClick={goPrev}
-                className="shrink-0 group flex items-center gap-2 px-4 py-2 bg-[#c5c75a] text-black rounded-lg transition-all duration-200 hover:bg-opacity-90 active:scale-95"
+                className="shrink-0 group flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 bg-[#c5c75a] text-black rounded-lg transition-all duration-200 hover:bg-opacity-90 active:scale-95"
                 aria-label="Previous format"
               >
-                <ChevronLeft size={20} />
-                <span className="hidden sm:inline text-sm font-medium">
+                <ChevronLeft size={16} className="sm:w-5 sm:h-5" />
+                <span className="hidden md:inline text-sm font-medium">
                   Previous
                 </span>
               </button>
 
               <div className="flex-1 text-center">
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-6">
                   {/* Never-played */}
-                  <div className="flex items-center justify-center text-lg md:text-xl">
-                    <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+                  <div className="flex items-center justify-center text-sm sm:text-lg md:text-xl">
+                    <div className="flex flex-wrap items-center justify-center gap-x-1 sm:gap-x-2 gap-y-1">
                       <span className="text-gray-300">There are</span>
-                      <span className="inline-flex items-center h-9 w-[140px] px-4 bg-gradient-to-r from-green-500/10 to-green-400/10 rounded-lg justify-center">
+                      <span className="inline-flex items-center h-7 sm:h-9 w-[100px] sm:w-[140px] px-2 sm:px-4 bg-gradient-to-r from-green-500/10 to-green-400/10 rounded-lg justify-center">
                         <FlipNumbers
-                          height={FLIP_NUMBERS_HEIGHT}
-                          width={FLIP_NUMBERS_WIDTH}
+                          height={16}
+                          width={12}
                           color="#4ade80"
                           background="transparent"
                           play
@@ -276,10 +277,10 @@ export default function UnscoredMatchesSection({ className }: Props) {
                       <span className="text-gray-300">
                         never-played score combinations in
                       </span>
-                      <span className="inline-flex items-center h-9 w-[100px] px-4 bg-gradient-to-r from-green-500/10 to-green-400/10 rounded-lg justify-center">
+                      <span className="inline-flex items-center h-7 sm:h-9 w-[80px] sm:w-[100px] px-2 sm:px-4 bg-gradient-to-r from-green-500/10 to-green-400/10 rounded-lg justify-center">
                         <FlipNumbers
-                          height={FLIP_NUMBERS_HEIGHT}
-                          width={FLIP_NUMBERS_WIDTH}
+                          height={16}
+                          width={10}
                           color="#4ade80"
                           background="transparent"
                           play
@@ -289,10 +290,10 @@ export default function UnscoredMatchesSection({ className }: Props) {
                           duration={FLIP_NUMBERS_DURATION}
                         />
                       </span>
-                      <span className="inline-flex items-center h-9 w-[120px] px-4 bg-gradient-to-r from-green-500/10 to-green-400/10 rounded-lg justify-center">
+                      <span className="inline-flex items-center h-7 sm:h-9 w-[100px] sm:w-[120px] px-2 sm:px-4 bg-gradient-to-r from-green-500/10 to-green-400/10 rounded-lg justify-center">
                         <FlipNumbers
-                          height={FLIP_NUMBERS_HEIGHT}
-                          width={FLIP_NUMBERS_WIDTH}
+                          height={16}
+                          width={10}
                           color="#4ade80"
                           background="transparent"
                           play
@@ -307,13 +308,13 @@ export default function UnscoredMatchesSection({ className }: Props) {
                   </div>
 
                   {/* Total possible */}
-                  <div className="flex items-center justify-center text-lg md:text-xl">
-                    <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+                  <div className="flex items-center justify-center text-sm sm:text-lg md:text-xl">
+                    <div className="flex flex-wrap items-center justify-center gap-x-1 sm:gap-x-2 gap-y-1">
                       <span className="text-gray-300">Out of</span>
-                      <span className="inline-flex items-center h-9 w-[140px] px-4 bg-gradient-to-r from-green-500/10 to-green-400/10 rounded-lg justify-center">
+                      <span className="inline-flex items-center h-7 sm:h-9 w-[100px] sm:w-[140px] px-2 sm:px-4 bg-gradient-to-r from-green-500/10 to-green-400/10 rounded-lg justify-center">
                         <FlipNumbers
-                          height={FLIP_NUMBERS_HEIGHT}
-                          width={FLIP_NUMBERS_WIDTH}
+                          height={16}
+                          width={12}
                           color="#a1a1aa"
                           background="transparent"
                           play
@@ -328,12 +329,12 @@ export default function UnscoredMatchesSection({ className }: Props) {
                   </div>
 
                   {/* Completion percentage */}
-                  <div className="flex items-center justify-center text-lg md:text-xl">
-                    <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
-                      <span className="inline-flex items-center h-9 w-[100px] px-4 bg-gradient-to-r from-green-500/10 to-green-400/10 rounded-lg justify-center">
+                  <div className="flex items-center justify-center text-sm sm:text-lg md:text-xl">
+                    <div className="flex flex-wrap items-center justify-center gap-x-1 sm:gap-x-2 gap-y-1">
+                      <span className="inline-flex items-center h-7 sm:h-9 w-[80px] sm:w-[100px] px-2 sm:px-4 bg-gradient-to-r from-green-500/10 to-green-400/10 rounded-lg justify-center">
                         <FlipNumbers
-                          height={FLIP_NUMBERS_HEIGHT}
-                          width={FLIP_NUMBERS_WIDTH}
+                          height={16}
+                          width={10}
                           color="#4ade80"
                           background="transparent"
                           play
@@ -343,13 +344,15 @@ export default function UnscoredMatchesSection({ className }: Props) {
                           duration={FLIP_NUMBERS_DURATION}
                         />
                       </span>
-                      <span className="text-gray-300">of all possible scores have been played.</span>
+                      <span className="text-gray-300">
+                        of all possible scores have been played.
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 {/* Dots */}
-                <div className="flex items-center justify-center gap-8 mt-8">
+                <div className="flex items-center justify-center gap-4 sm:gap-8 mt-6 sm:mt-8">
                   {stats.map((_, idx) => (
                     <div key={idx} className="flex flex-col items-center gap-2">
                       <div
@@ -369,13 +372,13 @@ export default function UnscoredMatchesSection({ className }: Props) {
 
               <button
                 onClick={goNext}
-                className="shrink-0 group flex items-center gap-2 px-4 py-2 bg-[#c5c75a] text-black rounded-lg transition-all duration-200 hover:bg-opacity-90 active:scale-95"
+                className="shrink-0 group flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 bg-[#c5c75a] text-black rounded-lg transition-all duration-200 hover:bg-opacity-90 active:scale-95"
                 aria-label="Next format"
               >
-                <span className="hidden sm:inline text-sm font-medium">
+                <span className="hidden md:inline text-sm font-medium">
                   Next
                 </span>
-                <ChevronRight size={20} />
+                <ChevronRight size={16} className="sm:w-5 sm:h-5" />
               </button>
             </div>
           </div>
@@ -385,11 +388,11 @@ export default function UnscoredMatchesSection({ className }: Props) {
         <ExploreButton className="mb-8" />
 
         {/* Scoreboards Header */}
-        <div className="text-center mb-8">
-          <h3 className="text-2xl font-bold text-green-400 mb-2">
+        <div className="text-center mb-6 sm:mb-8 px-4">
+          <h3 className="text-xl sm:text-2xl font-bold text-green-400 mb-2">
             Never-Occurred Scorelines
           </h3>
-          <p className="text-gray-300 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-gray-300 max-w-2xl mx-auto">
             Below are examples of score combinations that have never happened in
             professional {currentStat.gender.toLowerCase()}&apos;s best-of-
             {currentStat.best_of} tennis matches. These are just a few of the{" "}
@@ -399,7 +402,7 @@ export default function UnscoredMatchesSection({ className }: Props) {
         </div>
 
         {/* Scoreboards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-[90%] mx-auto mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 w-[95%] sm:w-[90%] mx-auto mb-8 sm:mb-16">
           {patternsToDisplay.map((pattern, idx) => (
             <div
               key={`${currentStat.gender}_${currentStat.best_of}-${idx}`}

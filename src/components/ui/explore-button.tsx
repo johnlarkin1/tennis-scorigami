@@ -23,13 +23,13 @@ export const ExploreButton: React.FC<ExploreButtonProps> = ({
     >
       <Link
         href="/explore"
-        className="bg-green-500 hover:bg-green-600 text-black font-bold px-8 py-4 rounded-full shadow-xl flex items-center gap-3 transition-all duration-300 hover:scale-105 hover:shadow-2xl text-lg border-2 border-green-400"
+        className="bg-green-500 hover:bg-green-600 text-black font-bold px-6 sm:px-8 py-3 sm:py-4 rounded-full shadow-xl flex items-center gap-2 sm:gap-3 transition-all duration-300 hover:scale-105 hover:shadow-2xl text-base sm:text-lg border-2 border-green-400"
         onClick={(e) => {
           e.preventDefault();
           router.push("/explore");
         }}
       >
-        <span className="text-xl">Explore interactively</span>
+        <span className="text-lg sm:text-xl">Explore interactively</span>
         <motion.div
           animate={{
             x: [0, 8, 0],
@@ -40,7 +40,7 @@ export const ExploreButton: React.FC<ExploreButtonProps> = ({
             ease: "easeInOut",
           }}
         >
-          <ChevronsRightIcon className="w-6 h-6" />
+          <ChevronsRightIcon className="w-5 h-5 sm:w-6 sm:h-6" />
         </motion.div>
       </Link>
     </motion.div>

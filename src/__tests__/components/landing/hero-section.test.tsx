@@ -15,7 +15,7 @@ describe('HeroSection', () => {
     
     const section = document.querySelector('section')
     expect(section).toBeInTheDocument()
-    expect(section).toHaveClass('relative', 'w-full', 'h-[32vh]', 'overflow-hidden', 'bg-gray-900')
+    expect(section).toHaveClass('relative', 'w-full', 'h-[20vh]', 'sm:h-[32vh]', 'overflow-hidden', 'bg-gray-900')
   })
 
   it('renders the ParticleCanvas component', () => {

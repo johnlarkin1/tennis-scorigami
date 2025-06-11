@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { isMobile } from "react-device-detect";
 
 type Particle = {
   x: number;
@@ -17,9 +16,7 @@ type Particle = {
   type: "text" | "staticBall" | "debris";
 };
 
-// Ball type removed since we're not using ball animations anymore
-
-export const ParticleCanvas: React.FC<{ className?: string }> = ({
+export const MobileParticleCanvas: React.FC<{ className?: string }> = ({
   className,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -32,9 +29,9 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
       H = 0;
     let textPts: { x: number; y: number }[] = [];
     let particles: Particle[] = [];
-    // Removed balls array since we're not using ball animations
-    // mouse starts off-screen - larger radius on mobile for easier interaction
-    const repulseRadius = isMobile ? 120 : 80;
+
+    // Mobile-optimized settings
+    const repulseRadius = 50;
     const offscreen = -repulseRadius * 2;
     const mouse = { x: offscreen, y: offscreen };
 
@@ -43,21 +40,19 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
     let staticBallRadius = 0;
     let netOffset = 0;
 
-    /* physics constants - adjusted for mobile */
-    const springStrength = 0.02;
+    /* Mobile-optimized physics constants */
+    const springStrength = 0.025;
     const friction = 0.9;
-    const repulseStrength = isMobile ? 15000 : 20000; // Slightly weaker on mobile
-    const ballRotationSpeed = 0.004;
-    const gravity = 0.5;
-    const staticBallFactor = isMobile ? 0.2 : 0.25; // Smaller ball on mobile
+    const repulseStrength = 12000;
+    const ballRotationSpeed = 0.003;
+    const staticBallFactor = 0.15; // Smaller ball for mobile
 
-    /* grid size - larger on mobile for better performance */
-    const textGrid = isMobile ? 8 : 6; // changing these will change the number of particles
-    const tennisGrid = isMobile ? 8 : 6;
+    /* Mobile-optimized grid size - maximum density for clean text */
+    const textGrid = 3; // Much smaller grid for higher resolution text
+    const tennisGrid = 4;
 
     /* off-screen canvas for text mask */
     const off = document.createElement("canvas");
-    // Set willReadFrequently to true to optimize getImageData calls
     const offCtx = off.getContext("2d", { willReadFrequently: true })!;
 
     function prepareTextMask() {
@@ -66,33 +61,31 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
       offCtx.clearRect(0, 0, W, H);
       offCtx.fillStyle = "#fff";
 
-      // Responsive font size - smaller on mobile
-      const fontSize = isMobile
-        ? Math.min(W * 0.2, 80)
-        : Math.min(W * 0.15, 132);
+      // Mobile-optimized responsive font size - smaller for better fit
+      const fontSize = Math.min(W * 0.1, 50); // Further reduced to 50px max
       offCtx.font = `bold ${fontSize}px sans-serif`;
-      offCtx.textAlign = "left";
-      const leftX = W * 0.1;
+      offCtx.textAlign = "left"; // Left align like desktop version
       offCtx.textBaseline = "middle";
 
-      // how far apart your two baselines *used* to be:
-      const origY1 = H * 0.4;
-      const origY2 = H * 0.6 + 40;
-      const halfGap = (origY2 - origY1) / 2;
+      // Position text on the left side like desktop
+      const leftX = W * 0.1;
+      const centerY = H * 0.5;
 
-      const centerY = staticBallCenter.y; // = H/2
-
-      // now place each line's *center* halfGap above / below the ball
-      const y1 = centerY - halfGap;
-      const y2 = centerY + halfGap;
+      // Stack text vertically with tighter spacing for better mobile fit
+      const lineSpacing = fontSize * 0.9;
+      const y1 = centerY - lineSpacing * 0.5;
+      const y2 = centerY + lineSpacing * 0.5;
 
       offCtx.fillText("TENNIS", leftX, y1);
       offCtx.fillText("SCORIGAMI", leftX, y2);
+
       const img = offCtx.getImageData(0, 0, W, H).data;
 
       textPts = [];
+      // Scan the left portion where text is positioned
       for (let y = 0; y < H; y += textGrid) {
-        for (let x = 0; x < W * 0.6; x += textGrid) {
+        for (let x = 0; x < W * 0.7; x += textGrid) {
+          // Scan wider area for better text coverage
           if (img[(y * W + x) * 4 + 3] > 128) {
             textPts.push({ x, y });
           }
@@ -102,7 +95,8 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
 
     function initParticles() {
       particles = [];
-      // text dots
+
+      // Text dots
       for (const p of textPts) {
         particles.push({
           x: p.x,
@@ -114,8 +108,8 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
           type: "text",
         });
       }
-      // static big ball dots
 
+      // Static ball - positioned on the right side
       const c = staticBallCenter;
       const r = staticBallRadius;
       for (let yy = c.y - r; yy < c.y + r; yy += tennisGrid) {
@@ -138,12 +132,12 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
         }
       }
     }
-    function drawNetTexture() {
-      const cellSize = 40; // Size of each net "cell"
-      const lineWidth = 1.5;
 
-      // Main net grid
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.05)"; // Very subtle white lines
+    function drawNetTexture() {
+      const cellSize = 30; // Smaller cells for mobile
+      const lineWidth = 1;
+
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.03)"; // More subtle
       ctx.lineWidth = lineWidth;
 
       // Vertical lines
@@ -162,28 +156,7 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
         ctx.stroke();
       }
 
-      // Crossing diagonal threads (characteristic of tennis nets)
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
-      ctx.lineWidth = 1;
-
-      // Draw X patterns within each cell
-      for (let x = netOffset % cellSize; x < W; x += cellSize) {
-        for (let y = 0; y < H; y += cellSize) {
-          // Top-left to bottom-right
-          ctx.beginPath();
-          ctx.moveTo(x, y);
-          ctx.lineTo(x + cellSize, y + cellSize);
-          ctx.stroke();
-
-          // Top-right to bottom-left
-          ctx.beginPath();
-          ctx.moveTo(x + cellSize, y);
-          ctx.lineTo(x, y + cellSize);
-          ctx.stroke();
-        }
-      }
-
-      // Add a subtle gradient overlay to fade the net at edges
+      // Subtle gradient overlay
       const gradient = ctx.createRadialGradient(
         W / 2,
         H / 2,
@@ -193,8 +166,8 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
         Math.max(W, H) / 2
       );
       gradient.addColorStop(0, "rgba(0, 0, 0, 0)");
-      gradient.addColorStop(0.7, "rgba(0, 0, 0, 0)");
-      gradient.addColorStop(1, "rgba(0, 0, 0, 0.3)");
+      gradient.addColorStop(0.8, "rgba(0, 0, 0, 0)");
+      gradient.addColorStop(1, "rgba(0, 0, 0, 0.2)");
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, W, H);
     }
@@ -202,10 +175,11 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
     function resize() {
       W = canvas.width = canvas.clientWidth;
       H = canvas.height = canvas.clientHeight;
-      staticBallCenter = { x: W * 0.75, y: H / 2 };
+
+      // Position ball further right for mobile
+      staticBallCenter = { x: W * 0.8, y: H * 0.5 }; // Moved further right to give text more space
       staticBallRadius = Math.min(W, H) * staticBallFactor;
 
-      // Use requestAnimationFrame to avoid setTimeout performance issues
       requestAnimationFrame(() => {
         prepareTextMask();
         initParticles();
@@ -218,13 +192,11 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
     let physicsId: number;
     function updatePhysics() {
       rotation += ballRotationSpeed;
-      netOffset += 0.1; // Subtle net movement
+      netOffset += 0.08; // Slower net movement
       const c = staticBallCenter;
 
       particles.forEach((p) => {
-        if (p.type === "debris") return;
-
-        // single, unconditional repulsion:
+        // Mouse repulsion
         const dx = p.x - mouse.x,
           dy = p.y - mouse.y;
         const dist2 = dx * dx + dy * dy;
@@ -235,7 +207,7 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
           p.vy += Math.sin(ang) * F;
         }
 
-        // spring back to origin/text
+        // Spring back to origin
         let tx: number, ty: number;
         if (p.type === "text") {
           tx = p.tx!;
@@ -248,24 +220,11 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
         p.vx += (tx - p.x) * springStrength;
         p.vy += (ty - p.y) * springStrength;
 
-        // integrate
+        // Integration
         p.vx *= friction;
         p.vy *= friction;
         p.x += p.vx;
         p.y += p.vy;
-      });
-
-      // debris
-      particles = particles.filter((p) => {
-        if (p.type !== "debris") return true;
-        p.age!++;
-        if (p.age! >= p.lifetime!) return false;
-        p.vy += gravity * 0.2;
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vx *= friction;
-        p.vy *= friction;
-        return true;
       });
 
       physicsId = requestAnimationFrame(updatePhysics);
@@ -278,42 +237,31 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
       // Draw the net texture as background
       drawNetTexture();
 
-      // text dots
+      // Text dots - smaller for higher density
       ctx.fillStyle = "#0f0";
       particles.forEach((p) => {
         if (p.type === "text") {
           ctx.beginPath();
-          ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, 2, 0, Math.PI * 2); // Reduced to 2 for higher density
           ctx.fill();
         }
       });
 
-      // static ball dots
+      // Static ball dots
       ctx.fillStyle = "#c5c75a";
       particles.forEach((p) => {
         if (p.type === "staticBall") {
           ctx.beginPath();
-          ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, 2, 0, Math.PI * 2); // Reduced for higher density
           ctx.fill();
         }
       });
 
-      // debris
-      particles.forEach((p) => {
-        if (p.type === "debris") {
-          ctx.globalAlpha = 1 - p.age! / p.lifetime!;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.globalAlpha = 1;
-        }
-      });
-
-      // static ball outline + seam
+      // Static ball outline + seam
       const c = staticBallCenter,
         bigR = staticBallRadius;
       ctx.strokeStyle = "#fff";
-      ctx.lineWidth = 4;
+      ctx.lineWidth = 3; // Thinner for mobile
       ctx.beginPath();
       ctx.arc(c.x, c.y, bigR, 0, Math.PI * 2);
       ctx.stroke();
@@ -325,7 +273,7 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
       ctx.arc(0, 0, bigR, 0, Math.PI * 2);
       ctx.clip();
       ctx.strokeStyle = "#fff";
-      ctx.lineWidth = 3;
+      ctx.lineWidth = 2; // Thinner
       ctx.moveTo(-bigR, 0);
       ctx.bezierCurveTo(
         -bigR * 0.5,
@@ -341,21 +289,9 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
       drawId = requestAnimationFrame(draw);
     }
 
-    // Enhanced pointer and touch events for better mobile experience
-    const handlePM = (e: PointerEvent) => {
-      const r = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - r.left;
-      mouse.y = e.clientY - r.top;
-    };
-
-    const handlePL = () => {
-      mouse.x = offscreen;
-      mouse.y = offscreen;
-    };
-
-    // Touch-specific handlers for better mobile responsiveness
+    // Touch-optimized event handlers
     const handleTouchStart = (e: TouchEvent) => {
-      e.preventDefault(); // Prevent scrolling
+      e.preventDefault();
       const r = canvas.getBoundingClientRect();
       const touch = e.touches[0];
       mouse.x = touch.clientX - r.left;
@@ -363,11 +299,14 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      e.preventDefault(); // Prevent scrolling
+      e.preventDefault();
       const r = canvas.getBoundingClientRect();
       const touch = e.touches[0];
-      mouse.x = touch.clientX - r.left;
-      mouse.y = touch.clientY - r.top;
+      const newX = touch.clientX - r.left;
+      const newY = touch.clientY - r.top;
+
+      mouse.x = newX;
+      mouse.y = newY;
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
@@ -376,22 +315,15 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
       mouse.y = offscreen;
     };
 
-    // Add all event listeners
-    canvas.addEventListener("pointermove", handlePM);
-    canvas.addEventListener("pointerleave", handlePL);
+    // Add touch event listeners
+    canvas.addEventListener("touchstart", handleTouchStart, { passive: false });
+    canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
+    canvas.addEventListener("touchend", handleTouchEnd, { passive: false });
+    canvas.style.touchAction = "none";
 
-    // Enhanced mobile touch support
-    if (isMobile) {
-      canvas.addEventListener("touchstart", handleTouchStart, {
-        passive: false,
-      });
-      canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
-      canvas.addEventListener("touchend", handleTouchEnd, { passive: false });
-      canvas.style.touchAction = "none"; // Prevent browser touch behaviors
-    }
     window.addEventListener("resize", resize);
 
-    // start
+    // Initialize
     resize();
     updatePhysics();
     draw();
@@ -399,15 +331,9 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
     return () => {
       cancelAnimationFrame(physicsId);
       cancelAnimationFrame(drawId);
-      canvas.removeEventListener("pointermove", handlePM);
-      canvas.removeEventListener("pointerleave", handlePL);
-
-      if (isMobile) {
-        canvas.removeEventListener("touchstart", handleTouchStart);
-        canvas.removeEventListener("touchmove", handleTouchMove);
-        canvas.removeEventListener("touchend", handleTouchEnd);
-      }
-
+      canvas.removeEventListener("touchstart", handleTouchStart);
+      canvas.removeEventListener("touchmove", handleTouchMove);
+      canvas.removeEventListener("touchend", handleTouchEnd);
       window.removeEventListener("resize", resize);
     };
   }, []);

@@ -26,6 +26,7 @@ import { circular } from "graphology-layout";
 import forceAtlas2 from "graphology-layout-forceatlas2";
 import { useAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { isMobile } from "react-device-detect";
 import { EdgeArrowProgram } from "sigma/rendering";
 
 // Create custom border program with visible borders
@@ -237,12 +238,13 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
       data.nodes.forEach((node) => {
         let size;
         if (node.id === ROOT_ID) {
-          size = 14; // Make root node larger
+          size = isMobile ? 10 : 14; // Smaller root node on mobile
         } else {
           // Scale node size based on occurrences and importance
-          const baseSize = Math.max(node.norm * 60, 2);
-          const occurrenceBonus = Math.log(node.occurrences + 1) * 1.5;
-          size = Math.max(5, baseSize + occurrenceBonus);
+          const baseSize = Math.max(node.norm * (isMobile ? 30 : 60), 2);
+          const occurrenceBonus =
+            Math.log(node.occurrences + 1) * (isMobile ? 0.6 : 1.5);
+          size = Math.max(isMobile ? 3 : 5, baseSize + occurrenceBonus);
         }
 
         // Skip nodes with empty slugs
@@ -270,7 +272,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
 
         const nodeColor = getNodeColor(node);
 
-        graph.addNode(nodeId, {
+        const nodeAttributes: Record<string, unknown> = {
           label: node.slug, // Always include label in node data
           size,
           color: nodeColor,
@@ -284,11 +286,17 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
               : !node.played || node.occurrences === 0
                 ? 2
                 : 1, // Different border sizes
-          type: "border", // Use border node type
           x: initialPositions[nodeIdStr].x,
           y: initialPositions[nodeIdStr].y,
           originalNode: node,
-        });
+        };
+
+        // Only add type on desktop
+        if (!isMobile) {
+          nodeAttributes.type = "border";
+        }
+
+        graph.addNode(nodeId, nodeAttributes);
       });
 
       // Add edges with improved styling
@@ -306,7 +314,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
             color: getEdgeColorByDepth(maxDepth)
               .replace("hsl", "hsla")
               .replace(")", ", 0.8)"),
-            size: 1 + maxDepth * 0.3,
+            size: isMobile ? 0.5 + maxDepth * 0.2 : 1 + maxDepth * 0.3,
             type: "arrow", // Use arrow edges
           });
         }
@@ -320,7 +328,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
       // Apply hierarchical radial layout based on parent-child relationships
       const centerX = 0;
       const centerY = 0;
-      const radiusStep = 120; // Distance between layers
+      const radiusStep = isMobile ? 80 : 120; // Smaller distance between layers on mobile
 
       // Build adjacency list for parent-child relationships
       const children: Record<string, string[]> = {};
@@ -424,16 +432,23 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
         sigmaRef.current.kill();
       }
 
-      // Create sigma instance with enhanced settings
+      // Create sigma instance with mobile-optimized settings
       const sigma = new Sigma(graph, containerRef.current as HTMLDivElement, {
-        renderLabels: true, // Always render labels
+        renderLabels: !isMobile || showLabels, // Disable labels on mobile unless explicitly enabled
         renderEdgeLabels: false,
         defaultNodeColor: "#666",
         defaultEdgeColor: "#333",
         labelFont: "Inter, Arial, sans-serif",
-        labelSize: 14,
+        labelSize: isMobile ? 12 : 14, // Smaller labels on mobile
         labelWeight: "600",
         labelColor: { color: "#000000" }, // Black labels for better contrast
+        // Mobile performance optimizations
+        ...(isMobile && {
+          enableEdgeHoverEvents: false, // Disable edge hover on mobile
+          enableEdgeClickEvents: false, // Disable edge click on mobile
+          allowInvalidContainer: true, // More permissive container handling
+          zIndex: false, // Disable z-index sorting for better performance
+        }),
         defaultDrawNodeLabel: (context, data, settings) => {
           // Custom label rendering with background
           const size = data.size;
@@ -504,39 +519,51 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
         labelDensity: 0.05, // Show more labels
         labelGridCellSize: 80, // Larger grid cells
         labelRenderedSizeThreshold: 3, // Lower threshold to show more labels
-        // Node programs for border support
-        nodeProgramClasses: {
-          border: CustomNodeBorderProgram,
-        },
+        // Node programs for border support (only on desktop)
+        nodeProgramClasses: isMobile
+          ? {}
+          : {
+              border: CustomNodeBorderProgram,
+            },
         // Edge programs for arrow support
-        edgeProgramClasses: {
-          arrow: EdgeArrowProgram,
-        },
-        // Node reducer for hover effects - very subtle
-        nodeReducer: (node, data) => {
-          const res = { ...data };
-          if (data.highlighted) {
-            // Only change border on hover, not size
-            res.zIndex = 1;
-            res.borderSize = 3; // Thicker border
-            res.borderColor = "#ffffff"; // White border on hover
-          }
-          return res;
-        },
+        edgeProgramClasses: isMobile
+          ? {}
+          : {
+              arrow: EdgeArrowProgram, // Disable arrows on mobile for performance
+            },
+        // Node reducer for hover effects - disabled on mobile
+        ...(isMobile
+          ? {}
+          : {
+              nodeReducer: (node, data) => {
+                const res = { ...data };
+                if (data.highlighted) {
+                  // Only change border on hover, not size
+                  res.zIndex = 1;
+                  res.borderSize = 3; // Thicker border
+                  res.borderColor = "#ffffff"; // White border on hover
+                }
+                return res;
+              },
+            }),
       });
 
-      // Animate nodes from initial to target positions
+      // Animate nodes from initial to target positions (simplified on mobile)
       const animateInitialLayout = () => {
-        const duration = INITIAL_ANIMATION_DURATION;
+        const duration = isMobile ? 1000 : INITIAL_ANIMATION_DURATION; // Faster on mobile
         const startTime = Date.now();
 
         const animate = () => {
           const now = Date.now();
           const progress = Math.min((now - startTime) / duration, 1);
 
-          // Easing function for smooth animation
+          // Simplified easing on mobile, full easing on desktop
           const easeInOutCubic = (t: number) => {
-            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            return isMobile
+              ? t
+              : t < 0.5
+                ? 4 * t * t * t
+                : 1 - Math.pow(-2 * t + 2, 3) / 2;
           };
 
           const easedProgress = easeInOutCubic(progress);
@@ -642,7 +669,7 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
         }
       });
 
-      // Add hover effects with enhanced tooltip
+      // Add hover effects with enhanced tooltip (disabled on mobile for performance)
       let hoverTimeout: NodeJS.Timeout;
       const tooltip = document.createElement("div");
       tooltip.style.position = "absolute";
@@ -662,32 +689,34 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
       tooltip.style.transition = "opacity 0.2s ease-in-out";
       document.body.appendChild(tooltip);
 
-      sigma.on("enterNode", (event) => {
-        try {
-          const node = event.node;
-          if (!graph.hasNode(node)) return;
+      // Only add hover events on desktop for better mobile performance
+      if (!isMobile) {
+        sigma.on("enterNode", (event) => {
+          try {
+            const node = event.node;
+            if (!graph.hasNode(node)) return;
 
-          const nodeData = graph.getNodeAttributes(node);
-          const originalNode = nodeData.originalNode as NodeDTO;
+            const nodeData = graph.getNodeAttributes(node);
+            const originalNode = nodeData.originalNode as NodeDTO;
 
-          if (!originalNode) return;
+            if (!originalNode) return;
 
-          // Change cursor to pointer
-          if (containerRef.current) {
-            containerRef.current.style.cursor = "pointer";
-          }
+            // Change cursor to pointer
+            if (containerRef.current) {
+              containerRef.current.style.cursor = "pointer";
+            }
 
-          // Subtle hover effect
-          graph.setNodeAttribute(node, "highlighted", true);
+            // Subtle hover effect
+            graph.setNodeAttribute(node, "highlighted", true);
 
-          // Show tooltip with animation
-          clearTimeout(hoverTimeout);
-          const nodeDisplayData = sigma.getNodeDisplayData(node);
-          if (!nodeDisplayData) return;
+            // Show tooltip with animation
+            clearTimeout(hoverTimeout);
+            const nodeDisplayData = sigma.getNodeDisplayData(node);
+            if (!nodeDisplayData) return;
 
-          const containerRect = containerRef.current!.getBoundingClientRect();
+            const containerRect = containerRef.current!.getBoundingClientRect();
 
-          tooltip.innerHTML = `
+            tooltip.innerHTML = `
           <div style="font-weight: 600; margin-bottom: 6px; font-size: 15px;">${originalNode.slug}</div>
           <div style="font-size: 13px; color: #e5e5e5; line-height: 1.5;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
@@ -707,50 +736,51 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
           </div>
         `;
 
-          tooltip.style.opacity = "0";
-          tooltip.style.display = "block";
-          tooltip.style.left = `${containerRect.left + nodeDisplayData.x + 15}px`;
-          tooltip.style.top = `${containerRect.top + nodeDisplayData.y - 10}px`;
+            tooltip.style.opacity = "0";
+            tooltip.style.display = "block";
+            tooltip.style.left = `${containerRect.left + nodeDisplayData.x + 15}px`;
+            tooltip.style.top = `${containerRect.top + nodeDisplayData.y - 10}px`;
 
-          // Fade in
-          requestAnimationFrame(() => {
-            tooltip.style.opacity = "1";
-          });
+            // Fade in
+            requestAnimationFrame(() => {
+              tooltip.style.opacity = "1";
+            });
 
-          sigma.refresh();
-        } catch (error) {
-          console.error("Error in enterNode handler:", error);
-        }
-      });
-
-      sigma.on("leaveNode", (event) => {
-        try {
-          const node = event.node;
-          if (!graph.hasNode(node)) return;
-
-          // Reset cursor to default
-          if (containerRef.current) {
-            containerRef.current.style.cursor = "default";
+            sigma.refresh();
+          } catch (error) {
+            console.error("Error in enterNode handler:", error);
           }
+        });
 
-          graph.setNodeAttribute(node, "highlighted", false);
+        sigma.on("leaveNode", (event) => {
+          try {
+            const node = event.node;
+            if (!graph.hasNode(node)) return;
 
-          // Hide tooltip with fade out
-          tooltip.style.opacity = "0";
-          hoverTimeout = setTimeout(() => {
-            tooltip.style.display = "none";
-          }, 200);
+            // Reset cursor to default
+            if (containerRef.current) {
+              containerRef.current.style.cursor = "default";
+            }
 
-          sigma.refresh();
-        } catch (error) {
-          console.error("Error in leaveNode handler:", error);
-        }
-      });
+            graph.setNodeAttribute(node, "highlighted", false);
 
-      // Clean up tooltip on unmount
-      sigma.on("kill", () => {
-        tooltip.remove();
-      });
+            // Hide tooltip with fade out
+            tooltip.style.opacity = "0";
+            hoverTimeout = setTimeout(() => {
+              tooltip.style.display = "none";
+            }, 200);
+
+            sigma.refresh();
+          } catch (error) {
+            console.error("Error in leaveNode handler:", error);
+          }
+        });
+
+        // Clean up tooltip on unmount
+        sigma.on("kill", () => {
+          tooltip.remove();
+        });
+      }
 
       sigmaRef.current = sigma;
       graphRef.current = graph;
@@ -824,8 +854,8 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
         }}
       />
 
-      {/* Legend */}
-      {!hideLegend && (
+      {/* Legend - hidden on mobile */}
+      {!hideLegend && !isMobile && (
         <Legend
           colorMode={colorMode}
           maxDepth={maxDepth}
@@ -833,8 +863,10 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
         />
       )}
 
-      {/* Unscored banner */}
-      {!hideLegend && <UnscoredBanner visible={hasUnscoredNodes} />}
+      {/* Unscored banner - hidden on mobile */}
+      {!hideLegend && !isMobile && (
+        <UnscoredBanner visible={hasUnscoredNodes} />
+      )}
 
       {/* Modals */}
       {discoveryModalOpen && discoveredNode && (

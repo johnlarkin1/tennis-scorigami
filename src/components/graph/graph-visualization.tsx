@@ -16,6 +16,7 @@ import { useGraphContext } from "@/providers/graph-provider";
 import { selectedTournamentAtom } from "@/store/tournament";
 import { useAtom } from "jotai";
 import React, { Fragment, lazy, Suspense } from "react";
+import { isMobile } from "react-device-detect";
 
 // Lazy load visualization components to avoid SSR issues
 const ForceGraph3D = lazy(() => import("@/components/graph/force-graph-3d"));
@@ -63,7 +64,7 @@ export const GraphVisualization: React.FC = () => {
             {graphLayout === "2d" ? <SigmaGraph2D /> : <ForceGraph3D />}
           </Suspense>
 
-          <UnscoredBanner visible={hasUnscoredNodes} />
+          {!isMobile && <UnscoredBanner visible={hasUnscoredNodes} />}
           <GraphControls />
 
           <div className="absolute bottom-2 right-3 text-xs text-gray-500">

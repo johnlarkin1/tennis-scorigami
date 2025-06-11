@@ -41,8 +41,8 @@ describe('Header', () => {
     expect(logo).toBeInTheDocument()
     expect(logo).toHaveAttribute('src', '/favicon/favicon.svg')
     expect(logo).toHaveAttribute('alt', 'Tennis Scorigami Logo')
-    expect(logo).toHaveAttribute('width', '40')
-    expect(logo).toHaveAttribute('height', '40')
+    expect(logo).toHaveAttribute('width', '32')
+    expect(logo).toHaveAttribute('height', '32')
 
     expect(screen.getByText('Tennis')).toBeInTheDocument()
     expect(screen.getByText('Scorigami')).toBeInTheDocument()
@@ -67,7 +67,7 @@ describe('Header', () => {
     
     const nav = screen.getByRole('navigation')
     expect(nav).toBeInTheDocument()
-    expect(nav).toHaveClass('flex', 'space-x-6')
+    expect(nav).toHaveClass('flex', 'space-x-4', 'sm:space-x-6')
   })
 
   it('logo link points to home page', () => {

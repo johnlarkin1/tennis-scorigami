@@ -41,7 +41,7 @@ export default function Home() {
       <main>
         {/* Main content visible on initial load */}
         <div className="min-h-screen flex flex-col">
-          <HeroSection className="h-[30vh]" />
+          <HeroSection className="h-[20vh] sm:h-[30vh]" />
           <UnscoredMatchesSection className="h-auto flex-1" />
 
           {/* <FloatingExploreButton targetId="force-graph" /> */}

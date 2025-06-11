@@ -15,8 +15,10 @@ import { useAtom } from "jotai";
 import { ChevronLeft, Settings } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
+import { isMobile } from "react-device-detect";
 
 export function ExplorePageContent() {
+  // Start with sidebar closed on mobile, open on desktop
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -28,6 +30,11 @@ export function ExplorePageContent() {
   const [graphLayout, setGraphLayout] = useAtom(graphLayoutAtom);
   const [colorMode, setColorMode] = useAtom(graphColorModeAtom);
   const [showLabels, setShowLabels] = useAtom(showLabelsAtom);
+
+  // Set sidebar state based on device type after mount to avoid hydration issues
+  useEffect(() => {
+    setSidebarOpen(!isMobile);
+  }, []);
 
   // Initialize atoms from URL params on mount
   useEffect(() => {
@@ -86,32 +93,37 @@ export function ExplorePageContent() {
     
     if (newUrl !== currentUrl) {
       router.push(`/explore${newUrl}`, { scroll: false });
+      
+      // Close sidebar on mobile after selection
+      if (isMobile && sidebarOpen) {
+        setSidebarOpen(false);
+      }
     }
-  }, [selectedSets, selectedYear, selectedSex, graphLayout, colorMode, showLabels, router]);
+  }, [selectedSets, selectedYear, selectedSex, graphLayout, colorMode, showLabels, router, sidebarOpen]);
 
   return (
     <>
       {/* Main Content with Sidebar and Graph */}
       <div className="flex flex-1 relative">
-        {/* Sidebar Controls */}
+        {/* Sidebar Controls - Mobile responsive */}
         <aside
-          className={`bg-gray-800 border-r border-gray-700 h-[calc(100vh-180px)] z-10 transition-all duration-300 overflow-y-auto
-            ${sidebarOpen ? "w-80 lg:w-96" : "w-0"}`}
+          className={`bg-gray-800 border-r border-gray-700 h-[calc(100vh-140px)] sm:h-[calc(100vh-180px)] z-10 transition-all duration-300 overflow-y-auto
+            ${sidebarOpen ? "w-full sm:w-80 lg:w-96" : "w-0"}`}
         >
           {sidebarOpen && (
-            <div className="p-4">
+            <div className="p-3 sm:p-4">
               <GraphControls />
             </div>
           )}
         </aside>
 
-        {/* Toggle Button */}
+        {/* Toggle Button - Mobile responsive */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className={`absolute top-4 bg-gray-700 hover:bg-gray-600 z-20 p-2 rounded-r-lg shadow-lg transition-all duration-300
-            ${sidebarOpen ? "left-80 lg:left-96" : "left-0"}`}
+          className={`absolute top-3 sm:top-4 bg-gray-700 hover:bg-gray-600 z-20 p-2 rounded-r-lg shadow-lg transition-all duration-300
+            ${sidebarOpen ? "left-full sm:left-80 lg:left-96 -ml-10 sm:-ml-0" : "left-0"}`}
         >
-          {sidebarOpen ? <ChevronLeft size={18} /> : <Settings size={18} />}
+          {sidebarOpen ? <ChevronLeft size={16} className="sm:w-[18px] sm:h-[18px]" /> : <Settings size={16} className="sm:w-[18px] sm:h-[18px]" />}
         </button>
 
         {/* Main Graph Area */}

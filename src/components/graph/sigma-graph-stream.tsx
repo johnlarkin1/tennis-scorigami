@@ -21,6 +21,7 @@ import Graph from "graphology";
 import FA2Layout from "graphology-layout-forceatlas2/worker";
 import { useAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { isMobile } from "react-device-detect";
 import type { default as Sigma } from "sigma";
 import { EdgeArrowProgram } from "sigma/rendering";
 
@@ -424,10 +425,16 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
             nodeCount > GRAPH_CONFIG.performanceThresholds.massiveNodeCount
               ? 0.8 // Changed from 0.5 to 0.8
               : 1;
-          const baseSize = Math.max(node.norm * 80 * sizeMultiplier, 2); // Increased from 60 to 80
+
+          const baseSize = Math.max(
+            node.norm * (isMobile ? 30 : 60) * sizeMultiplier,
+            2
+          );
           const occurrenceBonus =
-            Math.log(node.occurrences + 1) * 2 * sizeMultiplier; // Increased from 1.5 to 2
-          size = Math.max(4, baseSize + occurrenceBonus); // Minimum 4 instead of 2
+            Math.log(node.occurrences + 1) *
+            (isMobile ? 0.6 : 1.5) *
+            sizeMultiplier; // Increased from 1.5 to 2
+          size = Math.max(isMobile ? 3 : 5, baseSize + occurrenceBonus);
         }
 
         const isUnscored = !node.played || node.occurrences === 0;
@@ -525,14 +532,24 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
       );
 
       const sigma = new Sigma(graph, containerRef.current as HTMLDivElement, {
-        renderLabels: showLabels && !isExtremeGraph && !isMassiveGraph, // Disable labels on extreme/massive graphs
+        renderLabels:
+          showLabels &&
+          !isExtremeGraph &&
+          !isMassiveGraph &&
+          (!isMobile || showLabels), // Extra mobile check
         renderEdgeLabels: false,
         defaultNodeColor: "#666",
         defaultEdgeColor: "#000000",
         labelFont: "Inter, Arial, sans-serif",
-        labelSize: 14,
+        labelSize: isMobile ? 12 : 14, // Smaller labels on mobile
         labelWeight: "600",
         labelColor: { color: "#000000" },
+        // Mobile performance optimizations
+        ...(isMobile && {
+          enableEdgeHoverEvents: false,
+          enableEdgeClickEvents: false,
+          allowInvalidContainer: true,
+        }),
         defaultDrawNodeLabel: createLabelRenderer(showLabels),
         zIndex: !isMassiveGraph, // Disable z-index for massive graphs
         enableEdgeEvents: false,
@@ -717,13 +734,16 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
         }}
       />
 
-      <Legend
-        colorMode={colorMode}
-        maxDepth={maxDepth}
-        hasUnscoredNodes={hasUnscoredNodes}
-      />
+      {/* Hide legend and banner on mobile */}
+      {!isMobile && (
+        <Legend
+          colorMode={colorMode}
+          maxDepth={maxDepth}
+          hasUnscoredNodes={hasUnscoredNodes}
+        />
+      )}
 
-      <UnscoredBanner visible={hasUnscoredNodes} />
+      {!isMobile && <UnscoredBanner visible={hasUnscoredNodes} />}
 
       {discoveryModalOpen && discoveredNode && (
         <DiscoveryModal

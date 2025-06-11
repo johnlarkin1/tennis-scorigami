@@ -105,21 +105,21 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
       !isGrandSlamTournament(selectedTournament));
 
   return (
-    <div className={`${className} space-y-6`}>
+    <div className={`${className} space-y-4 sm:space-y-6`}>
       <div>
-        <h2 className="text-xl font-bold text-white mb-4">
+        <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">
           Visualization Options
         </h2>
 
         {/* Graph Layout */}
-        <div className="mb-6">
-          <h3 className="text-md font-bold text-white mb-3 border-l-2 border-gray-600 pl-2">
+        <div className="mb-4 sm:mb-6">
+          <h3 className="text-sm sm:text-md font-bold text-white mb-2 sm:mb-3 border-l-2 border-gray-600 pl-2">
             Graph Layout
           </h3>
           <div className="grid grid-cols-2 gap-2">
             <motion.button
               onClick={() => setGraphLayout("2d")}
-              className="relative flex items-center justify-center py-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden"
+              className="relative flex items-center justify-center py-2 px-1 sm:px-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -132,10 +132,10 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
                 />
               )}
               <Network
-                className={`mr-2 h-5 w-5 relative z-10 ${graphLayout === "2d" ? "text-white" : "text-gray-300"}`}
+                className={`mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 relative z-10 ${graphLayout === "2d" ? "text-white" : "text-gray-300"}`}
               />
               <span
-                className={`relative z-10 ${graphLayout === "2d" ? "text-white" : "text-gray-300"}`}
+                className={`relative z-10 text-sm sm:text-base ${graphLayout === "2d" ? "text-white" : "text-gray-300"}`}
               >
                 2D View
               </span>
@@ -145,7 +145,7 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
                 if (selectedSets !== 5) setGraphLayout("3d");
               }}
               disabled={selectedSets === 5}
-              className={`relative flex items-center justify-center py-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden ${
+              className={`relative flex items-center justify-center py-2 px-1 sm:px-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden ${
                 selectedSets === 5 ? "opacity-50 cursor-not-allowed" : ""
               }`}
               whileHover={selectedSets !== 5 ? { scale: 1.02 } : {}}
@@ -160,18 +160,18 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
                 />
               )}
               <Layers
-                className={`mr-2 h-5 w-5 relative z-10 ${graphLayout === "3d" ? "text-white" : "text-gray-300"}`}
+                className={`mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 relative z-10 ${graphLayout === "3d" ? "text-white" : "text-gray-300"}`}
               />
               <span
-                className={`relative z-10 ${graphLayout === "3d" ? "text-white" : "text-gray-300"}`}
+                className={`relative z-10 text-sm sm:text-base ${graphLayout === "3d" ? "text-white" : "text-gray-300"}`}
               >
                 3D View
               </span>
             </motion.button>
           </div>
           {selectedSets === 5 && graphLayout === "2d" && (
-            <div className="text-blue-400 text-sm flex items-center mt-2">
-              <AlertCircle className="h-4 w-4 mr-1 flex-shrink-0" />
+            <div className="text-blue-400 text-xs sm:text-sm flex items-center mt-2">
+              <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1 flex-shrink-0" />
               <span>
                 Using 2D view for optimal performance with 5-set matches
               </span>
@@ -180,14 +180,14 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
         </div>
 
         {/* Node Coloring */}
-        <div className="mb-6">
-          <h3 className="text-md font-bold text-white mb-3 border-l-2 border-gray-600 pl-2">
+        <div className="mb-4 sm:mb-6">
+          <h3 className="text-sm sm:text-md font-bold text-white mb-2 sm:mb-3 border-l-2 border-gray-600 pl-2">
             Node Coloring
           </h3>
           <div className="grid grid-cols-2 gap-2">
             <motion.button
               onClick={() => setColorMode("category")}
-              className="relative flex items-center justify-center py-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden"
+              className="relative flex items-center justify-center py-2 px-1 sm:px-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -200,10 +200,10 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
                 />
               )}
               <Hash
-                className={`mr-2 h-5 w-5 relative z-10 ${colorMode === "category" ? "text-white" : "text-gray-300"}`}
+                className={`mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 relative z-10 ${colorMode === "category" ? "text-white" : "text-gray-300"}`}
               />
               <span
-                className={`relative z-10 ${colorMode === "category" ? "text-white" : "text-gray-300"}`}
+                className={`relative z-10 text-sm sm:text-base ${colorMode === "category" ? "text-white" : "text-gray-300"}`}
               >
                 Category Based
               </span>
@@ -211,7 +211,7 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
 
             <motion.button
               onClick={() => setColorMode("gradient")}
-              className="relative flex items-center justify-center py-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden"
+              className="relative flex items-center justify-center py-2 px-1 sm:px-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -224,10 +224,10 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
                 />
               )}
               <Paintbrush
-                className={`mr-2 h-5 w-5 relative z-10 ${colorMode === "gradient" ? "text-white" : "text-gray-300"}`}
+                className={`mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 relative z-10 ${colorMode === "gradient" ? "text-white" : "text-gray-300"}`}
               />
               <span
-                className={`relative z-10 ${colorMode === "gradient" ? "text-white" : "text-gray-300"}`}
+                className={`relative z-10 text-sm sm:text-base ${colorMode === "gradient" ? "text-white" : "text-gray-300"}`}
               >
                 Gradient
               </span>
@@ -236,14 +236,14 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
         </div>
 
         {/* Show Labels Toggle */}
-        <div className="mb-6">
-          <h3 className="text-md font-bold text-white mb-3 border-l-2 border-gray-600 pl-2">
+        <div className="mb-4 sm:mb-6">
+          <h3 className="text-sm sm:text-md font-bold text-white mb-2 sm:mb-3 border-l-2 border-gray-600 pl-2">
             Node Labels
           </h3>
           <div className="grid grid-cols-2 gap-2">
             <motion.button
               onClick={() => setShowLabels(true)}
-              className="relative flex items-center justify-center py-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden"
+              className="relative flex items-center justify-center py-2 px-1 sm:px-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -256,10 +256,10 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
                 />
               )}
               <Tag
-                className={`mr-2 h-5 w-5 relative z-10 ${showLabels ? "text-white" : "text-gray-300"}`}
+                className={`mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 relative z-10 ${showLabels ? "text-white" : "text-gray-300"}`}
               />
               <span
-                className={`relative z-10 ${showLabels ? "text-white" : "text-gray-300"}`}
+                className={`relative z-10 text-sm sm:text-base ${showLabels ? "text-white" : "text-gray-300"}`}
               >
                 Show Labels
               </span>
@@ -267,7 +267,7 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
 
             <motion.button
               onClick={() => setShowLabels(false)}
-              className="relative flex items-center justify-center py-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden"
+              className="relative flex items-center justify-center py-2 px-1 sm:px-2 rounded-lg bg-gray-900 border border-gray-700 overflow-hidden"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -280,10 +280,10 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
                 />
               )}
               <Tag
-                className={`mr-2 h-5 w-5 relative z-10 ${!showLabels ? "text-white" : "text-gray-300"}`}
+                className={`mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 relative z-10 ${!showLabels ? "text-white" : "text-gray-300"}`}
               />
               <span
-                className={`relative z-10 ${!showLabels ? "text-white" : "text-gray-300"}`}
+                className={`relative z-10 text-sm sm:text-base ${!showLabels ? "text-white" : "text-gray-300"}`}
               >
                 Hide Labels
               </span>
@@ -293,13 +293,13 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
       </div>
 
       {/* Match Filters */}
-      <div className="pt-4 border-t border-gray-700">
-        <h2 className="text-xl font-bold text-white mb-4">Match Filters</h2>
+      <div className="pt-3 sm:pt-4 border-t border-gray-700">
+        <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Match Filters</h2>
 
-        <div className="space-y-5">
+        <div className="space-y-4 sm:space-y-5">
           {/* Tournament Dropdown */}
           <div>
-            <label className="block text-sm font-bold text-white mb-2 border-l-2 border-gray-600 pl-2">
+            <label className="block text-xs sm:text-sm font-bold text-white mb-2 border-l-2 border-gray-600 pl-2">
               Tournament
             </label>
             <TournamentDropdown />
@@ -307,7 +307,7 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
 
           {/* Year Select */}
           <div>
-            <label className="block text-sm font-bold text-white mb-2 border-l-2 border-gray-600 pl-2">
+            <label className="block text-xs sm:text-sm font-bold text-white mb-2 border-l-2 border-gray-600 pl-2">
               Year
             </label>
             <Select onValueChange={setSelectedYear} value={selectedYear}>
@@ -337,7 +337,7 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
 
           {/* Division Select */}
           <div>
-            <label className="block text-sm font-bold text-white mb-2 border-l-2 border-gray-600 pl-2">
+            <label className="block text-xs sm:text-sm font-bold text-white mb-2 border-l-2 border-gray-600 pl-2">
               Division
             </label>
             <Select
@@ -367,7 +367,7 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
 
           {/* Match Format */}
           <div>
-            <label className="block text-sm font-bold text-white mb-2 border-l-2 border-gray-600 pl-2">
+            <label className="block text-xs sm:text-sm font-bold text-white mb-2 border-l-2 border-gray-600 pl-2">
               Match Format
             </label>
             <Select
@@ -398,8 +398,8 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
               </SelectContent>
             </Select>
             {isFiveSetsDisabled && (
-              <div className="text-amber-400 text-sm flex items-center mt-2">
-                <AlertCircle className="h-4 w-4 mr-1 flex-shrink-0" />
+              <div className="text-amber-400 text-xs sm:text-sm flex items-center mt-2">
+                <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1 flex-shrink-0" />
                 <span>
                   {selectedSex === "Women"
                     ? "Women's matches are best of 3 sets"

@@ -57,21 +57,21 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
 
       <div className="max-w-6xl mx-auto">
         {/* Timeline */}
-        <div className="relative mb-20">
+        <div className="relative mb-20 px-4 sm:px-0">
           <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-gradient-to-b from-green-500 to-blue-500" />
 
           {timelineEvents.map((event, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className={`relative flex items-center mb-12 ${
-                index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
+                index % 2 === 0 ? "flex-col md:flex-row" : "flex-col md:flex-row-reverse"
               }`}
             >
               <div
-                className={`w-full md:w-5/12 ${index % 2 === 0 ? "md:text-right md:pr-12" : "md:pl-12"}`}
+                className={`w-full md:w-5/12 ${index % 2 === 0 ? "text-center md:text-right md:pr-12" : "text-center md:pl-12"}`}
               >
                 <div className="bg-gray-900 p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
                   <div className="text-green-400 font-bold text-2xl mb-2">
@@ -82,7 +82,7 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
                 </div>
               </div>
 
-              <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-green-500 rounded-full border-4 border-gray-900" />
+              <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-green-500 rounded-full border-4 border-gray-900 md:top-1/2 md:-translate-y-1/2 -top-2" />
             </motion.div>
           ))}
         </div>
@@ -105,7 +105,7 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
             inherent difficulties in collecting decades of tennis history.
           </p>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-8 px-4 sm:px-0">
             <div className="bg-gray-800 p-6 rounded-lg">
               <Award className="w-8 h-8 text-green-400 mb-4" />
               <h4 className="text-xl font-bold mb-3">Special Thanks</h4>
@@ -164,7 +164,7 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="grid md:grid-cols-3 gap-8"
+          className="grid md:grid-cols-3 gap-8 px-4 sm:px-0"
         >
           <FeatureCard
             icon={<Database className="w-8 h-8" />}

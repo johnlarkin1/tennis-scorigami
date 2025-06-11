@@ -24,7 +24,8 @@
       "Bash(rg:*)",
       "Bash(rm:*)",
       "Bash(cp:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(sed:*)"
     ],
     "deny": []
   },

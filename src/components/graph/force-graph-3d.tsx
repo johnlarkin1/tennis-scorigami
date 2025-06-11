@@ -24,6 +24,7 @@ import dynamic from "next/dynamic";
 import React, { useCallback, useMemo, useRef } from "react";
 import type { ForceGraphMethods } from "react-force-graph-3d";
 import { useResizeDetector } from "react-resize-detector";
+import { isMobile } from "react-device-detect";
 const ROOT_ID = 0;
 
 // Dynamically import ForceGraph3D to avoid SSR issues
@@ -254,7 +255,8 @@ const ForceGraph3D: React.FC = () => {
           text="Loading graph..."
         />
       )}
-      <Legend colorMode={colorMode} maxDepth={maxDepth} data={data} />
+      {/* Legend - hidden on mobile */}
+      {!isMobile && <Legend colorMode={colorMode} maxDepth={maxDepth} data={data} />}
     </div>
   );
 };

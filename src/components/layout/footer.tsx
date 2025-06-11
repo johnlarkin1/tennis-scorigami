@@ -8,54 +8,53 @@ export const Footer = () => {
 
   return (
     <footer className="bg-gray-900 text-white border-t border-gray-700 shadow-[0_-4px_12px_rgba(0,0,0,0.3)]">
-      <div className="container mx-auto px-4 py-10">
-        <div className="grid md:grid-cols-4 gap-8">
-          <div className="md:col-span-2">
-            <div className="text-2xl font-bold mb-4 flex items-center">
+      <div className="container mx-auto px-4 py-6 sm:py-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
+          <div className="sm:col-span-2 md:col-span-2">
+            <div className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 flex items-center">
               <span className="mr-2">🎾</span>
               <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                 Tennis Scorigami
               </span>
             </div>
-            <p className="text-gray-300 mb-4 max-w-md">
-              Exploring the uncharted territory of tennis scores. A data
-              visualization project tracking unique score combinations in
-              professional tennis.
+            <p className="text-gray-300 mb-3 sm:mb-4 max-w-md text-sm sm:text-base">
+              As if tennis wasn&apos;t already exciting enough! Maybe the match
+              you&apos;re about to watch will be a tennis scorigami.
             </p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-3 sm:space-x-4">
               <SocialIcon
                 url="https://twitter.com/JLarks32"
                 bgColor="#1DA1F2"
-                style={{ height: 36, width: 36 }}
+                style={{ height: 32, width: 32 }}
                 target="_blank"
-                className="hover:scale-110 transition-transform"
+                className="hover:scale-110 transition-transform sm:!h-9 sm:!w-9"
               />
               <SocialIcon
                 url="https://github.com/johnlarkin1"
                 bgColor="#6e5494"
-                style={{ height: 36, width: 36 }}
+                style={{ height: 32, width: 32 }}
                 target="_blank"
-                className="hover:scale-110 transition-transform"
+                className="hover:scale-110 transition-transform sm:!h-9 sm:!w-9"
               />
               <SocialIcon
                 url="https://linkedin.com/in/johnlarkin"
                 bgColor="#0077B5"
-                style={{ height: 36, width: 36 }}
+                style={{ height: 32, width: 32 }}
                 target="_blank"
-                className="hover:scale-110 transition-transform"
+                className="hover:scale-110 transition-transform sm:!h-9 sm:!w-9"
               />
             </div>
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-gray-200 border-b border-gray-700/50 pb-2">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-200 border-b border-gray-700/50 pb-2">
               Navigation
             </h3>
-            <ul className="space-y-2">
+            <ul className="space-y-1 sm:space-y-2">
               <li>
                 <Link
                   href="/"
-                  className="text-gray-300 hover:text-white transition flex items-center group"
+                  className="text-gray-300 hover:text-white transition flex items-center group text-sm sm:text-base"
                 >
                   <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-green-400 transition-colors"></span>
                   Home
@@ -64,7 +63,7 @@ export const Footer = () => {
               <li>
                 <Link
                   href="/about"
-                  className="text-gray-300 hover:text-white transition flex items-center group"
+                  className="text-gray-300 hover:text-white transition flex items-center group text-sm sm:text-base"
                 >
                   <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-green-400 transition-colors"></span>
                   About
@@ -73,7 +72,7 @@ export const Footer = () => {
               <li>
                 <Link
                   href="/#explore"
-                  className="text-gray-300 hover:text-white transition flex items-center group"
+                  className="text-gray-300 hover:text-white transition flex items-center group text-sm sm:text-base"
                 >
                   <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-green-400 transition-colors"></span>
                   Explore
@@ -83,14 +82,14 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-gray-200 border-b border-gray-700/50 pb-2">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-200 border-b border-gray-700/50 pb-2">
               Team
             </h3>
-            <ul className="space-y-2">
+            <ul className="space-y-1 sm:space-y-2">
               <li>
                 <Link
                   href="/about"
-                  className="text-gray-300 hover:text-white transition flex items-center group"
+                  className="text-gray-300 hover:text-white transition flex items-center group text-sm sm:text-base"
                 >
                   <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-green-400 transition-colors"></span>
                   Henry Head
@@ -99,7 +98,7 @@ export const Footer = () => {
               <li>
                 <Link
                   href="/about"
-                  className="text-gray-300 hover:text-white transition flex items-center group"
+                  className="text-gray-300 hover:text-white transition flex items-center group text-sm sm:text-base"
                 >
                   <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-green-400 transition-colors"></span>
                   John Larkin
@@ -108,7 +107,7 @@ export const Footer = () => {
               <li>
                 <Link
                   href="/about"
-                  className="text-gray-300 hover:text-white transition flex items-center group"
+                  className="text-gray-300 hover:text-white transition flex items-center group text-sm sm:text-base"
                 >
                   <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-green-400 transition-colors"></span>
                   Sebastian Hoar
@@ -117,7 +116,7 @@ export const Footer = () => {
               <li>
                 <a
                   href="mailto:john@tennisscorigami.com"
-                  className="text-gray-300 hover:text-white transition flex items-center group"
+                  className="text-gray-300 hover:text-white transition flex items-center group text-sm sm:text-base"
                 >
                   <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-green-400 transition-colors"></span>
                   Contact Us
@@ -127,9 +126,11 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-500 mt-8 pt-8 text-center text-gray-400">
-          <p>© {currentYear} Tennis Scorigami. All rights reserved.</p>
-          <p className="mt-2 text-sm">
+        <div className="border-t border-gray-500 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-gray-400">
+          <p className="text-sm sm:text-base">
+            © {currentYear} Tennis Scorigami. All rights reserved.
+          </p>
+          <p className="mt-2 text-xs sm:text-sm">
             Tennis Scorigami is not affiliated with ATP, WTA, or ITF.
           </p>
         </div>

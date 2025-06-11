@@ -89,25 +89,26 @@ export const StatsCarousel: React.FC<StatCarouselProps> = ({
   const currentStat = displayStats[activeIndex];
 
   return (
-    <section className="py-20 bg-gray-800" id="stats">
+    <section className="py-12 sm:py-20 bg-gray-800" id="stats">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12">
           Tennis Scorigami Statistics
         </h2>
 
         <div className="max-w-4xl mx-auto relative">
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4 sm:mb-6">
             {displayStats.map((stat, index) => (
               <button
                 key={`${stat.gender}-${stat.best_of}`}
                 onClick={() => setActiveIndex(index)}
-                className={`py-2 px-4 rounded-t-lg font-semibold transition ${
+                className={`py-2 px-2 sm:px-4 rounded-t-lg font-semibold transition text-sm sm:text-base ${
                   index === activeIndex
                     ? "bg-green-500 text-white"
                     : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                 }`}
               >
-                {stat.gender === "men" ? "Men's" : "Women's"} {stat.best_of}-Set
+                <span className="hidden sm:inline">{stat.gender === "men" ? "Men's" : "Women's"} {stat.best_of}-Set</span>
+                <span className="sm:hidden">{stat.gender === "men" ? "M" : "W"} {stat.best_of}</span>
               </button>
             ))}
           </div>
@@ -119,13 +120,13 @@ export const StatsCarousel: React.FC<StatCarouselProps> = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
-              className="bg-gray-700 rounded-lg p-8 shadow-xl"
+              className="bg-gray-700 rounded-lg p-4 sm:p-8 shadow-xl"
             >
-              <h3 className="text-2xl font-bold text-green-400 mb-6 text-center">
+              <h3 className="text-lg sm:text-2xl font-bold text-green-400 mb-4 sm:mb-6 text-center">
                 {getCategoryTitle(currentStat)}
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
                 <StatCard
                   label="Total Possible Scores"
                   value={currentStat.total_possible}
@@ -143,33 +144,33 @@ export const StatsCarousel: React.FC<StatCarouselProps> = ({
                 />
               </div>
 
-              <div className="mt-8 text-center">
-                <h4 className="text-xl font-semibold mb-3">
+              <div className="mt-6 sm:mt-8 text-center">
+                <h4 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">
                   Completion Percentage
                 </h4>
                 <div className="flex items-center justify-center">
-                  <div className="text-4xl font-bold text-yellow-400 h-12 flex items-center">
+                  <div className="text-3xl sm:text-4xl font-bold text-yellow-400 h-10 sm:h-12 flex items-center">
                     <FlipNumbers
-                      height={40}
-                      width={25}
+                      height={32}
+                      width={20}
                       color="#fcd34d"
                       background="transparent"
                       play
                       numbers={currentStat.completion_pct.toFixed(2)}
                     />
                   </div>
-                  <span className="text-4xl font-bold text-yellow-400 ml-1">
+                  <span className="text-3xl sm:text-4xl font-bold text-yellow-400 ml-1">
                     %
                   </span>
                 </div>
               </div>
 
-              <div className="w-full bg-gray-600 rounded-full h-4 mt-4">
+              <div className="w-full bg-gray-600 rounded-full h-3 sm:h-4 mt-3 sm:mt-4">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${currentStat.completion_pct}%` }}
                   transition={{ duration: 1, delay: 0.2 }}
-                  className="bg-yellow-400 h-4 rounded-full"
+                  className="bg-yellow-400 h-3 sm:h-4 rounded-full"
                 ></motion.div>
               </div>
             </motion.div>
@@ -213,12 +214,12 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, color }) => {
   };
 
   return (
-    <div className={`${bgColor[color]} p-6 rounded-lg text-center`}>
-      <h4 className="text-lg font-semibold mb-3">{label}</h4>
-      <div className="h-12 flex items-center justify-center">
+    <div className={`${bgColor[color]} p-4 sm:p-6 rounded-lg text-center`}>
+      <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3">{label}</h4>
+      <div className="h-10 sm:h-12 flex items-center justify-center">
         <FlipNumbers
-          height={40}
-          width={28}
+          height={32}
+          width={22}
           color={textColor[color]}
           background="transparent"
           play

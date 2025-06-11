@@ -1,7 +1,7 @@
-import React from "react";
 import { motion } from "framer-motion";
+import React from "react";
 import { Section, SectionHeader } from "./section";
-import { TeamMemberCard, TeamMember } from "./team-member-card";
+import { TeamMember, TeamMemberCard } from "./team-member-card";
 
 export const TeamSection: React.FC<{ id?: string }> = ({ id }) => {
   const teamMembers: TeamMember[] = [
@@ -13,8 +13,8 @@ export const TeamSection: React.FC<{ id?: string }> = ({ id }) => {
       email: "jeb.henryhead@gmail.com",
       github: "https://github.com/henryhead",
       twitter: "https://x.com/jebhenryhead",
-      bio: "Passionate about creating intuitive user experiences and turning complex data into beautiful visualizations.",
-      skills: ["React", "TypeScript", "UI/UX", "Product Design"],
+      bio: "World reknown Cincinnati doubles expert. Made his claim to fame in 2013 with a deep run to high school state dubs. Some of the silkiest volleys you'll probably never see.",
+      // skills: ["React", "TypeScript", "UI/UX", "Product Design"],
     },
     {
       name: "John Larkin",
@@ -26,8 +26,8 @@ export const TeamSection: React.FC<{ id?: string }> = ({ id }) => {
       website: "https://johnlarkin1.github.io/",
       twitter: "https://x.com/JLarks32",
       stackoverflow: "https://stackoverflow.com/users/6347839/jlarks32",
-      bio: "Full-stack developer with a love for data engineering and building scalable systems.",
-      skills: ["Python", "Node.js", "PostgreSQL", "System Architecture"],
+      bio: "Washed up Swarthmore tennis player. Catch him still trying to tear the cover off the ball on West Side Highway. Tennis game is focused on linearity.",
+      // skills: ["Python", "Node.js", "PostgreSQL", "System Architecture"],
     },
     {
       name: "Sebastian Hoar",
@@ -36,13 +36,13 @@ export const TeamSection: React.FC<{ id?: string }> = ({ id }) => {
       linkedin: "https://www.linkedin.com/in/sebastian-hoar-a71a5b112/",
       email: "hoar.sebastian@gmail.com",
       github: "https://github.com/johnlarkin1",
-      bio: "Data enthusiast specializing in statistical analysis and machine learning applications in sports analytics.",
-      skills: [
-        "Machine Learning",
-        "Statistics",
-        "Python",
-        "Data Visualization",
-      ],
+      bio: "Long time lover of all sports and data expert and afficionado. I'd trust his logistic regression skills over his backhand.",
+      // skills: [
+      //   "Machine Learning",
+      //   "Statistics",
+      //   "Python",
+      //   "Data Visualization",
+      // ],
     },
   ];
 

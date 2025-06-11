@@ -1,5 +1,5 @@
+import { ExternalLink, Github, Linkedin, Mail, Twitter } from "lucide-react";
 import Image from "next/image";
-import { Linkedin, Mail, Github, ExternalLink, Twitter } from "lucide-react";
 
 export type TeamMember = {
   name: string;
@@ -12,7 +12,7 @@ export type TeamMember = {
   twitter?: string;
   stackoverflow?: string;
   bio: string;
-  skills: string[];
+  // skills?: string[];
 };
 
 export const TeamMemberCard = ({
@@ -25,7 +25,7 @@ export const TeamMemberCard = ({
   website,
   twitter,
   bio,
-  skills,
+  // skills,
 }: TeamMember) => (
   <div
     className="bg-gray-800 p-6 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 
@@ -50,16 +50,18 @@ export const TeamMemberCard = ({
     <p className="text-gray-300 text-center mb-6 text-sm">{bio}</p>
 
     {/* Skills */}
-    <div className="flex flex-wrap gap-2 mb-6 justify-center">
-      {skills.map((skill) => (
-        <span
-          key={skill}
-          className="px-3 py-1 bg-gray-700 text-gray-300 text-xs rounded-full"
-        >
-          {skill}
-        </span>
-      ))}
-    </div>
+    {/* {skills && skills.length > 0 && (
+      <div className="flex flex-wrap gap-2 mb-6 justify-center">
+        {skills.map((skill) => (
+          <span
+            key={skill}
+            className="px-3 py-1 bg-gray-700 text-gray-300 text-xs rounded-full"
+          >
+            {skill}
+          </span>
+        ))}
+      </div>
+    )} */}
 
     {/* Social Links */}
     <div className="flex justify-center gap-3">
