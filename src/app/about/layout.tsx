@@ -20,10 +20,11 @@ export const metadata: Metadata = {
     siteName: "Tennis Scorigami",
     images: [
       {
-        url: "https://tennis-scorigami.com/unfurls/2d-graph.gif",
+        url: "https://tennis-scorigami.com/unfurls/2d-graph-static.png",
         width: 1200,
         height: 630,
         alt: "Tennis Score Tree Visualization",
+        type: "image/png",
       },
     ],
     locale: "en_US",
@@ -34,7 +35,7 @@ export const metadata: Metadata = {
     title: "About Tennis Scorigami",
     description:
       "Learn about the team, technology, and data behind Tennis Scorigami's exploration of unique tennis scores",
-    images: ["https://tennis-scorigami.com/unfurls/2d-graph.gif"],
+    images: ["https://tennis-scorigami.com/unfurls/2d-graph-static.png"],
     creator: "@tennisscorigami",
   },
 };

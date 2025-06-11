@@ -85,30 +85,48 @@ export function generateMetadata(): Metadata {
 }
 
 // Helper function to generate platform-specific metadata
-export function getPlatformSpecificImage(userAgent?: string): string {
+export function getPlatformSpecificImage(
+  userAgent?: string,
+  imageType: 'hero' | '2d-graph' = 'hero'
+): { url: string; type: string } {
   const baseUrl = "https://tennis-scorigami.com";
 
-  // Default to GIF
-  let imageUrl = `${baseUrl}/unfurls/hero-section.gif`;
+  // Determine base image names
+  const images = {
+    hero: {
+      gif: `${baseUrl}/unfurls/hero-section.gif`,
+      static: `${baseUrl}/unfurls/hero-section-static.png`,
+    },
+    '2d-graph': {
+      gif: `${baseUrl}/unfurls/2d-graph.gif`,
+      static: `${baseUrl}/unfurls/2d-graph-static.png`,
+    },
+  };
+
+  // Default to GIF for platforms that support it
+  let imageUrl = images[imageType].gif;
+  let mimeType = "image/gif";
 
   if (userAgent) {
-    // Twitter clients
-    if (userAgent.includes("Twitterbot")) {
-      imageUrl = `${baseUrl}/unfurls/hero-section-static.png`;
+    // Platforms that don't support GIFs - use static image
+    if (
+      userAgent.includes("Twitterbot") ||
+      userAgent.includes("facebookexternalhit") ||
+      userAgent.includes("WhatsApp") ||
+      userAgent.includes("iPhone") ||
+      userAgent.includes("iPad")
+    ) {
+      imageUrl = images[imageType].static;
+      mimeType = "image/png";
     }
-    // Facebook crawler
-    else if (userAgent.includes("facebookexternalhit")) {
-      imageUrl = `${baseUrl}/unfurls/hero-section-static.png`;
-    }
-    // WhatsApp
-    else if (userAgent.includes("WhatsApp")) {
-      imageUrl = `${baseUrl}/unfurls/hero-section-static.png`;
-    }
-    // iMessage/iOS devices - use static image
-    else if (userAgent.includes("iPhone") || userAgent.includes("iPad")) {
-      imageUrl = `${baseUrl}/unfurls/hero-section-static.png`;
-    }
+    // Platforms that support GIFs: LinkedIn, Discord, Slack
+    // (Default case already handles this)
   }
 
-  return imageUrl;
+  return { url: imageUrl, type: mimeType };
+}
+
+// Legacy function for backwards compatibility - returns just the URL string
+export function getPlatformSpecificImageUrl(userAgent?: string): string {
+  return getPlatformSpecificImage(userAgent, 'hero').url;
 }

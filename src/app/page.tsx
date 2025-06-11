@@ -11,8 +11,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const userAgent = headersList.get("user-agent") || "";
 
   const baseUrl = "https://tennis-scorigami.com";
-  const imageUrl = getPlatformSpecificImage(userAgent);
-  const imageType = imageUrl.includes(".gif") ? "image/gif" : "image/png";
+  const { url: imageUrl, type: imageType } =
+    getPlatformSpecificImage(userAgent);
 
   return {
     openGraph: {

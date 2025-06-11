@@ -116,6 +116,8 @@ export default function RootLayout({
           property="og:image:alt"
           content="Tennis Scorigami - Explore never-played tennis scores"
         />
+        {/* Discord-specific meta tags to ensure only GIF is shown */}
+        <meta property="og:image:secure_url" content="https://tennis-scorigami.com/unfurls/hero-section.gif" />
         <meta name="twitter:creator" content="@tennisscorigami" />
         <meta name="twitter:site" content="@tennisscorigami" />
         <meta
