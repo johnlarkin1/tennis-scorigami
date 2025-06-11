@@ -87,7 +87,7 @@ export function generateMetadata(): Metadata {
 // Helper function to generate platform-specific metadata
 export function getPlatformSpecificImage(
   userAgent?: string,
-  imageType: 'hero' | '2d-graph' = 'hero'
+  imageType: "hero" | "2d-graph" = "hero"
 ): { url: string; type: string } {
   const baseUrl = "https://tennis-scorigami.com";
 
@@ -97,7 +97,7 @@ export function getPlatformSpecificImage(
       gif: `${baseUrl}/unfurls/hero-section.gif`,
       static: `${baseUrl}/unfurls/hero-section-static.png`,
     },
-    '2d-graph': {
+    "2d-graph": {
       gif: `${baseUrl}/unfurls/2d-graph.gif`,
       static: `${baseUrl}/unfurls/2d-graph-static.png`,
     },
@@ -108,19 +108,36 @@ export function getPlatformSpecificImage(
   let mimeType = "image/gif";
 
   if (userAgent) {
+    // Convert to lowercase for case-insensitive matching
+    const ua = userAgent.toLowerCase();
+
+    // Explicitly handle Discord - always use GIF
+    if (ua.includes("discordbot") || ua.includes("discord")) {
+      imageUrl = images[imageType].gif;
+      mimeType = "image/gif";
+    }
     // Platforms that don't support GIFs - use static image
-    if (
-      userAgent.includes("Twitterbot") ||
-      userAgent.includes("facebookexternalhit") ||
-      userAgent.includes("WhatsApp") ||
-      userAgent.includes("iPhone") ||
-      userAgent.includes("iPad")
+    else if (
+      ua.includes("twitterbot") ||
+      ua.includes("facebookexternalhit") ||
+      ua.includes("whatsapp")
     ) {
       imageUrl = images[imageType].static;
       mimeType = "image/png";
     }
-    // Platforms that support GIFs: LinkedIn, Discord, Slack
-    // (Default case already handles this)
+    // iMessage/iOS - use static to avoid double images
+    else if (
+      ua.includes("iphone") ||
+      ua.includes("ipad") ||
+      (ua.includes("applewebkit") &&
+        (ua.includes("mobile") ||
+          (ua.includes("safari") && !ua.includes("chrome"))))
+    ) {
+      imageUrl = images[imageType].static;
+      mimeType = "image/png";
+    }
+    // Default case: Platforms that support GIFs (LinkedIn, Slack, etc.)
+    // Keep GIF (already set as default)
   }
 
   return { url: imageUrl, type: mimeType };
@@ -128,5 +145,5 @@ export function getPlatformSpecificImage(
 
 // Legacy function for backwards compatibility - returns just the URL string
 export function getPlatformSpecificImageUrl(userAgent?: string): string {
-  return getPlatformSpecificImage(userAgent, 'hero').url;
+  return getPlatformSpecificImage(userAgent, "hero").url;
 }

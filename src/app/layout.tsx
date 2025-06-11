@@ -3,6 +3,8 @@ import "@/styles";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import localFont from "next/font/local";
+import { headers } from "next/headers";
+import { getPlatformSpecificImage } from "./metadata";
 
 const roboto = Roboto({
   weight: "400",
@@ -21,68 +23,80 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://tennis-scorigami.com"),
-  title: "Tennis Scorigami",
-  description:
-    "Have we converged on all possible tennis scores? Explore never-played tennis scores and unique match progressions.",
-  generator: "Next.js",
-  keywords: [
-    "tennis",
-    "scorigami",
-    "scores",
-    "data visualization",
-    "sports analytics",
-    "tennis matches",
-    "graph visualization",
-  ],
-  authors: [
-    { name: "John Larkin", url: "https://johnlarkin1.github.io/" },
-    { name: "Henry Carscadden" },
-    { name: "Sebastian Tota" },
-  ],
-  icons: {
-    icon: "/favicon/favicon.svg",
-    apple: "/favicon/apple-touch-icon.png",
-    shortcut: "/favicon/favicon.ico",
-  },
-  openGraph: {
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const userAgent = headersList.get("user-agent") || "";
+  const image = getPlatformSpecificImage(userAgent, "hero");
+
+  return {
+    metadataBase: new URL("https://tennis-scorigami.com"),
     title: "Tennis Scorigami",
     description:
-      "Explore never-played tennis scores and unique match progressions",
-    url: "https://tennis-scorigami.com",
-    siteName: "Tennis Scorigami",
-    images: [
-      {
-        url: "https://tennis-scorigami.com/unfurls/hero-section.gif",
-        width: 1200,
-        height: 630,
-        alt: "Tennis Scorigami - Explore never-played tennis scores",
-        type: "image/gif",
-      },
+      "Have we converged on all possible tennis scores? Explore never-played tennis scores and unique match progressions.",
+    generator: "Next.js",
+    keywords: [
+      "tennis",
+      "scorigami",
+      "scores",
+      "data visualization",
+      "sports analytics",
+      "tennis matches",
+      "graph visualization",
     ],
-    locale: "en_US",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Tennis Scorigami",
-    description:
-      "Explore never-played tennis scores and unique match progressions",
-    // Use static image for Twitter since it doesn't support animated GIFs
-    images: ["https://tennis-scorigami.com/unfurls/hero-section-static.png"],
-    creator: "@tennisscorigami",
-  },
-  other: {
-    // LinkedIn specific - keep GIF for LinkedIn since it works there
-    "linkedin:image": "https://tennis-scorigami.com/unfurls/hero-section.gif",
-    // Additional labels for Slack and other platforms
-    "twitter:label1": "Category",
-    "twitter:data1": "Sports Analytics",
-    "twitter:label2": "Experience",
-    "twitter:data2": "Interactive data visualization",
-  },
-};
+    authors: [
+      { name: "John Larkin", url: "https://johnlarkin1.github.io/" },
+      { name: "Henry Carscadden" },
+      { name: "Sebastian Tota" },
+    ],
+    icons: {
+      icon: "/favicon/favicon.svg",
+      apple: "/favicon/apple-touch-icon.png",
+      shortcut: "/favicon/favicon.ico",
+    },
+    openGraph: {
+      title: "Tennis Scorigami",
+      description:
+        "Explore never-played tennis scores and unique match progressions",
+      url: "https://tennis-scorigami.com",
+      siteName: "Tennis Scorigami",
+      images: [
+        {
+          url: image.url,
+          width: 1200,
+          height: 630,
+          alt: "Tennis Scorigami - Explore never-played tennis scores",
+          type: image.type,
+        },
+      ],
+      locale: "en_US",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Tennis Scorigami",
+      description:
+        "Explore never-played tennis scores and unique match progressions",
+      images: [
+        userAgent.includes("Twitterbot")
+          ? "https://tennis-scorigami.com/unfurls/hero-section-static.png"
+          : image.url,
+      ],
+      creator: "@tennisscorigami",
+    },
+    other: {
+      // LinkedIn specific - always use GIF for LinkedIn
+      "linkedin:image": "https://tennis-scorigami.com/unfurls/hero-section.gif",
+      "linkedin:image:type": "image/gif",
+      "linkedin:image:width": "1200",
+      "linkedin:image:height": "630",
+      // Additional labels for Slack and other platforms
+      "twitter:label1": "Category",
+      "twitter:data1": "Sports Analytics",
+      "twitter:label2": "Experience",
+      "twitter:data2": "Interactive data visualization",
+    },
+  };
+}
 
 export default function RootLayout({
   children,
@@ -108,22 +122,8 @@ export default function RootLayout({
         <link rel="manifest" href="/favicon/site.webmanifest" />
 
         {/* Additional meta tags for better social sharing */}
-        <meta property="og:site_name" content="Tennis Scorigami" />
-        <meta property="og:image:type" content="image/gif" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta
-          property="og:image:alt"
-          content="Tennis Scorigami - Explore never-played tennis scores"
-        />
-        {/* Discord-specific meta tags to ensure only GIF is shown */}
-        <meta property="og:image:secure_url" content="https://tennis-scorigami.com/unfurls/hero-section.gif" />
         <meta name="twitter:creator" content="@tennisscorigami" />
         <meta name="twitter:site" content="@tennisscorigami" />
-        <meta
-          name="twitter:image:alt"
-          content="Tennis Scorigami - Explore never-played tennis scores"
-        />
       </head>
       <body
         className={`${roboto.className} ${geistSans.variable} ${geistMono.variable} antialiased`}
