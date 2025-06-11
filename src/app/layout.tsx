@@ -60,14 +60,6 @@ export const metadata: Metadata = {
         alt: "Tennis Scorigami - Explore never-played tennis scores",
         type: "image/gif",
       },
-      // Fallback static image for platforms that don't support GIF
-      {
-        url: "https://tennis-scorigami.com/unfurls/hero-section-static.png",
-        width: 1200,
-        height: 630,
-        alt: "Tennis Scorigami - Explore never-played tennis scores",
-        type: "image/png",
-      },
     ],
     locale: "en_US",
     type: "website",
@@ -82,7 +74,7 @@ export const metadata: Metadata = {
     creator: "@tennisscorigami",
   },
   other: {
-    // LinkedIn specific
+    // LinkedIn specific - keep GIF for LinkedIn since it works there
     "linkedin:image": "https://tennis-scorigami.com/unfurls/hero-section.gif",
     // Additional labels for Slack and other platforms
     "twitter:label1": "Category",
@@ -120,10 +112,16 @@ export default function RootLayout({
         <meta property="og:image:type" content="image/gif" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="Tennis Scorigami - Explore never-played tennis scores" />
+        <meta
+          property="og:image:alt"
+          content="Tennis Scorigami - Explore never-played tennis scores"
+        />
         <meta name="twitter:creator" content="@tennisscorigami" />
         <meta name="twitter:site" content="@tennisscorigami" />
-        <meta name="twitter:image:alt" content="Tennis Scorigami - Explore never-played tennis scores" />
+        <meta
+          name="twitter:image:alt"
+          content="Tennis Scorigami - Explore never-played tennis scores"
+        />
       </head>
       <body
         className={`${roboto.className} ${geistSans.variable} ${geistMono.variable} antialiased`}

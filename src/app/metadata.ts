@@ -104,6 +104,10 @@ export function getPlatformSpecificImage(userAgent?: string): string {
     else if (userAgent.includes("WhatsApp")) {
       imageUrl = `${baseUrl}/unfurls/hero-section-static.png`;
     }
+    // iMessage/iOS devices - use static image
+    else if (userAgent.includes("iPhone") || userAgent.includes("iPad")) {
+      imageUrl = `${baseUrl}/unfurls/hero-section-static.png`;
+    }
   }
 
   return imageUrl;
