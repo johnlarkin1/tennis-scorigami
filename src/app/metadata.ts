@@ -2,7 +2,7 @@ import { Metadata } from "next";
 
 export function generateMetadata(): Metadata {
   const baseUrl = "https://tennis-scorigami.com";
-  
+
   return {
     metadataBase: new URL(baseUrl),
     title: "Tennis Scorigami",
@@ -20,8 +20,8 @@ export function generateMetadata(): Metadata {
     ],
     authors: [
       { name: "John Larkin", url: "https://johnlarkin1.github.io/" },
-      { name: "Henry Carscadden" },
-      { name: "Sebastian Tota" },
+      { name: "Henry Head" },
+      { name: "Sebastian Hoar" },
     ],
     icons: {
       icon: "/favicon/favicon.svg",
@@ -70,11 +70,11 @@ export function generateMetadata(): Metadata {
       "linkedin:image:type": "image/gif",
       "linkedin:image:width": "1200",
       "linkedin:image:height": "627", // LinkedIn prefers 1.91:1 ratio
-      
+
       // Apple/iMessage specific
       "apple-mobile-web-app-capable": "yes",
       "apple-mobile-web-app-status-bar-style": "black-translucent",
-      
+
       // Additional labels for Slack and other platforms
       "twitter:label1": "Category",
       "twitter:data1": "Sports Analytics",
@@ -87,10 +87,10 @@ export function generateMetadata(): Metadata {
 // Helper function to generate platform-specific metadata
 export function getPlatformSpecificImage(userAgent?: string): string {
   const baseUrl = "https://tennis-scorigami.com";
-  
+
   // Default to GIF
   let imageUrl = `${baseUrl}/unfurls/hero-section.gif`;
-  
+
   if (userAgent) {
     // Twitter clients
     if (userAgent.includes("Twitterbot")) {
@@ -105,6 +105,6 @@ export function getPlatformSpecificImage(userAgent?: string): string {
       imageUrl = `${baseUrl}/unfurls/hero-section-static.png`;
     }
   }
-  
+
   return imageUrl;
 }
