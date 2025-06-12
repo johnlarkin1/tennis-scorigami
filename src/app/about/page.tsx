@@ -13,7 +13,13 @@ import { useSectionObserver } from "@/lib/hooks/use-section-observer";
 import React from "react";
 
 const AboutPage: React.FC = () => {
-  const sectionIds = ['project-overview', 'data-collection', 'technology-stack', 'team', 'call-to-action'];
+  const sectionIds = [
+    "project-overview",
+    "data-collection",
+    "technology-stack",
+    "team",
+    "call-to-action",
+  ];
   useSectionObserver(sectionIds);
 
   return (
