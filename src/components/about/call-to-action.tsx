@@ -4,16 +4,16 @@ import React, { useState } from "react";
 import { Section } from "./section";
 
 export const CallToAction: React.FC<{ id?: string }> = ({ id }) => {
-  const [copied, setCopied] = useState(false);
+  const [_copied, _setCopied] = useState(false);
 
-  const handleCopyLink = async () => {
+  const _handleCopyLink = async () => {
     if (!id) return;
 
     const url = `${window.location.origin}${window.location.pathname}#${id}`;
     try {
       await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      _setCopied(true);
+      setTimeout(() => _setCopied(false), 2000);
     } catch (err) {
       console.error("Failed to copy link:", err);
     }

@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Award, Database, LineChart, Target } from "lucide-react";
-import React, { useEffect } from "react";
+import React from "react";
 import { FeatureCard } from "./feature-card";
 import { Section, SectionHeader } from "./section";
 
@@ -16,12 +16,6 @@ const ComingSoonTag: React.FC = () => (
 export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
   const prefersReducedMotion = useReducedMotion();
 
-  // Polyfill IntersectionObserver for older browsers
-  useEffect(() => {
-    if (typeof window !== 'undefined' && !('IntersectionObserver' in window)) {
-      import('intersection-observer');
-    }
-  }, []);
 
   const timelineEvents = [
     {
@@ -72,8 +66,8 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
           {timelineEvents.map((event, index) => (
             <motion.div
               key={index}
-              initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
-              whileInView={prefersReducedMotion ? false : { opacity: 1, y: 0 }}
+              initial={prefersReducedMotion ? undefined : { opacity: 0, y: 20 }}
+              whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
               animate={prefersReducedMotion ? { opacity: 1, y: 0 } : undefined}
               viewport={{ once: true, amount: 0.1 }}
               transition={{ duration: 0.2, delay: index * 0.05 }}
@@ -106,8 +100,8 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
 
         {/* Data Collection Challenges */}
         <motion.div
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
-          whileInView={prefersReducedMotion ? false : { opacity: 1, y: 0 }}
+          initial={prefersReducedMotion ? undefined : { opacity: 0, y: 20 }}
+          whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
           animate={prefersReducedMotion ? { opacity: 1, y: 0 } : undefined}
           viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.6 }}
@@ -180,8 +174,8 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
 
         {/* Data Features */}
         <motion.div
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
-          whileInView={prefersReducedMotion ? false : { opacity: 1, y: 0 }}
+          initial={prefersReducedMotion ? undefined : { opacity: 0, y: 20 }}
+          whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
           animate={prefersReducedMotion ? { opacity: 1, y: 0 } : undefined}
           viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.6 }}
