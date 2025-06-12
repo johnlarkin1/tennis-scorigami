@@ -110,6 +110,8 @@ const config: Config = {
         "flip-bottom": "flip-bottom 0.3s ease-in-out",
         "fade-in": "fadeIn 0.3s ease-in-out",
         "slide-up": "slideUp 0.4s ease-out",
+        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        "glow": "glow 2s ease-in-out infinite",
       },
       keyframes: {
         flip: {
@@ -132,6 +134,20 @@ const config: Config = {
         slideUp: {
           "0%": { transform: "translateY(100%)" },
           "100%": { transform: "translateY(0)" },
+        },
+        "pulse-glow": {
+          "0%, 100%": { opacity: "1", transform: "scale(1)" },
+          "50%": { opacity: "0.8", transform: "scale(1.05)" },
+        },
+        "glow": {
+          "0%, 100%": { 
+            "box-shadow": "0 0 5px rgba(251, 191, 36, 0.3)",
+            opacity: "0.8"
+          },
+          "50%": { 
+            "box-shadow": "0 0 20px rgba(251, 191, 36, 0.6), 0 0 30px rgba(251, 191, 36, 0.4)",
+            opacity: "1"
+          },
         },
       },
       backgroundImage: {

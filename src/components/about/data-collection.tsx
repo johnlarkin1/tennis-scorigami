@@ -66,13 +66,19 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.1 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ duration: 0.2, delay: index * 0.05 }}
               className={`relative flex items-center mb-12 ${
-                index % 2 === 0 ? "flex-col md:flex-row" : "flex-col md:flex-row-reverse"
+                index % 2 === 0
+                  ? "flex-col md:flex-row"
+                  : "flex-col md:flex-row-reverse"
               }`}
             >
               <div
-                className={`w-full md:w-5/12 ${index % 2 === 0 ? "text-center md:text-right md:pr-12" : "text-center md:pl-12"}`}
+                className={`w-full md:w-5/12 ${
+                  index % 2 === 0
+                    ? "text-center md:text-right md:pr-12"
+                    : "text-center md:pl-12"
+                }`}
               >
                 <div className="bg-gray-900 p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow">
                   <div className="text-green-400 font-bold text-2xl mb-2">
