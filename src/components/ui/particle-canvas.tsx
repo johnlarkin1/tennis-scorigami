@@ -46,13 +46,13 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
     /* physics constants - adjusted for mobile */
     const springStrength = 0.02;
     const friction = 0.9;
-    const repulseStrength = isMobile ? 15000 : 20000; // Slightly weaker on mobile
+    const repulseStrength = isMobile ? 15000 : 20000;
     const ballRotationSpeed = 0.004;
     const gravity = 0.5;
     const staticBallFactor = isMobile ? 0.2 : 0.25; // Smaller ball on mobile
 
     /* grid size - larger on mobile for better performance */
-    const textGrid = isMobile ? 8 : 6; // changing these will change the number of particles
+    const textGrid = isMobile ? 8 : 6;
     const tennisGrid = isMobile ? 8 : 6;
 
     /* off-screen canvas for text mask */
@@ -76,8 +76,9 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
       offCtx.textBaseline = "middle";
 
       // how far apart your two baselines *used* to be:
+      const textGap = 60;
       const origY1 = H * 0.4;
-      const origY2 = H * 0.6 + 40;
+      const origY2 = H * 0.6 + textGap;
       const halfGap = (origY2 - origY1) / 2;
 
       const centerY = staticBallCenter.y; // = H/2
