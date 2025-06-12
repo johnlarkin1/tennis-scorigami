@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Award, Database, LineChart, Target } from "lucide-react";
 import React from "react";
 import { FeatureCard } from "./feature-card";
@@ -14,7 +14,6 @@ const ComingSoonTag: React.FC = () => (
 );
 
 export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
-  const prefersReducedMotion = useReducedMotion();
 
 
   const timelineEvents = [
@@ -66,9 +65,8 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
           {timelineEvents.map((event, index) => (
             <motion.div
               key={index}
-              initial={prefersReducedMotion ? undefined : { opacity: 0, y: 20 }}
-              whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
-              animate={prefersReducedMotion ? { opacity: 1, y: 0 } : undefined}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.1 }}
               transition={{ duration: 0.2, delay: index * 0.05 }}
               className={`relative flex items-center mb-12 ${
@@ -100,9 +98,8 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
 
         {/* Data Collection Challenges */}
         <motion.div
-          initial={prefersReducedMotion ? undefined : { opacity: 0, y: 20 }}
-          whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
-          animate={prefersReducedMotion ? { opacity: 1, y: 0 } : undefined}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.6 }}
           className="bg-gray-900 rounded-2xl p-8 mb-16"
@@ -174,9 +171,8 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
 
         {/* Data Features */}
         <motion.div
-          initial={prefersReducedMotion ? undefined : { opacity: 0, y: 20 }}
-          whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
-          animate={prefersReducedMotion ? { opacity: 1, y: 0 } : undefined}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.6 }}
           className="grid md:grid-cols-3 gap-8 px-4 sm:px-0"
