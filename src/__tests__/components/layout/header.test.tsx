@@ -31,7 +31,7 @@ describe('Header', () => {
     
     const header = screen.getByRole('banner')
     expect(header).toBeInTheDocument()
-    expect(header).toHaveClass('bg-gray-900', 'text-white', 'shadow-md')
+    expect(header).toHaveClass('bg-gradient-to-b', 'from-gray-900/95', 'to-gray-900', 'text-white', 'shadow-lg')
   })
 
   it('renders the logo and title correctly', () => {
