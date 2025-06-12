@@ -36,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function Home() {
   return (
-    <div className="bg-gray-900 text-white">
+    <div className="bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white min-h-screen">
       <Header />
       <main>
         {/* Main content visible on initial load */}

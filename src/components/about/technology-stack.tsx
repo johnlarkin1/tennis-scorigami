@@ -1,3 +1,4 @@
+import { HedgehogIcon } from "@/components/ui/hedgehog-icon";
 import { motion } from "framer-motion";
 import {
   BarChart3,
@@ -93,6 +94,16 @@ export const TechnologyStack: React.FC<{ id?: string }> = ({ id }) => {
               </>
             }
           />
+          <TechCard
+            icon={<HedgehogIcon />}
+            title="PostHog"
+            description={
+              <>
+                Open-source analytics platform for tracking user behavior and
+                product insights
+              </>
+            }
+          />
         </div>
         <div className="mb-10" />
 
@@ -104,7 +115,7 @@ export const TechnologyStack: React.FC<{ id?: string }> = ({ id }) => {
             className="inline-block"
           >
             <ExternalLink href="https://johnlarkin1.github.io">
-              <div className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 px-6 py-3 rounded-lg transition-colors">
+              <div className="flex items-center gap-2 bg-gray-800 text-md hover:bg-gray-700 px-6 py-3 rounded-lg transition-colors">
                 <BookOpen className="w-5 h-5" />
                 <span>Read the technical deep dive on my blog</span>
               </div>

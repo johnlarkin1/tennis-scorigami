@@ -87,7 +87,7 @@ export default function UnscoredMatchesSection({ className }: Props) {
     const yearsSinceStart = currentYear - START_DATA_COLLECTION_YEAR;
 
     return (
-      <section className={`${className} bg-gray-900 overflow-hidden`}>
+      <section className={`${className} overflow-hidden`}>
         <div className="mx-auto max-w-none">
           {/* Title with glow effect */}
           <div className="flex justify-center mt-8 sm:mt-16 mb-6 sm:mb-8 px-4">
@@ -222,7 +222,7 @@ export default function UnscoredMatchesSection({ className }: Props) {
   const yearsSinceStart = currentYear - START_DATA_COLLECTION_YEAR;
 
   return (
-    <section className={`${className} bg-gray-900 overflow-hidden`}>
+    <section className={`${className} overflow-hidden`}>
       <div className="mx-auto max-w-none">
         {/* Title with glow effect */}
         <div className="flex justify-center mt-8 sm:mt-16 mb-6 sm:mb-8 px-4">

@@ -1,3 +1,4 @@
+import { START_DATA_COLLECTION_YEAR } from "@/constants";
 import { motion } from "framer-motion";
 import { Activity, Calendar, Globe, Trophy } from "lucide-react";
 import React from "react";
@@ -17,7 +18,7 @@ export const ProjectOverview: React.FC<{ id?: string }> = ({ id }) => {
     },
     {
       label: "Years of Data",
-      value: "44",
+      value: `${new Date().getFullYear() - START_DATA_COLLECTION_YEAR}`,
       icon: <Calendar className="w-6 h-6" />,
     },
     {

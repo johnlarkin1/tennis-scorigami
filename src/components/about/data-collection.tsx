@@ -48,7 +48,7 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
   ];
 
   return (
-    <Section className="bg-gray-800/50">
+    <Section>
       <SectionHeader
         title="Data Collection & Analysis"
         subtitle="From tennis history to comprehensive database"
@@ -65,6 +65,7 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
               key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.1 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className={`relative flex items-center mb-12 ${
                 index % 2 === 0 ? "flex-col md:flex-row" : "flex-col md:flex-row-reverse"
@@ -91,6 +92,7 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.6 }}
           className="bg-gray-900 rounded-2xl p-8 mb-16"
         >
@@ -163,6 +165,7 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.6 }}
           className="grid md:grid-cols-3 gap-8 px-4 sm:px-0"
         >

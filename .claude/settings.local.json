@@ -25,7 +25,8 @@
       "Bash(rm:*)",
       "Bash(cp:*)",
       "Bash(node:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": []
   },

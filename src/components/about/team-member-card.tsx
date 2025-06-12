@@ -32,7 +32,7 @@ export const TeamMemberCard = ({
                   transform hover:-translate-y-1
                   focus-within:-translate-y-1 focus-within:shadow-xl
                   hover:ring-2 hover:ring-green-400 focus-within:ring-2 focus-within:ring-green-400
-                  group"
+                  group h-full flex flex-col"
   >
     <div className="relative w-48 h-48 mx-auto mb-4 rounded-full overflow-hidden">
       <Image
@@ -47,7 +47,7 @@ export const TeamMemberCard = ({
       {name}
     </h3>
     <p className="text-green-400 text-center mb-4">{role}</p>
-    <p className="text-gray-300 text-center mb-6 text-sm">{bio}</p>
+    <p className="text-gray-300 text-center mb-6 text-sm flex-grow">{bio}</p>
 
     {/* Skills */}
     {/* {skills && skills.length > 0 && (
@@ -64,7 +64,7 @@ export const TeamMemberCard = ({
     )} */}
 
     {/* Social Links */}
-    <div className="flex justify-center gap-3">
+    <div className="flex justify-center gap-3 mt-auto">
       <a
         href={linkedin}
         target="_blank"

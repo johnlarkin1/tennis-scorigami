@@ -7,13 +7,13 @@ export const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gray-900 text-white border-t border-gray-700 shadow-[0_-4px_12px_rgba(0,0,0,0.3)]">
-      <div className="container mx-auto px-4 py-6 sm:py-10">
+    <footer className="bg-gradient-to-b from-gray-900 to-black text-white border-t border-gray-700/50 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
+      <div className="container mx-auto px-4 py-8 sm:py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
           <div className="sm:col-span-2 md:col-span-2">
-            <div className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 flex items-center">
-              <span className="mr-2">🎾</span>
-              <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+            <div className="text-xl sm:text-2xl font-black mb-3 sm:mb-4 flex items-center">
+              <span className="mr-3 text-2xl sm:text-3xl animate-bounce">🎾</span>
+              <span className="bg-gradient-to-r from-green-400 via-white to-green-300 bg-clip-text text-transparent">
                 Tennis Scorigami
               </span>
             </div>
@@ -47,7 +47,7 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-200 border-b border-gray-700/50 pb-2">
+            <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-green-300 border-b border-gray-700/30 pb-2">
               Navigation
             </h3>
             <ul className="space-y-1 sm:space-y-2">
@@ -82,7 +82,7 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-200 border-b border-gray-700/50 pb-2">
+            <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-green-300 border-b border-gray-700/30 pb-2">
               Team
             </h3>
             <ul className="space-y-1 sm:space-y-2">
@@ -126,7 +126,7 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-500 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-gray-400">
+        <div className="border-t border-gray-700/50 mt-8 sm:mt-10 pt-6 sm:pt-8 text-center text-gray-400">
           <p className="text-sm sm:text-base">
             © {currentYear} Tennis Scorigami. All rights reserved.
           </p>
