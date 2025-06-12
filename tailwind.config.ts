@@ -111,7 +111,8 @@ const config: Config = {
         "fade-in": "fadeIn 0.3s ease-in-out",
         "slide-up": "slideUp 0.4s ease-out",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
-        "glow": "glow 2s ease-in-out infinite",
+        glow: "glow 2s ease-in-out infinite",
+        shine: "shine 6s linear infinite",
       },
       keyframes: {
         flip: {
@@ -139,15 +140,20 @@ const config: Config = {
           "0%, 100%": { opacity: "1", transform: "scale(1)" },
           "50%": { opacity: "0.8", transform: "scale(1.05)" },
         },
-        "glow": {
-          "0%, 100%": { 
+        glow: {
+          "0%, 100%": {
             "box-shadow": "0 0 5px rgba(251, 191, 36, 0.3)",
-            opacity: "0.8"
+            opacity: "0.8",
           },
-          "50%": { 
-            "box-shadow": "0 0 20px rgba(251, 191, 36, 0.6), 0 0 30px rgba(251, 191, 36, 0.4)",
-            opacity: "1"
+          "50%": {
+            "box-shadow":
+              "0 0 20px rgba(251, 191, 36, 0.6), 0 0 30px rgba(251, 191, 36, 0.4)",
+            opacity: "1",
           },
+        },
+        shine: {
+          "0%,100%": { backgroundPosition: "-200% 0%" },
+          "50%": { backgroundPosition: "200% 0%" },
         },
       },
       backgroundImage: {

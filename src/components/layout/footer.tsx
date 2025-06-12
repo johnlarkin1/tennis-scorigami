@@ -12,8 +12,15 @@ export const Footer = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
           <div className="sm:col-span-2 md:col-span-2">
             <div className="text-xl sm:text-2xl font-black mb-3 sm:mb-4 flex items-center">
-              <span className="mr-3 text-2xl sm:text-3xl animate-bounce">🎾</span>
-              <span className="bg-gradient-to-r from-green-400 via-white to-green-300 bg-clip-text text-transparent">
+              <span className="mr-3 text-2xl sm:text-3xl animate-bounce">
+                🎾
+              </span>
+              <span
+                className="
+                relative inline-block bg-gradient-to-r from-green-400 via-white to-green-300
+                bg-clip-text text-transparent bg-[length:200%_100%]
+                animate-shine"
+              >
                 Tennis Scorigami
               </span>
             </div>
