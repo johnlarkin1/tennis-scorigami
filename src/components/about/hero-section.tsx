@@ -1,15 +1,16 @@
-import React from "react";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
+import Image from "next/image";
+import React from "react";
 
 export const HeroSection: React.FC = () => {
   return (
     <section className="relative h-[60vh] overflow-hidden">
       <Image
-        src="/western-and-southern2.jpg"
+        src="/western-and-southern2.avif"
         alt="Tennis Court"
         fill
+        placeholder="blur"
         className="object-cover"
         priority
       />
