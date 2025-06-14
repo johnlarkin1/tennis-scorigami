@@ -25,6 +25,7 @@ export const Header = () => (
         {[
           { href: "/", label: "Home" },
           { href: "/explore", label: "Explore" },
+          { href: "/search", label: "Search" },
           { href: "/about", label: "About" },
         ].map(({ href, label }) => (
           <Button
