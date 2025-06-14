@@ -2,14 +2,13 @@
 
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
+import { SearchBar } from "@/components/search/search-bar";
+import { SearchResults } from "@/components/search/search-results";
+import { QuickFilters } from "@/components/search/quick-filters";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Search, Filter, Calendar, Trophy, Users, TrendingUp } from "lucide-react";
+import { motion } from "framer-motion";
+import { Sparkles, Search } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 type SearchResult = {
@@ -41,7 +40,6 @@ export default function SearchPage() {
   const [isLoadingMatches, setIsLoadingMatches] = useState(false);
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(null);
   const [searchType, setSearchType] = useState<"player" | "score" | null>(null);
-  const router = useRouter();
 
   // Debounced search
   useEffect(() => {
@@ -105,259 +103,112 @@ export default function SearchPage() {
     return examples[Math.floor(Math.random() * examples.length)];
   }, []);
 
+  const handleQuickFilter = (filterQuery: string) => {
+    setQuery(filterQuery);
+  };
+
   return (
-    <div className="bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white min-h-screen">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white">
       <Header />
       
-      <main className="container mx-auto px-4 py-8">
-        {/* Page Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <Search className="w-8 h-8 text-green-400 mr-3" />
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
-              Search Tennis Data
-            </h1>
-          </div>
-          <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-            Search through our comprehensive database of tennis matches, players, and scores.
-            Discover unique scorelines and explore match histories.
-          </p>
+      <main className="relative">
+        {/* Background Effects */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-green-400/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl" />
         </div>
-
-        {/* Search Input */}
-        <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm mb-8">
-          <CardContent className="p-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <Input
-                type="text"
-                placeholder={searchPlaceholder}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                className="pl-10 bg-gray-900/50 border-gray-600 text-white placeholder-gray-400 text-lg py-3 focus:border-green-400 focus:ring-green-400"
-              />
-              {isSearching && (
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-green-400"></div>
-                </div>
-              )}
+        
+        <div className="relative container mx-auto px-4 py-8">
+          {/* Page Header */}
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <div className="flex items-center justify-center mb-4">
+              <motion.div 
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="p-3 bg-gradient-to-br from-green-400/20 to-green-400/10 rounded-2xl mr-4"
+              >
+                <Search className="w-8 h-8 text-green-400" />
+              </motion.div>
+              <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+                Search Tennis Data
+              </h1>
             </div>
-          </CardContent>
-        </Card>
+            <p className="text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              Explore our comprehensive database of tennis matches, players, and scores.
+              <span className="block mt-2 text-green-400 flex items-center justify-center">
+                <Sparkles className="w-4 h-4 mr-2" />
+                Discover unique scorelines and match histories
+              </span>
+            </p>
+          </motion.div>
 
-        {/* Search Results */}
-        {searchResults.length > 0 && (
-          <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Filter className="w-5 h-5 text-green-400 mr-2" />
-                Search Results
-                <Badge variant="secondary" className="ml-2 bg-green-400/20 text-green-400">
-                  {searchType === "player" ? "Players" : "Scores"}
-                </Badge>
-              </CardTitle>
-              <CardDescription>
-                Found {searchResults.length} {searchType === "player" ? "players" : "score patterns"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-3">
-                {searchResults.map((result) => (
-                  <div
-                    key={result.id}
-                    className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                      selectedResult?.id === result.id
-                        ? "bg-green-400/10 border-green-400"
-                        : "bg-gray-900/50 border-gray-600 hover:bg-gray-700/50 hover:border-gray-500"
-                    }`}
-                    onClick={() => handleResultSelect(result)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        {result.type === "player" ? (
-                          <Users className="w-5 h-5 text-blue-400 mr-3" />
-                        ) : (
-                          <TrendingUp className="w-5 h-5 text-purple-400 mr-3" />
-                        )}
-                        <span className="font-medium text-white">
-                          {result.name || result.slug}
-                        </span>
-                      </div>
-                      <Badge variant="outline" className="text-xs">
-                        {result.type}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+          {/* Search Bar */}
+          <div className="mb-8">
+            <SearchBar 
+              query={query}
+              setQuery={setQuery}
+              placeholder={searchPlaceholder}
+              isSearching={isSearching}
+            />
+          </div>
 
-        {/* Selected Result Details */}
-        {selectedResult && (
-          <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                {selectedResult.type === "player" ? (
-                  <Users className="w-5 h-5 text-blue-400 mr-2" />
-                ) : (
-                  <TrendingUp className="w-5 h-5 text-purple-400 mr-2" />
-                )}
-                {selectedResult.name || selectedResult.slug}
-              </CardTitle>
-              <CardDescription>
-                {selectedResult.type === "player" 
-                  ? "Player profile and match history"
-                  : "Matches with this scoreline"
-                }
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {selectedResult.type === "player" ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-400 mb-4">
-                    Player details and match history coming soon!
-                  </p>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => router.push("/explore")}
-                    className="border-green-400 text-green-400 hover:bg-green-400 hover:text-black"
-                  >
-                    Explore Data Visualization
-                  </Button>
-                </div>
-              ) : (
-                <div>
-                  {isLoadingMatches ? (
-                    <div className="text-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400 mx-auto mb-4"></div>
-                      <p className="text-gray-400">Loading matches...</p>
-                    </div>
-                  ) : matches.length > 0 ? (
-                    <div>
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-white">
-                          Matches ({matches.length})
-                        </h3>
-                        <Badge variant="secondary" className="bg-purple-400/20 text-purple-400">
-                          {selectedResult.slug}
-                        </Badge>
-                      </div>
-                      <Separator className="bg-gray-600 mb-4" />
-                      <div className="space-y-3 max-h-96 overflow-y-auto">
-                        {matches.map((match) => (
-                          <div
-                            key={match.match_id}
-                            className="p-4 bg-gray-900/50 rounded-lg border border-gray-600 hover:border-gray-500 transition-colors"
-                          >
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center">
-                                <Trophy className="w-4 h-4 text-yellow-400 mr-2" />
-                                <span className="font-medium text-white">
-                                  {match.event_name}
-                                </span>
-                              </div>
-                              <div className="flex items-center text-sm text-gray-400">
-                                <Calendar className="w-4 h-4 mr-1" />
-                                {match.year}
-                              </div>
-                            </div>
-                            <div className="text-sm text-gray-300">
-                              {match.player_a} vs {match.player_b}
-                            </div>
-                            {match.start_time && (
-                              <div className="text-xs text-gray-500 mt-1">
-                                {new Date(match.start_time).toLocaleDateString()}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <p className="text-gray-400">No matches found for this scoreline.</p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
+          {/* Search Results */}
+          <SearchResults 
+            searchResults={searchResults}
+            selectedResult={selectedResult}
+            matches={matches}
+            isLoadingMatches={isLoadingMatches}
+            searchType={searchType}
+            onResultSelect={handleResultSelect}
+          />
 
-        {/* Getting Started */}
-        {!query.trim() && (
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center text-green-400">
-                  <Users className="w-5 h-5 mr-2" />
-                  Player Search
-                </CardTitle>
-                <CardDescription>
-                  Search for professional tennis players to explore their match history
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 text-sm text-gray-300">
-                  <p>• Search by full name: &ldquo;Roger Federer&rdquo;</p>
-                  <p>• Partial names work too: &ldquo;Novak&rdquo;</p>
-                  <p>• Case insensitive matching</p>
-                </div>
+          {/* Quick Filters - Show when no query */}
+          {!query.trim() && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="mb-12"
+            >
+              <QuickFilters 
+                onFilterSelect={handleQuickFilter}
+                currentQuery={query}
+              />
+            </motion.div>
+          )}
+
+          {/* Quick Links */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mt-16 text-center"
+          >
+            <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Explore More</h2>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link href="/explore">
                 <Button 
                   variant="outline" 
-                  className="mt-4 w-full border-green-400 text-green-400 hover:bg-green-400 hover:text-black"
-                  onClick={() => setQuery("Roger Federer")}
+                  className="border-green-400/50 text-green-400 hover:bg-green-400/10 hover:border-green-400 backdrop-blur-sm transition-all duration-300"
                 >
-                  Try Example
+                  Interactive Data Visualization
                 </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center text-purple-400">
-                  <TrendingUp className="w-5 h-5 mr-2" />
-                  Score Search
-                </CardTitle>
-                <CardDescription>
-                  Find matches with specific scorelines and explore tennis scorigami
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 text-sm text-gray-300">
-                  <p>• Format: &ldquo;6-4 6-3&rdquo; or &ldquo;7-6 6-4&rdquo;</p>
-                  <p>• Partial patterns: &ldquo;6-0&rdquo; or &ldquo;7-6&rdquo;</p>
-                  <p>• Discover rare scorelines</p>
-                </div>
+              </Link>
+              <Link href="/about">
                 <Button 
                   variant="outline" 
-                  className="mt-4 w-full border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-black"
-                  onClick={() => setQuery("6-0 6-0")}
+                  className="border-blue-400/50 text-blue-400 hover:bg-blue-400/10 hover:border-blue-400 backdrop-blur-sm transition-all duration-300"
                 >
-                  Try Example
+                  Learn About Tennis Scorigami
                 </Button>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* Quick Links */}
-        <div className="mt-12 text-center">
-          <h2 className="text-2xl font-bold mb-4 text-white">Explore More</h2>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/explore">
-              <Button variant="outline" className="border-green-400 text-green-400 hover:bg-green-400 hover:text-black">
-                Interactive Data Visualization
-              </Button>
-            </Link>
-            <Link href="/about">
-              <Button variant="outline" className="border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-black">
-                Learn About Tennis Scorigami
-              </Button>
-            </Link>
-          </div>
+              </Link>
+            </div>
+          </motion.div>
         </div>
       </main>
 

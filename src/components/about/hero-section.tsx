@@ -1,3 +1,4 @@
+import courtImg from "@public/western-and-southern2.webp";
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import Image from "next/image";
@@ -7,7 +8,7 @@ export const HeroSection: React.FC = () => {
   return (
     <section className="relative h-[60vh] overflow-hidden">
       <Image
-        src="/western-and-southern2.avif"
+        src={courtImg}
         alt="Tennis Court"
         fill
         placeholder="blur"
