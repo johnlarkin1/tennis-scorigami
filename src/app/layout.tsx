@@ -5,6 +5,8 @@ import { Roboto } from "next/font/google";
 import localFont from "next/font/local";
 import { headers } from "next/headers";
 import { getPlatformSpecificImage } from "./metadata";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const roboto = Roboto({
   weight: "400",
@@ -168,6 +170,8 @@ export default function RootLayout({
         >
           {children}
         </Providers>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
