@@ -35,9 +35,7 @@
   "prettier.useEditorConfig": false,
 
   // Deno configuration (unchanged but scoped to supabase/functions)
-  "deno.enablePaths": [
-    "supabase/functions"
-  ],
+  "deno.enablePaths": ["supabase/functions"],
   "deno.lint": true,
   "deno.unstable": [
     "bare-node-builtins",
@@ -61,14 +59,12 @@
   "ruff.organizeImports": true,
 
   // Black
-  "black-formatter.args": [
-    "--config=pyproject.toml"
-  ],
+  "black-formatter.args": ["--config=pyproject.toml"],
 
   // TypeScript
   "typescript.preferences.importModuleSpecifier": "non-relative",
   "typescript.updateImportsOnFileMove.enabled": "always",
-  
+
   // Global editor settings
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
@@ -86,6 +82,7 @@
     "mgid",
     "mgids",
     "msgspec",
+    "Roddick",
     "scoreigami",
     "scorigami",
     "stackoverflow"

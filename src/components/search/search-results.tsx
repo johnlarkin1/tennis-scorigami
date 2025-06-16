@@ -34,9 +34,9 @@ interface SearchResultsProps {
 }
 
 export const SearchResults: React.FC<SearchResultsProps> = ({
-  searchResults,
+  searchResults = [],
   selectedResult,
-  matches,
+  matches = [],
   isLoadingMatches,
   searchType,
   onResultSelect,

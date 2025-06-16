@@ -30,22 +30,22 @@ export const Footer = () => {
             </p>
             <div className="flex space-x-3 sm:space-x-4">
               <SocialIcon
-                url="https://twitter.com/JLarks32"
-                bgColor="#1DA1F2"
+                url="https://x.com/TennisScorigami"
+                bgColor="#000000"
                 style={{ height: 32, width: 32 }}
                 target="_blank"
                 className="hover:scale-110 transition-transform sm:!h-9 sm:!w-9"
               />
               <SocialIcon
-                url="https://github.com/johnlarkin1"
-                bgColor="#6e5494"
+                url="https://www.linkedin.com/company/tennis-scorigami/about"
+                bgColor="#0077B5" // LinkedIn blue
                 style={{ height: 32, width: 32 }}
                 target="_blank"
                 className="hover:scale-110 transition-transform sm:!h-9 sm:!w-9"
               />
               <SocialIcon
-                url="https://linkedin.com/in/johnlarkin"
-                bgColor="#0077B5"
+                url="https://discord.gg/rhUKR2Hpj3"
+                bgColor="#5865F2" // Discord “blurple”
                 style={{ height: 32, width: 32 }}
                 target="_blank"
                 className="hover:scale-110 transition-transform sm:!h-9 sm:!w-9"

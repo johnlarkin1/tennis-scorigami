@@ -1,27 +1,61 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { Users, TrendingUp, Sparkles, History } from "lucide-react";
+import { History, Sparkles, TrendingUp, Users } from "lucide-react";
 
 interface QuickFiltersProps {
   onFilterSelect: (query: string) => void;
   currentQuery: string;
 }
 
-const playerExamples = [
-  { label: "Roger Federer", icon: Sparkles },
-  { label: "Novak Djokovic", icon: Sparkles },
-  { label: "Rafael Nadal", icon: Sparkles },
-  { label: "Serena Williams", icon: Sparkles },
+const keywordExamples = [
+  {
+    label: "player:Roddick",
+    icon: Sparkles,
+    description: "Search for specific player",
+  },
+  {
+    label: "tournament:Wimbledon",
+    icon: Sparkles,
+    description: "Find tournament matches",
+  },
+  {
+    label: "has:tiebreak",
+    icon: TrendingUp,
+    description: "Matches with tiebreaks",
+  },
+  { label: "year:2023", icon: TrendingUp, description: "Recent matches" },
 ];
 
-const scoreExamples = [
-  { label: "6-0 6-0", icon: TrendingUp },
-  { label: "7-6 6-4", icon: TrendingUp },
-  { label: "6-4 6-3", icon: TrendingUp },
-  { label: "6-1 6-1", icon: TrendingUp },
+const advancedExamples = [
+  {
+    label: "player:Roddick opponent:Federer",
+    icon: TrendingUp,
+    description: "Head-to-head matches",
+  },
+  {
+    label: 'tournament:"US Open" year:2020-2023',
+    icon: TrendingUp,
+    description: "Tournament + year range",
+  },
+  {
+    label: "surface:clay has:bagel",
+    icon: TrendingUp,
+    description: "Surface + score type",
+  },
+  {
+    label: "sex:F round:final",
+    icon: TrendingUp,
+    description: "Women's finals",
+  },
 ];
 
 export const QuickFilters: React.FC<QuickFiltersProps> = ({
@@ -33,14 +67,14 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   const item = {
     hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
+    show: { opacity: 1, y: 0 },
   };
 
   return (
@@ -57,36 +91,45 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
             <div className="p-2 bg-blue-400/10 rounded-lg mr-3">
               <Users className="w-5 h-5" />
             </div>
-            Player Search
+            Keyword Search
           </CardTitle>
           <CardDescription className="text-gray-300">
-            Search for professional tennis players to explore their match history
+            Use keywords to search players, tournaments, scores, and more
           </CardDescription>
         </CardHeader>
         <CardContent className="relative">
           <div className="space-y-3 mb-4">
             <div className="flex items-center space-x-2 text-sm text-gray-400">
               <History className="w-4 h-4" />
-              <span>Recent searches & popular players</span>
+              <span>Try these keyword searches</span>
             </div>
-            <motion.div 
+            <motion.div
               variants={container}
               initial="hidden"
               animate="show"
-              className="grid grid-cols-2 gap-2"
+              className="space-y-2"
             >
-              {playerExamples.map((example) => (
+              {keywordExamples.map((example) => (
                 <motion.div key={example.label} variants={item}>
                   <Button
                     variant="outline"
                     size="sm"
-                    className={`w-full border-gray-600 text-gray-300 hover:bg-blue-400/10 hover:border-blue-400/50 hover:text-blue-400 transition-all duration-300 ${
-                      currentQuery === example.label ? 'bg-blue-400/10 border-blue-400/50 text-blue-400' : ''
+                    className={`w-full justify-between border-gray-600 text-gray-300 hover:bg-blue-400/10 hover:border-blue-400/50 hover:text-blue-400 transition-all duration-300 ${
+                      currentQuery === example.label
+                        ? "bg-blue-400/10 border-blue-400/50 text-blue-400"
+                        : ""
                     }`}
                     onClick={() => onFilterSelect(example.label)}
                   >
-                    <example.icon className="w-3 h-3 mr-1" />
-                    <span className="truncate">{example.label}</span>
+                    <div className="flex items-center">
+                      <example.icon className="w-3 h-3 mr-2" />
+                      <code className="text-xs bg-gray-800/50 px-1 rounded">
+                        {example.label}
+                      </code>
+                    </div>
+                    <span className="text-xs text-gray-500">
+                      {example.description}
+                    </span>
                   </Button>
                 </motion.div>
               ))}
@@ -94,7 +137,9 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
           </div>
           <div className="pt-4 border-t border-gray-700/50">
             <p className="text-xs text-gray-500 text-center">
-              Search by full or partial name • Case insensitive
+              Type keywords like{" "}
+              <code className="bg-gray-800 px-1 rounded">player:</code> and see
+              suggestions
             </p>
           </div>
         </CardContent>
@@ -107,36 +152,47 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
             <div className="p-2 bg-purple-400/10 rounded-lg mr-3">
               <TrendingUp className="w-5 h-5" />
             </div>
-            Score Search
+            Advanced Search
           </CardTitle>
           <CardDescription className="text-gray-300">
-            Find matches with specific scorelines and explore tennis scorigami
+            Combine multiple keywords for powerful, specific searches
           </CardDescription>
         </CardHeader>
         <CardContent className="relative">
           <div className="space-y-3 mb-4">
             <div className="flex items-center space-x-2 text-sm text-gray-400">
               <Sparkles className="w-4 h-4" />
-              <span>Popular & rare scorelines</span>
+              <span>Complex query examples</span>
             </div>
-            <motion.div 
+            <motion.div
               variants={container}
               initial="hidden"
               animate="show"
-              className="grid grid-cols-2 gap-2"
+              className="space-y-2"
             >
-              {scoreExamples.map((example) => (
+              {advancedExamples.map((example) => (
                 <motion.div key={example.label} variants={item}>
                   <Button
                     variant="outline"
                     size="sm"
-                    className={`w-full border-gray-600 text-gray-300 hover:bg-purple-400/10 hover:border-purple-400/50 hover:text-purple-400 transition-all duration-300 ${
-                      currentQuery === example.label ? 'bg-purple-400/10 border-purple-400/50 text-purple-400' : ''
+                    className={`w-full justify-start text-left h-auto p-3 border-gray-600 text-gray-300 hover:bg-purple-400/10 hover:border-purple-400/50 hover:text-purple-400 transition-all duration-300 ${
+                      currentQuery === example.label
+                        ? "bg-purple-400/10 border-purple-400/50 text-purple-400"
+                        : ""
                     }`}
                     onClick={() => onFilterSelect(example.label)}
                   >
-                    <example.icon className="w-3 h-3 mr-1" />
-                    {example.label}
+                    <div className="w-full">
+                      <div className="flex items-center mb-1">
+                        <example.icon className="w-3 h-3 mr-2" />
+                        <code className="text-xs bg-gray-800/50 px-1 rounded font-mono">
+                          {example.label}
+                        </code>
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {example.description}
+                      </div>
+                    </div>
                   </Button>
                 </motion.div>
               ))}
@@ -144,7 +200,7 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
           </div>
           <div className="pt-4 border-t border-gray-700/50">
             <p className="text-xs text-gray-500 text-center">
-              Format: &ldquo;6-4 6-3&rdquo; • Partial patterns work too
+              Combine keywords with spaces • Use quotes for multi-word values
             </p>
           </div>
         </CardContent>
