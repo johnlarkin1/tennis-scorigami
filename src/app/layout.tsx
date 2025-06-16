@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import localFont from "next/font/local";
 import { headers } from "next/headers";
-import { getPlatformSpecificImage } from "./metadata";
+import { getPlatformSpecificImage, isIMessageUserAgent } from "./metadata";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -29,6 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
   const userAgent = headersList.get("user-agent") || "";
   const image = getPlatformSpecificImage(userAgent, "hero");
+  const isIMessage = isIMessageUserAgent(userAgent);
 
   return {
     metadataBase: new URL("https://tennis-scorigami.com"),
@@ -71,7 +72,7 @@ export async function generateMetadata(): Promise<Metadata> {
         },
       ],
       locale: "en_US",
-      type: "website",
+      type: isIMessage ? "video.other" : "website",
     },
     twitter: {
       card: "summary_large_image",
@@ -86,6 +87,16 @@ export async function generateMetadata(): Promise<Metadata> {
       creator: "@tennisscorigami",
     },
     other: {
+      // iMessage specific - use MP4 for autoplay
+      ...(isIMessage
+        ? {
+            "og:video": "https://tennis-scorigami.com/unfurls/hero-section.mp4",
+            "og:video:secure_url": "https://tennis-scorigami.com/unfurls/hero-section.mp4",
+            "og:video:type": "video/mp4",
+            "og:video:width": "1200",
+            "og:video:height": "630",
+          }
+        : {}),
       // Discord specific - always use GIF for Discord
       ...(userAgent.includes("discord") || userAgent.includes("Discord")
         ? {
@@ -137,27 +148,6 @@ export default function RootLayout({
         {/* Additional meta tags for better social sharing */}
         <meta name="twitter:creator" content="@tennisscorigami" />
         <meta name="twitter:site" content="@tennisscorigami" />
-
-        {/* Discord-specific meta tags */}
-        <meta property="og:image:type" content="image/gif" />
-        <meta
-          property="og:video"
-          content="https://tennis-scorigami.com/unfurls/hero-section.gif"
-        />
-        <meta property="og:video:type" content="image/gif" />
-        <meta property="og:video:width" content="1200" />
-        <meta property="og:video:height" content="630" />
-        <meta property="og:site_name" content="Tennis Scorigami" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta
-          property="og:image:alt"
-          content="Tennis Scorigami - Explore never-played tennis scores"
-        />
-        <meta
-          name="twitter:image:alt"
-          content="Tennis Scorigami - Explore never-played tennis scores"
-        />
       </head>
       <body
         className={`${roboto.className} ${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}

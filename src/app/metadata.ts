@@ -108,10 +108,12 @@ export function getPlatformSpecificImage(
     hero: {
       gif: `${baseUrl}/unfurls/hero-section.gif`,
       static: `${baseUrl}/unfurls/hero-section-static.png`,
+      mp4: `${baseUrl}/unfurls/hero-section.mp4`, // MP4 for iMessage autoplay
     },
     "2d-graph": {
       gif: `${baseUrl}/unfurls/2d-graph.gif`,
       static: `${baseUrl}/unfurls/2d-graph-static.png`,
+      mp4: `${baseUrl}/unfurls/2d-graph.mp4`,
     },
   };
 
@@ -139,7 +141,7 @@ export function getPlatformSpecificImage(
       imageUrl = images[imageType].static;
       mimeType = "image/png";
     }
-    // iMessage/iOS - use static to avoid double images
+    // iMessage/iOS - use static image (will be overridden by video tags)
     else if (
       ua.includes("iphone") ||
       ua.includes("ipad") ||
@@ -155,6 +157,19 @@ export function getPlatformSpecificImage(
   }
 
   return { url: imageUrl, type: mimeType };
+}
+
+// Helper function to check if user agent is iMessage/iOS
+export function isIMessageUserAgent(userAgent?: string): boolean {
+  if (!userAgent) return false;
+  const ua = userAgent.toLowerCase();
+  return (
+    ua.includes("iphone") ||
+    ua.includes("ipad") ||
+    (ua.includes("applewebkit") &&
+      (ua.includes("mobile") ||
+        (ua.includes("safari") && !ua.includes("chrome"))))
+  );
 }
 
 // Legacy function for backwards compatibility - returns just the URL string
