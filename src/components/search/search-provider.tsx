@@ -2,41 +2,17 @@
 
 import { SearchMappingContext } from "@/lib/search/search-context";
 import { KeywordType } from "@/lib/search/search-parser";
+import { SearchDataKeys, getDataKeyForKeywordType } from "@/lib/search/search-types";
 import { useQuery } from "@tanstack/react-query";
 import { createContext, useContext, useEffect } from "react";
 
-interface SearchData {
-  players: Array<{
-    id: number;
-    name: string;
-    value: string;
-    country: number;
-    sex: string;
-  }>;
-  tournaments: Array<{
-    id: number;
-    name: string;
-    value: string;
-    surface_type_id: number;
-    country_id: number;
-  }>;
-  countries: Array<{
-    id: number;
-    name: string;
-    value: string;
-    code: string;
-    continent: string;
-  }>;
-  surfaces: Array<{ id: number; name: string; value: string }>;
-  rounds: Array<{ id: number; name: string; value: string }>;
-  years: Array<{ id: number; name: string; value: string }>;
-}
+type SearchData = SearchDataKeys;
 
 interface SearchContextType {
   searchData: SearchData;
   isLoading: boolean;
   getDataForKeyword: (keyword: KeywordType) => Array<{
-    id: number;
+    id: number | string;
     name: string;
     value: string;
     [key: string]: unknown;
@@ -47,18 +23,21 @@ const SearchContext = createContext<SearchContextType | null>(null);
 
 async function fetchAllSuggestions(): Promise<SearchData> {
   const endpoints = [
-    { key: "players", type: "players" },
-    { key: "tournaments", type: "tournaments" },
-    { key: "countries", type: "countries" },
-    { key: "surfaces", type: "surfaces" },
-    { key: "rounds", type: "rounds" },
-    { key: "years", type: "years" },
+    { key: "player", type: "player" },
+    { key: "tournament", type: "tournament" },
+    { key: "country", type: "country" },
+    { key: "surface", type: "surface" },
+    { key: "round", type: "round" },
+    { key: "year", type: "year" },
+    { key: "sex", type: "sex" },
+    { key: "has", type: "has" },
+    { key: "never", type: "never" },
   ];
 
   const results = await Promise.all(
     endpoints.map(async ({ type }) => {
       const response = await fetch(
-        `/api/v1/search/suggestions?type=${type}&limit=100`
+        `/api/v1/search/suggestions?type=${type}&limit=200`
       );
       if (!response.ok) throw new Error(`Failed to fetch ${type}`);
       return response.json();
@@ -66,13 +45,16 @@ async function fetchAllSuggestions(): Promise<SearchData> {
   );
 
   return {
-    players: results[0].items || [],
-    tournaments: results[1].items || [],
-    countries: results[2].items || [],
-    surfaces: results[3].items || [],
-    rounds: results[4].items || [],
-    years: results[5].items || [],
-  };
+    player: results[0].items || [],
+    tournament: results[1].items || [],
+    country: results[2].items || [],
+    surface: results[3].items || [],
+    round: results[4].items || [],
+    year: results[5].items || [],
+    sex: results[6].items || [],
+    has: results[7].items || [],
+    never: results[8].items || [],
+  } as SearchData;
 }
 
 export function SearchProvider({ children }: { children: React.ReactNode }) {
@@ -87,49 +69,45 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
   // Load mappings when data is available
   useEffect(() => {
     if (searchData) {
-      SearchMappingContext.loadMappingsFromData(searchData);
+      // Only pass data with numeric IDs to the mapping context
+      SearchMappingContext.loadMappingsFromData({
+        players: searchData.player,
+        tournaments: searchData.tournament,
+        countries: searchData.country,
+        surfaces: searchData.surface.filter(s => typeof s.id === 'number') as Array<{ id: number; name: string; value: string }>,
+        rounds: searchData.round.filter(r => typeof r.id === 'number') as Array<{ id: number; name: string; value: string }>,
+        years: searchData.year.filter(y => typeof y.id === 'number') as Array<{ id: number; name: string; value: string }>,
+      });
     }
   }, [searchData]);
 
   const getDataForKeyword = (
     keyword: KeywordType
   ): Array<{
-    id: number;
+    id: number | string;
     name: string;
     value: string;
     [key: string]: unknown;
   }> => {
     if (!searchData) return [];
-
-    switch (keyword) {
-      case "player":
-      case "opponent":
-        return searchData.players;
-      case "tournament":
-        return searchData.tournaments;
-      case "country":
-        return searchData.countries;
-      case "surface":
-        return searchData.surfaces;
-      case "round":
-        return searchData.rounds;
-      case "year":
-        return searchData.years;
-      default:
-        return [];
-    }
+    
+    const dataKey = getDataKeyForKeywordType(keyword);
+    return searchData[dataKey] || [];
   };
 
   return (
     <SearchContext.Provider
       value={{
         searchData: searchData || {
-          players: [],
-          tournaments: [],
-          countries: [],
-          surfaces: [],
-          rounds: [],
-          years: [],
+          player: [],
+          tournament: [],
+          country: [],
+          surface: [],
+          round: [],
+          year: [],
+          sex: [],
+          has: [],
+          never: [],
         },
         isLoading,
         getDataForKeyword,

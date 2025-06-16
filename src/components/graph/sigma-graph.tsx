@@ -13,7 +13,7 @@ import {
   NEVER_OCCURRED_COLOR,
 } from "@/constants/graph-colors";
 import { fetchGraphData } from "@/lib/api-client";
-import type { EdgeDTO, NodeDTO } from "@/lib/types";
+import type { EdgeDTO, NodeDTO } from "@/lib/types/graph-types";
 import { selectedTournamentAtom } from "@/store/tournament";
 import {
   createDepthScales,

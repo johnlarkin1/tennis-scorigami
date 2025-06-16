@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { NodeDTO } from "@/lib/types";
+import type { NodeDTO } from "@/lib/types/graph-types";
 import { Check, Copy, Download, Share2, Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 

@@ -1,7 +1,7 @@
 // src/app/api/v1/graph-stream/route.ts
 import { db } from "@/db";
 import { bad } from "@/lib/errors";
-import type { EdgeDTO, NodeDTO } from "@/lib/types";
+import type { EdgeDTO, NodeDTO } from "@/lib/types/graph-types";
 import { sql } from "drizzle-orm";
 import { NextRequest } from "next/server";
 

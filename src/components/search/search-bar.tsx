@@ -87,16 +87,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   const { data: fetchedSuggestions, isLoading } = useSearchSuggestions(
     activeKeywordType,
     dropdownQuery,
-    showDropdown && !!activeKeywordType && !!dropdownQuery
+    showDropdown && !!activeKeywordType // Remove the dropdownQuery requirement
   );
 
   // Use preloaded data when no query, fetched data when there's a query
   const currentSuggestions =
-    dropdownQuery && fetchedSuggestions?.items
-      ? fetchedSuggestions.items
-      : activeKeywordType
-        ? getDataForKeyword(activeKeywordType)
-        : [];
+    !dropdownQuery && activeKeywordType
+      ? getDataForKeyword(activeKeywordType) // Use preloaded data when just prefix is typed
+      : fetchedSuggestions?.items || [];
 
   // Apply fuzzy search only if there's a query, otherwise show all suggestions
   const fuzzySearchResults = useFuzzySearch(currentSuggestions, dropdownQuery);
@@ -272,41 +270,45 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           {/* Active keywords display */}
           {parsedQuery.keywords.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2 px-4 pb-2">
-              {parsedQuery.keywords.map((keyword, index) => {
-                // Define colors for different keyword types
-                const colorMap: Record<KeywordType, string> = {
-                  player: "bg-blue-400/20 text-blue-400 border-blue-400/30",
-                  opponent:
-                    "bg-purple-400/20 text-purple-400 border-purple-400/30",
-                  tournament:
-                    "bg-green-400/20 text-green-400 border-green-400/30",
-                  country:
-                    "bg-orange-400/20 text-orange-400 border-orange-400/30",
-                  surface:
-                    "bg-yellow-400/20 text-yellow-400 border-yellow-400/30",
-                  round: "bg-pink-400/20 text-pink-400 border-pink-400/30",
-                  year: "bg-cyan-400/20 text-cyan-400 border-cyan-400/30",
-                  sex: "bg-indigo-400/20 text-indigo-400 border-indigo-400/30",
-                  score: "bg-red-400/20 text-red-400 border-red-400/30",
-                  has: "bg-emerald-400/20 text-emerald-400 border-emerald-400/30",
-                  never: "bg-rose-400/20 text-rose-400 border-rose-400/30",
-                  location: "bg-teal-400/20 text-teal-400 border-teal-400/30",
-                };
+              {parsedQuery.keywords
+                .filter(
+                  (keyword) => keyword.value && keyword.value.trim() !== ""
+                ) // Only show keywords with values
+                .map((keyword, index) => {
+                  // Define colors for different keyword types
+                  const colorMap: Record<KeywordType, string> = {
+                    player: "bg-blue-400/20 text-blue-400 border-blue-400/30",
+                    opponent:
+                      "bg-purple-400/20 text-purple-400 border-purple-400/30",
+                    tournament:
+                      "bg-green-400/20 text-green-400 border-green-400/30",
+                    country:
+                      "bg-orange-400/20 text-orange-400 border-orange-400/30",
+                    surface:
+                      "bg-yellow-400/20 text-yellow-400 border-yellow-400/30",
+                    round: "bg-pink-400/20 text-pink-400 border-pink-400/30",
+                    year: "bg-cyan-400/20 text-cyan-400 border-cyan-400/30",
+                    sex: "bg-indigo-400/20 text-indigo-400 border-indigo-400/30",
+                    score: "bg-red-400/20 text-red-400 border-red-400/30",
+                    has: "bg-emerald-400/20 text-emerald-400 border-emerald-400/30",
+                    never: "bg-rose-400/20 text-rose-400 border-rose-400/30",
+                    location: "bg-teal-400/20 text-teal-400 border-teal-400/30",
+                  };
 
-                return (
-                  <Badge
-                    key={index}
-                    variant="secondary"
-                    className={
-                      colorMap[keyword.type as KeywordType] ||
-                      "bg-gray-400/20 text-gray-400 border-gray-400/30"
-                    }
-                  >
-                    <span className="font-semibold">{keyword.type}:</span>{" "}
-                    {keyword.value}
-                  </Badge>
-                );
-              })}
+                  return (
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className={
+                        colorMap[keyword.type as KeywordType] ||
+                        "bg-gray-400/20 text-gray-400 border-gray-400/30"
+                      }
+                    >
+                      <span className="font-semibold">{keyword.type}:</span>{" "}
+                      {keyword.value}
+                    </Badge>
+                  );
+                })}
             </div>
           )}
         </div>
@@ -358,11 +360,29 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                           <div
                             key={suggestion.id}
                             onClick={() => handleSuggestionClick(suggestion)}
-                            className="px-3 py-2 rounded-lg hover:bg-gray-800/50 cursor-pointer transition-colors text-gray-200 hover:text-white flex items-center justify-between group"
+                            className={`px-3 py-2 rounded-lg hover:bg-gray-800/50 cursor-pointer transition-colors flex items-center justify-between group ${
+                              suggestion.suggested
+                                ? "bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/20 text-white"
+                                : "text-gray-200 hover:text-white"
+                            }`}
                           >
-                            <span>{suggestion.name}</span>
+                            <div className="flex items-center">
+                              {suggestion.suggested ? (
+                                <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse" />
+                              ) : null}
+                              <span className={suggestion.suggested ? "font-medium" : ""}>
+                                {suggestion.name}
+                              </span>
+                              {suggestion.suggested ? (
+                                <span className="ml-2 text-xs px-1.5 py-0.5 bg-green-400/20 text-green-400 rounded-full">
+                                  Featured
+                                </span>
+                              ) : null}
+                            </div>
                             {suggestion.value !== suggestion.name && (
-                              <span className="text-xs text-gray-500 group-hover:text-gray-400">
+                              <span className={`text-xs group-hover:text-gray-400 ${
+                                suggestion.suggested ? "text-gray-300" : "text-gray-500"
+                              }`}>
                                 {suggestion.value}
                               </span>
                             )}

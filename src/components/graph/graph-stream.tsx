@@ -21,7 +21,7 @@ import {
   GRAPH_BACKGROUND_COLOR,
   NEVER_OCCURRED_COLOR,
 } from "@/constants/graph-colors";
-import type { NodeDTO } from "@/lib/types";
+import type { NodeDTO } from "@/lib/types/graph-types";
 import {
   getEdgeColorByDepth,
   getOccurrenceIntensityColor,

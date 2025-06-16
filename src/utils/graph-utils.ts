@@ -1,5 +1,5 @@
 import { DEPTH_COLORS, NEVER_OCCURRED_COLOR } from "@/constants/graph-colors";
-import { NodeDTO } from "@/lib/types";
+import { NodeDTO } from "@/lib/types/graph-types";
 import { scaleLinear } from "d3-scale";
 
 const ROOT_ID = 0;

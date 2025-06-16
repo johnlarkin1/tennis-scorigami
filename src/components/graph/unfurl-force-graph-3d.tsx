@@ -11,7 +11,7 @@ import {
   GRAPH_BACKGROUND_COLOR,
   NEVER_OCCURRED_COLOR,
 } from "@/constants/graph-colors";
-import type { NodeDTO } from "@/lib/types";
+import type { NodeDTO } from "@/lib/types/graph-types";
 import { useGraphContext } from "@/providers/graph-provider";
 import {
   getEdgeColorByDepth,
@@ -164,8 +164,11 @@ const UnfurlForceGraph3D: React.FC = () => {
       nodeThreeObject: showLabels
         ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (n: any) => {
-            // eslint-disable-next-line @typescript-eslint/no-require-imports
-            const SpriteText = require("three-spritetext").default || require("three-spritetext");
+            /* eslint-disable @typescript-eslint/no-require-imports */
+            const SpriteText =
+              require("three-spritetext").default ||
+              require("three-spritetext");
+            /* eslint-enable @typescript-eslint/no-require-imports */
             const sprite = new SpriteText(n.slug || "");
             sprite.color = "#ffffff";
             sprite.textHeight = 6;

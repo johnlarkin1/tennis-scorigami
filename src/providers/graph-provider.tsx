@@ -1,7 +1,7 @@
 "use client";
 
-import type { EdgeDTO, NodeDTO } from "@/lib/types";
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import type { EdgeDTO, NodeDTO } from "@/lib/types/graph-types";
+import React, { createContext, ReactNode, useContext, useState } from "react";
 
 type GraphLink = { source: number; target: number };
 
@@ -17,17 +17,17 @@ interface GraphContextType {
   setData: (data: GraphData) => void;
   loading: boolean;
   setLoading: (loading: boolean) => void;
-  
+
   // Selected node state
   selectedSequenceId: number | null;
   setSelectedSequenceId: (id: number | null) => void;
-  
+
   // Discovery modal state
   discoveryModalOpen: boolean;
   setDiscoveryModalOpen: (open: boolean) => void;
   discoveredNode: NodeDTO | null;
   setDiscoveredNode: (node: NodeDTO | null) => void;
-  
+
   // Computed values
   hasUnscoredNodes: boolean;
   maxDepth: number;
@@ -48,17 +48,26 @@ interface GraphProviderProps {
   maxDepth: number;
 }
 
-export const GraphProvider: React.FC<GraphProviderProps> = ({ children, maxDepth }) => {
-  const [data, setData] = useState<GraphData>({ nodes: [], edges: [], links: [] });
+export const GraphProvider: React.FC<GraphProviderProps> = ({
+  children,
+  maxDepth,
+}) => {
+  const [data, setData] = useState<GraphData>({
+    nodes: [],
+    edges: [],
+    links: [],
+  });
   const [loading, setLoading] = useState(false);
-  const [selectedSequenceId, setSelectedSequenceId] = useState<number | null>(null);
+  const [selectedSequenceId, setSelectedSequenceId] = useState<number | null>(
+    null
+  );
   const [discoveryModalOpen, setDiscoveryModalOpen] = useState(false);
   const [discoveredNode, setDiscoveredNode] = useState<NodeDTO | null>(null);
-  
+
   const hasUnscoredNodes = React.useMemo(() => {
     return data.nodes.some((node) => !node.played && node.id !== 0);
   }, [data.nodes]);
-  
+
   const value: GraphContextType = {
     data,
     setData,
@@ -73,6 +82,8 @@ export const GraphProvider: React.FC<GraphProviderProps> = ({ children, maxDepth
     hasUnscoredNodes,
     maxDepth,
   };
-  
-  return <GraphContext.Provider value={value}>{children}</GraphContext.Provider>;
+
+  return (
+    <GraphContext.Provider value={value}>{children}</GraphContext.Provider>
+  );
 };

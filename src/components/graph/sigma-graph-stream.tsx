@@ -9,7 +9,7 @@ import { DiscoveryModal } from "@/components/graph/discovery-modal";
 import { GraphLoadingState } from "@/components/graph/graph-loading-state";
 import { MatchDetailsModal } from "@/components/graph/match-details-modal";
 import { fetchGraphStream } from "@/lib/api-client";
-import type { EdgeDTO, NodeDTO } from "@/lib/types";
+import type { EdgeDTO, NodeDTO } from "@/lib/types/graph-types";
 import { selectedTournamentAtom } from "@/store/tournament";
 import { convertSexFilter, convertYearFilter } from "@/utils/filter-converters";
 import {

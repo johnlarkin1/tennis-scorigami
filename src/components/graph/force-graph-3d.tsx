@@ -12,7 +12,7 @@ import {
   GRAPH_BACKGROUND_COLOR,
   NEVER_OCCURRED_COLOR,
 } from "@/constants/graph-colors";
-import type { NodeDTO } from "@/lib/types";
+import type { NodeDTO } from "@/lib/types/graph-types";
 import { useGraphContext } from "@/providers/graph-provider";
 import {
   getEdgeColorByDepth,
@@ -22,9 +22,9 @@ import { scaleLinear } from "d3-scale";
 import { useAtom } from "jotai";
 import dynamic from "next/dynamic";
 import React, { useCallback, useMemo, useRef } from "react";
+import { isMobile } from "react-device-detect";
 import type { ForceGraphMethods } from "react-force-graph-3d";
 import { useResizeDetector } from "react-resize-detector";
-import { isMobile } from "react-device-detect";
 const ROOT_ID = 0;
 
 // Dynamically import ForceGraph3D to avoid SSR issues
@@ -256,7 +256,9 @@ const ForceGraph3D: React.FC = () => {
         />
       )}
       {/* Legend - hidden on mobile */}
-      {!isMobile && <Legend colorMode={colorMode} maxDepth={maxDepth} data={data} />}
+      {!isMobile && (
+        <Legend colorMode={colorMode} maxDepth={maxDepth} data={data} />
+      )}
     </div>
   );
 };

@@ -41,12 +41,16 @@ export default function ExplorePage() {
             <p className="text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed">
               Visualize all possible score sequences in tennis matches through
               our interactive graph.
-              <span className="block mt-2 text-green-400 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 mr-2" />
-                Click the gear icon to adjust parameters, click nodes for
-                details
-              </span>
             </p>
+            <div className="block mt-2 text-green-400">
+              <div className="flex items-center justify-center">
+                <Sparkles className="w-4 h-4 mr-2" />
+                Click the gear icon to adjust parameters.
+              </div>
+              <div className="flex items-center justify-center">
+                <strong>Click nodes for details!</strong>
+              </div>
+            </div>
           </motion.div>
 
           <Suspense

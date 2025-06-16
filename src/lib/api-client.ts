@@ -1,4 +1,4 @@
-import type { EdgeDTO, NodeDTO } from "@/lib/types";
+import type { EdgeDTO, NodeDTO } from "@/lib/types/graph-types";
 import type { MatchStatWithSamples } from "@/types/match-stats/response";
 import type {
   SequenceInfo,

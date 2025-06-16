@@ -47,7 +47,7 @@ export const TeamMemberCard = ({
       {name}
     </h3>
     <p className="text-green-400 text-center mb-4">{role}</p>
-    <p className="text-gray-300 text-center mb-6 text-sm flex-grow">{bio}</p>
+    <p className="text-gray-300 text-center mb-6 text-md flex-grow">{bio}</p>
 
     {/* Skills */}
     {/* {skills && skills.length > 0 && (

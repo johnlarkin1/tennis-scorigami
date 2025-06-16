@@ -7,50 +7,25 @@ import { SearchBar } from "@/components/search/search-bar";
 import { SearchProvider } from "@/components/search/search-provider";
 import { SearchResults } from "@/components/search/search-results";
 import { Button } from "@/components/ui/button";
+import { SearchResponse, SearchResult } from "@/lib/types/search-types";
 import { motion } from "framer-motion";
 import { Search, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-type SearchResult = {
-  id: number;
-  name?: string;
-  slug?: string;
-  type: "player" | "score";
-};
-
-type SearchResponse = {
-  type: "player" | "score";
-  items: SearchResult[];
-};
-
-type Match = {
-  match_id: number;
-  event_name: string;
-  player_a: string;
-  player_b: string;
-  year: number;
-  start_time: string;
-};
-
 export default function SearchPage() {
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [matches, setMatches] = useState<Match[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [isLoadingMatches, setIsLoadingMatches] = useState(false);
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(
     null
   );
-  const [searchType, setSearchType] = useState<"player" | "score" | null>(null);
 
   // Debounced search
   useEffect(() => {
     if (!query.trim()) {
       setSearchResults([]);
-      setMatches([]);
       setSelectedResult(null);
-      setSearchType(null);
       return;
     }
 
@@ -62,7 +37,6 @@ export default function SearchPage() {
         );
         const data: SearchResponse = await response.json();
         setSearchResults(data.items);
-        setSearchType(data.type);
       } catch (error) {
         console.error("Search error:", error);
         setSearchResults([]);
@@ -74,34 +48,12 @@ export default function SearchPage() {
     return () => clearTimeout(timeoutId);
   }, [query]);
 
-  // Load matches when a score result is selected
-  const loadMatches = async (scoreId: number) => {
-    setIsLoadingMatches(true);
-    try {
-      const response = await fetch(
-        `/api/v1/matches?scoreId=${scoreId}&limit=50`
-      );
-      const data: Match[] = await response.json();
-      setMatches(data);
-    } catch (error) {
-      console.error("Error loading matches:", error);
-      setMatches([]);
-    } finally {
-      setIsLoadingMatches(false);
-    }
-  };
-
   const handleResultSelect = (result: SearchResult) => {
     setSelectedResult(result);
-    if (result.type === "score") {
-      loadMatches(result.id);
-    } else {
-      setMatches([]);
-    }
   };
 
   const searchPlaceholder =
-    "Search for players, tournaments, scores... Try: player:Roddick";
+    "Search for players, tournaments, scores... for example, try searching for American hero: `player:Roddick`";
 
   const handleQuickFilter = (filterQuery: string) => {
     setQuery(filterQuery);
@@ -144,8 +96,7 @@ export default function SearchPage() {
                 </h1>
               </div>
               <p className="text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed">
-                Explore our comprehensive database of tennis matches, players,
-                and scores.
+                Explore our collection of tennis matches, players, and scores.
                 <span className="block mt-2 text-green-400 flex items-center justify-center">
                   <Sparkles className="w-4 h-4 mr-2" />
                   Discover unique scorelines and match histories
@@ -167,9 +118,6 @@ export default function SearchPage() {
             <SearchResults
               searchResults={searchResults}
               selectedResult={selectedResult}
-              matches={matches}
-              isLoadingMatches={isLoadingMatches}
-              searchType={searchType}
               onResultSelect={handleResultSelect}
             />
 

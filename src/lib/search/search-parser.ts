@@ -48,7 +48,7 @@ export function parseSearchQuery(query: string): ParsedSearchQuery {
   // Find all keyword patterns
   for (const [keywordType, prefixes] of Object.entries(KEYWORD_PREFIXES)) {
     for (const prefix of prefixes) {
-      const regex = new RegExp(`${escapeRegExp(prefix)}([^\\s]+(?:\\s+[^\\s:]+)*)`, 'gi');
+      const regex = new RegExp(`${escapeRegExp(prefix)}([^\\s:]+(?:\\s+[^\\s:]+)*)`, 'gi');
       let match;
       
       while ((match = regex.exec(query)) !== null) {
@@ -73,7 +73,8 @@ export function parseSearchQuery(query: string): ParsedSearchQuery {
 function parseKeywordValue(type: KeywordType, rawValue: string): KeywordFilter | null {
   const trimmedValue = rawValue.trim();
   
-  if (!trimmedValue) return null;
+  // Don't create a keyword if there's no value after the prefix
+  if (!trimmedValue || trimmedValue === '') return null;
 
   // Handle quoted strings
   const quotedMatch = trimmedValue.match(/^"([^"]+)"$/);

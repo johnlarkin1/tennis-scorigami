@@ -6,6 +6,7 @@ export interface SuggestionItem {
   id: string | number;
   name: string;
   value: string;
+  suggested?: boolean;
   [key: string]: unknown;
 }
 
@@ -22,8 +23,11 @@ async function fetchSuggestions(
   query: string = "",
   limit: number = 20
 ): Promise<SuggestionsResponse> {
+  // Use the keyword type directly - backend now expects singular forms
+  const apiType = type === "opponent" ? "player" : type;
+
   const params = new URLSearchParams({
-    type: type === "opponent" ? "players" : type, // Map opponent to players
+    type: apiType,
     limit: limit.toString(),
   });
 
@@ -82,7 +86,14 @@ export function useFuzzySearch(
   keys: string[] = ["name", "value"]
 ) {
   return useMemo(() => {
-    if (!query.trim()) return items;
+    if (!query.trim()) {
+      // When no query, sort suggested items first
+      return [...items].sort((a, b) => {
+        if (a.suggested && !b.suggested) return -1;
+        if (!a.suggested && b.suggested) return 1;
+        return 0;
+      });
+    }
 
     const lowercaseQuery = query.toLowerCase();
 
@@ -113,6 +124,11 @@ export function useFuzzySearch(
             score += Math.max(0, 50 - value.length);
           }
         });
+
+        // Bonus for suggested items
+        if (item.suggested) {
+          score += 25;
+        }
 
         return matches ? { ...item, _score: score } : null;
       })
