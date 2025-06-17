@@ -2,6 +2,7 @@
 
 import { CallToAction } from "@/components/about/call-to-action";
 import { DataCollection } from "@/components/about/data-collection";
+import { FeedbackSection } from "@/components/about/feedback-section";
 import { HeroSection } from "@/components/about/hero-section";
 import { ProjectOverview } from "@/components/about/project-overview";
 import { Section } from "@/components/about/section";
@@ -18,6 +19,7 @@ const AboutPage: React.FC = () => {
     "data-collection",
     "technology-stack",
     "team",
+    "feedback",
     "call-to-action",
   ];
   useSectionObserver(sectionIds);
@@ -45,7 +47,11 @@ const AboutPage: React.FC = () => {
           <TeamSection id="team" />
         </Section>
 
-        <Section id="call-to-action">
+        <Section id="feedback">
+          <FeedbackSection id="feedback" />
+        </Section>
+
+        <Section className="bg-gray-800/50" id="call-to-action">
           <CallToAction id="call-to-action" />
         </Section>
       </main>

@@ -77,7 +77,7 @@ export default function SearchPage() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="text-center mb-12"
+              className="text-center mb-8 sm:mb-12"
             >
               <div className="flex items-center justify-center mb-4">
                 <motion.div
@@ -87,18 +87,18 @@ export default function SearchPage() {
                     repeat: Infinity,
                     ease: "linear",
                   }}
-                  className="p-3 bg-gradient-to-br from-green-400/20 to-green-400/10 rounded-2xl mr-4"
+                  className="p-2 sm:p-3 bg-gradient-to-br from-green-400/20 to-green-400/10 rounded-xl sm:rounded-2xl mr-3 sm:mr-4"
                 >
-                  <Search className="w-8 h-8 text-green-400" />
+                  <Search className="w-6 h-6 sm:w-8 sm:h-8 text-green-400" />
                 </motion.div>
-                <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+                <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
                   Search Tennis Data
                 </h1>
               </div>
-              <p className="text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-sm sm:text-base md:text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed px-4 sm:px-0">
                 Explore our collection of tennis matches, players, and scores.
-                <span className="block mt-2 text-green-400 flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 mr-2" />
+                <span className="block mt-2 text-green-400 flex items-center justify-center text-xs sm:text-sm md:text-base">
+                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                   Discover unique scorelines and match histories
                 </span>
               </p>

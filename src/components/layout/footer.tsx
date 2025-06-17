@@ -9,7 +9,7 @@ export const Footer = () => {
   return (
     <footer className="bg-gradient-to-b from-gray-900 to-black text-white border-t border-gray-700/50 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
       <div className="container mx-auto px-4 py-8 sm:py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6 sm:gap-8">
           <div className="sm:col-span-2 md:col-span-2">
             <div className="text-xl sm:text-2xl font-black mb-3 sm:mb-4 flex items-center">
               <span className="mr-3 text-2xl sm:text-3xl animate-bounce">
@@ -129,9 +129,39 @@ export const Footer = () => {
                   Sebastian Hoar
                 </Link>
               </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-green-300 border-b border-gray-700/30 pb-2">
+              Feedback & Requests
+            </h3>
+            <ul className="space-y-1 sm:space-y-2">
               <li>
                 <a
-                  href="mailto:john@tennisscorigami.com"
+                  href="https://tennis-scorigami.canny.io/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-300 hover:text-white transition flex items-center group text-sm sm:text-base"
+                >
+                  <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-green-400 transition-colors"></span>
+                  Request a Feature
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://discord.gg/rhUKR2Hpj3"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-300 hover:text-white transition flex items-center group text-sm sm:text-base"
+                >
+                  <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-green-400 transition-colors"></span>
+                  Join Discord
+                </a>
+              </li>
+              <li>
+                <a
+                  href="mailto:support@tennis-scorigami.com"
                   className="text-gray-300 hover:text-white transition flex items-center group text-sm sm:text-base"
                 >
                   <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-green-400 transition-colors"></span>

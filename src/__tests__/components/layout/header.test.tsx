@@ -67,7 +67,7 @@ describe('Header', () => {
     
     const nav = screen.getByRole('navigation')
     expect(nav).toBeInTheDocument()
-    expect(nav).toHaveClass('flex', 'space-x-4', 'sm:space-x-6')
+    expect(nav).toHaveClass('hidden', 'sm:flex', 'space-x-4', 'sm:space-x-6')
   })
 
   it('logo link points to home page', () => {
