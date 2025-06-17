@@ -18,26 +18,75 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
     {
       year: "1968",
       event: "Open Era begins",
-      description:
-        "Professional tennis enters the modern era, allowing pros to compete in Grand Slams",
+      description: (
+        <>
+          Professional tennis enters the modern era, allowing pros to compete in
+          Grand Slams.
+          <br />
+          <br />
+          Welcome to civilization.
+        </>
+      ),
     },
     {
       year: "1973",
       event: "ATP Rankings launch",
-      description:
-        "Official computer rankings system established for men's tennis",
+      description: (
+        <>
+          Official computer rankings system established for men&apos;s tennis...
+          <br />
+          <br />
+          How insane is that? Before this, it was just Lance Tigray and the
+          likes ranking tennis players for seeds.
+        </>
+      ),
     },
     {
       year: "1990s",
       event: "Digital scorekeeping",
       description:
-        "Electronic line calling and digital match tracking begin at major tournaments",
+        "Finally some tech in the mix. Electronic line calling and digital match tracking begin at major tournaments.",
+    },
+    {
+      year: "2012",
+      event: "Potential scorigami?",
+      description:
+        "Henry and John play a best of five on the (fake green) clay in Cincinnati. Who knows - coulda been a scorigami, if only this project was around",
     },
     {
       year: "2024",
       event: "Groupchat texts about Tennis Scorigami",
-      description:
-        "Henry, Seb, and John start yapping about tracking unique tennis scores in a groupchat",
+      description: (
+        <>
+          <a
+            href="https://www.linkedin.com/in/jebhenryhead/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-green-400 font-semibold hover:text-green-300 transition-colors underline"
+          >
+            Henry
+          </a>
+          {", "}
+          <a
+            href="https://www.linkedin.com/in/sebastian-hoar-a71a5b112/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-green-400 font-semibold hover:text-green-300 transition-colors underline"
+          >
+            Seb
+          </a>
+          {", and "}
+          <a
+            href="https://www.linkedin.com/in/johnlarkin/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-green-400 font-semibold hover:text-green-300 transition-colors underline"
+          >
+            John
+          </a>
+          {" start yapping about tracking unique tennis scores in a groupchat"}
+        </>
+      ),
     },
     {
       year: "2025",
@@ -75,7 +124,7 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
               <div
                 className={`w-full md:w-5/12 ${
                   index % 2 === 0
-                    ? "text-center md:text-right md:pr-12"
+                    ? "text-center md:pr-12"
                     : "text-center md:pl-12"
                 }`}
               >
@@ -104,19 +153,40 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
             The Challenge of Tennis Data
           </h3>
           <p className="text-lg text-gray-300 mb-8 leading-relaxed">
-            Building a comprehensive tennis database is one of our biggest
-            challenges. Tennis data is fragmented across multiple sources, often
-            incomplete, and requires significant cleaning and normalization. We
-            continuously work to improve data quality while acknowledging the
-            inherent difficulties in collecting decades of tennis history.
+            In a more meta sense, the data quality of this project was (and is)
+            one of the biggest challenges of this. It&apos;s borderline
+            impossible to find <b>free</b> high-quality tennis data. I signed up
+            for numerous free trials to pull as much data as I could from
+            SportRadar, SportsDataIO, SportsDev, and RapidAPI. We actually had a
+            good amount of success with RapidAPI for a truly free (but highly
+            rate limited platform). SportRadar (sadly) is preposteroulsy
+            expensive but has some of the highest quality data.
+          </p>
+          <p className="text-lg text-gray-300 mb-8 leading-relaxed">
+            Data is fragmented across multiple sources, often incomplete, and
+            requires significant cleaning and normalization. The bulk of this
+            data comes from Jeff Sackmann&apos;s comprehensive tennis databases,
+            but... even with that, there are numerous issues, redundant
+            player-ids, incorrect scores, etc.
+          </p>
+          <p className="text-lg text-gray-300 mb-8 leading-relaxed">
+            We have plans to build a more sophisticated data collection system
+            and make this data free through API and files that are free to
+            download.
+          </p>
+          <p className="text-lg text-gray-300 mb-8 leading-relaxed">
+            Although this being said, per usual, we&apos;re stronger together,
+            so please join the Discord or file a Canny issue, or email us,
+            whatever you want if you <b>HAVE</b> tennis data, or you see any
+            issues with the data.
           </p>
 
-          <div className="grid md:grid-cols-2 gap-8 px-4 sm:px-0">
+          <div className="grid md:grid-cols-1 gap-8 px-4 sm:px-0">
             <div className="bg-gray-800 p-6 rounded-lg">
               <Award className="w-8 h-8 text-green-400 mb-4" />
               <h4 className="text-xl font-bold mb-3">Special Thanks</h4>
               <p className="text-gray-300 mb-4">
-                We owe a tremendous debt of gratitude to{" "}
+                Once again, we owe a tremendous debt of gratitude to{" "}
                 <a
                   href="https://www.jeffsackmann.com/"
                   target="_blank"
@@ -128,8 +198,10 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
                 , whose comprehensive tennis databases form the foundation of
                 our historical data. Jeff has painstakingly compiled match
                 results, player information, and detailed statistics for ATP and
-                WTA tours going back decades. You can find his invaluable
-                open-source repositories at{" "}
+                WTA tours going back decades.
+              </p>
+              <p className="text-gray-300 mb-4">
+                You can find his invaluable open-source repositories at{" "}
                 <a
                   href="https://github.com/JeffSackmann/tennis_atp"
                   target="_blank"
@@ -147,19 +219,9 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
                 >
                   WTA Data
                 </a>
-                .
-              </p>
-            </div>
-
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <Database className="w-8 h-8 text-green-400 mb-4" />
-              <h4 className="text-xl font-bold mb-3">Data Sources</h4>
-              <p className="text-gray-300">
-                For recent match data, we also utilize Sportradar&apos;s tennis
-                API to ensure our database stays current with the latest matches
-                and scoring updates. This combination of historical depth and
-                real-time updates allows us to track scorigami moments as they
-                happen.
+                . He has put in hundreds of hours of work to get the data to
+                where it is (and i think he&apos;s sandbagging and probably
+                it&apos;s more time than that).
               </p>
             </div>
           </div>

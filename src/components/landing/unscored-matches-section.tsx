@@ -32,43 +32,43 @@ interface TitleSectionProps {
 }
 
 function TitleSection({ yearsSinceStart }: TitleSectionProps) {
-  // return (
-  //   <div className="flex justify-center mt-8 sm:mt-16 mb-6 sm:mb-8 px-4">
-  //     <div className="max-w-4xl w-full">
-  //       <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-white text-center border border-gray-700 rounded-lg px-4 sm:px-8 py-4 sm:py-6 shadow-[0_0_30px_rgba(68,219,94,0.3),inset_0_0_30px_rgba(68,219,94,0.1)] bg-gray-900/50 backdrop-blur-sm space-y-4">
-  //         In the past <span className="text-green-400">{yearsSinceStart}</span>{" "}
-  //         years of tennis matches since{" "}
-  //         <span className="text-green-400">{START_DATA_COLLECTION_YEAR}</span>,
-  //         some score combinations have still never occurred. This project is
-  //         designed to track and discover these missing scorelines.
-  //       </h2>
-  //     </div>
-  //   </div>
-  // );
-
   return (
     <div className="flex justify-center mt-8 sm:mt-16 mb-6 sm:mb-8 px-4">
-      <div className="max-w-7xl w-full">
-        <div className="text-lg sm:text-xl md:text-3xl font-bold text-white text-center border border-gray-700 rounded-lg px-4 sm:px-8 py-4 sm:py-6 shadow-[0_0_30px_rgba(68,219,94,0.3),inset_0_0_30px_rgba(68,219,94,0.1)] bg-gray-900/50 backdrop-blur-sm space-y-4">
-          <p>
-            Every tennis match tells a story, but some stories have never been
-            written.
-          </p>
-          <p>
-            Since{" "}
-            <span className="text-green-400">{START_DATA_COLLECTION_YEAR}</span>
-            , over <span className="text-green-400">{yearsSinceStart}</span>{" "}
-            years, certain score combinations remain the sport&apos;s best-kept
-            secrets.
-          </p>
-          <p>
-            This project let&apos;s you flip the cover and explore those
-            unwritten stories.
-          </p>
-        </div>
+      <div className="max-w-4xl w-full">
+        <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-white text-center border border-gray-700 rounded-lg px-4 sm:px-8 py-4 sm:py-6 shadow-[0_0_30px_rgba(68,219,94,0.3),inset_0_0_30px_rgba(68,219,94,0.1)] bg-gray-900/50 backdrop-blur-sm space-y-4">
+          In the past <span className="text-green-400">{yearsSinceStart}</span>{" "}
+          years of tennis matches since{" "}
+          <span className="text-green-400">{START_DATA_COLLECTION_YEAR}</span>,
+          some score combinations have still never occurred. This project is
+          designed to track and discover these missing scorelines.
+        </h2>
       </div>
     </div>
   );
+
+  // return (
+  //   <div className="flex justify-center mt-8 sm:mt-16 mb-6 sm:mb-8 px-4">
+  //     <div className="max-w-7xl w-full">
+  //       <div className="text-lg sm:text-xl md:text-3xl font-bold text-white text-center border border-gray-700 rounded-lg px-4 sm:px-8 py-4 sm:py-6 shadow-[0_0_30px_rgba(68,219,94,0.3),inset_0_0_30px_rgba(68,219,94,0.1)] bg-gray-900/50 backdrop-blur-sm space-y-4">
+  //         <p>
+  //           Every tennis match tells a story, but some stories have never been
+  //           written.
+  //         </p>
+  //         <p>
+  //           Since{" "}
+  //           <span className="text-green-400">{START_DATA_COLLECTION_YEAR}</span>
+  //           , over <span className="text-green-400">{yearsSinceStart}</span>{" "}
+  //           years, certain score combinations remain the sport&apos;s best-kept
+  //           secrets.
+  //         </p>
+  //         <p>
+  //           This project let&apos;s you flip the cover and explore those
+  //           unwritten stories.
+  //         </p>
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
 }
 
 interface NavigationButtonProps {

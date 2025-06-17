@@ -32,7 +32,7 @@ export const ProjectOverview: React.FC<{ id?: string }> = ({ id }) => {
     <Section>
       <SectionHeader
         title="The Project"
-        subtitle="Exploring the mathematical beauty of tennis scoring"
+        subtitle="Exploring some data, some math, and the beauty of tennis"
         id={id}
       />
 
@@ -47,7 +47,32 @@ export const ProjectOverview: React.FC<{ id?: string }> = ({ id }) => {
           </h3>
           <p className="text-lg text-gray-300 mb-6 leading-relaxed">
             Scorigami represents the occurrence of a final score that has never
-            happened before in a sport&apos;s history. Originated by{" "}
+            happened before in a sport&apos;s history.
+          </p>
+          <p className="text-lg text-gray-300 mb-6 leading-relaxed">
+            It&apos;s also unironically what our dear friend{" "}
+            <a
+              href="https://www.linkedin.com/in/sebastian-hoar-a71a5b112/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-400 hover:text-green-300 underline"
+            >
+              Sebastian
+            </a>{" "}
+            would bring up anytime there was a SNIFF of a scoreline that
+            hadn&apos;t occurred in the NFL. So it&apos;s something{" "}
+            <a
+              href="https://www.linkedin.com/in/jebhenryhead/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-400 hover:text-green-300 underline"
+            >
+              Henry
+            </a>{" "}
+            and I
+          </p>
+          <p className="text-lg text-gray-300 mb-6 leading-relaxed">
+            Originated by{" "}
             <a
               href="https://en.wikipedia.org/wiki/Jon_Bois"
               target="_blank"
@@ -56,15 +81,18 @@ export const ProjectOverview: React.FC<{ id?: string }> = ({ id }) => {
             >
               Jon Bois
             </a>{" "}
-            for American football, we&apos;ve adapted this concept to tennis,
-            tracking every unique match score combination across professional
-            tournaments.
+            for American football, we&apos;ve done our best to adapt this
+            concept to tennis, tracking every unique match score combination
+            across professional tournaments.
           </p>
           <p className="text-lg text-gray-300 leading-relaxed">
-            With tennis&apos;s unique scoring system, there are 735 possible
-            final scores in best-of-3 matches and over 108,000 in best-of-5
-            matches. Our mission is to track which of these have occurred and
-            which remain theoretical possibilities.
+            With tennis&apos;s unique scoring system, it gets... dare we say...
+            a bit more interesting?! (please don&apos;t come for me{" "}
+            <s>football</s> <s>soccer</s> <s>basketball</s> &lt;insert other
+            sport&gt; superfans). There are 735 possible final scores in
+            best-of-3 matches and over 108,000 in best-of-5 matches. Sure NFL
+            scores are also technically unbounded, but if you include tiebreak
+            outcomes as unique identifiers, then so are tennis scores.
           </p>
         </motion.div>
 

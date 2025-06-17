@@ -62,7 +62,8 @@ export const TechnologyStack: React.FC<{ id?: string }> = ({ id }) => {
                 </ExternalLink>
                 , then{" "}
                 <ExternalLink href="https://aiven.io/">Aiven</ExternalLink>,
-                then finally Neon)
+                then finally{" "}
+                <ExternalLink href="https://neon.com/">Neon</ExternalLink>)
               </>
             }
           />
