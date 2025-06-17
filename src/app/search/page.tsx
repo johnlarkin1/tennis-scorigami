@@ -53,7 +53,7 @@ export default function SearchPage() {
   };
 
   const searchPlaceholder =
-    "Search for players, tournaments, scores... for example, try searching for American hero: `player:Roddick`";
+    "Dynamic keyword search! e.g. try searching for American hero with `player:Roddick`";
 
   const handleQuickFilter = (filterQuery: string) => {
     setQuery(filterQuery);
@@ -92,7 +92,7 @@ export default function SearchPage() {
                   <Search className="w-6 h-6 sm:w-8 sm:h-8 text-green-400" />
                 </motion.div>
                 <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
-                  Search Tennis Data
+                  Search for Scorigamis
                 </h1>
               </div>
               <p className="text-sm sm:text-base md:text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed px-4 sm:px-0">
