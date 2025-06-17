@@ -59,6 +59,73 @@ export default function SearchPage() {
     setQuery(filterQuery);
   };
 
+  const isProduction = process.env.NODE_ENV === "production";
+
+  if (isProduction) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white flex flex-col">
+        <Header />
+
+        <main className="relative flex-1 flex items-center justify-center">
+          {/* Background Effects */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-20 left-10 w-72 h-72 bg-green-400/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl" />
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center relative z-10"
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{
+                duration: 20,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+              className="p-4 bg-gradient-to-br from-green-400/20 to-green-400/10 rounded-2xl mb-6 inline-block"
+            >
+              <Search className="w-12 h-12 text-green-400" />
+            </motion.div>
+
+            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent mb-4">
+              Coming Soon
+            </h1>
+
+            <p className="text-lg text-gray-300 mb-8 max-w-md mx-auto">
+              Search functionality is currently under development. Check back
+              soon for powerful search capabilities!
+            </p>
+
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link href="/explore">
+                <Button
+                  variant="outline"
+                  className="border-green-400/50 text-green-400 hover:bg-green-400/10 hover:border-green-400 backdrop-blur-sm transition-all duration-300"
+                >
+                  Explore Data Visualization
+                </Button>
+              </Link>
+              <Link href="/about">
+                <Button
+                  variant="outline"
+                  className="border-blue-400/50 text-blue-400 hover:bg-blue-400/10 hover:border-blue-400 backdrop-blur-sm transition-all duration-300"
+                >
+                  Learn About Scorigami
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+        </main>
+
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <SearchProvider>
       <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white flex flex-col">

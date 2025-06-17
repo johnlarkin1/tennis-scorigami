@@ -559,11 +559,9 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
         nodeProgramClasses: {
           border: CustomNodeBorderProgram,
         },
-        edgeProgramClasses: isMassiveGraph
-          ? {}
-          : {
-              arrow: EdgeArrowProgram,
-            },
+        edgeProgramClasses: {
+          arrow: EdgeArrowProgram,
+        },
         // Performance optimizations
         hideEdgesOnMove: isLargeGraph || isMassiveGraph,
         hideLabelsOnMove: true,

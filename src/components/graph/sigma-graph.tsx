@@ -519,18 +519,14 @@ export const SigmaGraph: React.FC<SigmaGraphProps> = ({
         labelDensity: 0.05, // Show more labels
         labelGridCellSize: 80, // Larger grid cells
         labelRenderedSizeThreshold: 3, // Lower threshold to show more labels
-        // Node programs for border support (only on desktop)
-        nodeProgramClasses: isMobile
-          ? {}
-          : {
-              border: CustomNodeBorderProgram,
-            },
+        // Node programs for border support
+        nodeProgramClasses: {
+          border: CustomNodeBorderProgram,
+        },
         // Edge programs for arrow support
-        edgeProgramClasses: isMobile
-          ? {}
-          : {
-              arrow: EdgeArrowProgram, // Disable arrows on mobile for performance
-            },
+        edgeProgramClasses: {
+          arrow: EdgeArrowProgram,
+        },
         // Node reducer for hover effects - disabled on mobile
         ...(isMobile
           ? {}
