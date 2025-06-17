@@ -91,7 +91,8 @@ export async function generateMetadata(): Promise<Metadata> {
       ...(isIMessage
         ? {
             "og:video": "https://tennis-scorigami.com/unfurls/hero-section.mp4",
-            "og:video:secure_url": "https://tennis-scorigami.com/unfurls/hero-section.mp4",
+            "og:video:secure_url":
+              "https://tennis-scorigami.com/unfurls/hero-section.mp4",
             "og:video:type": "video/mp4",
             "og:video:width": "1200",
             "og:video:height": "630",

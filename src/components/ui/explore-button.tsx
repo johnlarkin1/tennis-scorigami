@@ -31,7 +31,9 @@ export const ExploreButton: React.FC<ExploreButtonProps> = ({
       >
         {/* Shimmer effect */}
         <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-        <span className="text-lg sm:text-xl relative z-10">Explore interactively</span>
+        <span className="text-lg sm:text-xl relative z-10">
+          Explore interactively
+        </span>
         <motion.div
           animate={{
             x: [0, 8, 0],

@@ -55,12 +55,26 @@ export const GraphVisualization: React.FC = () => {
   return (
     <div className="relative w-full h-full overflow-hidden">
       {/* Loading overlay */}
-      {loading && <LoadingSpinner size={12} className="w-full h-full" text="Loading graph..." />}
+      {loading && (
+        <LoadingSpinner
+          size={12}
+          className="w-full h-full"
+          text="Loading graph..."
+        />
+      )}
 
       {/* Main visualization */}
       {!loading && (
         <Fragment>
-          <Suspense fallback={<LoadingSpinner size={12} className="w-full h-full" text="Loading visualization..." />}>
+          <Suspense
+            fallback={
+              <LoadingSpinner
+                size={12}
+                className="w-full h-full"
+                text="Loading visualization..."
+              />
+            }
+          >
             {graphLayout === "2d" ? <SigmaGraph2D /> : <ForceGraph3D />}
           </Suspense>
 

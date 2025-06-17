@@ -294,7 +294,9 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
 
       {/* Match Filters */}
       <div className="pt-3 sm:pt-4 border-t border-gray-700">
-        <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Match Filters</h2>
+        <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">
+          Match Filters
+        </h2>
 
         <div className="space-y-4 sm:space-y-5">
           {/* Tournament Dropdown */}

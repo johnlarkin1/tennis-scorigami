@@ -5,7 +5,7 @@ import { getPlatformSpecificImage } from "../metadata";
 export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
   const userAgent = headersList.get("user-agent") || "";
-  const image = getPlatformSpecificImage(userAgent, '2d-graph');
+  const image = getPlatformSpecificImage(userAgent, "2d-graph");
 
   return {
     title: "Explore Tennis Scorigami Data",

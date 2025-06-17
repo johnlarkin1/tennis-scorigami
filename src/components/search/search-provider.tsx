@@ -2,7 +2,10 @@
 
 import { SearchMappingContext } from "@/lib/search/search-context";
 import { KeywordType } from "@/lib/search/search-parser";
-import { SearchDataKeys, getDataKeyForKeywordType } from "@/lib/search/search-types";
+import {
+  SearchDataKeys,
+  getDataKeyForKeywordType,
+} from "@/lib/search/search-types";
 import { useQuery } from "@tanstack/react-query";
 import { createContext, useContext, useEffect } from "react";
 
@@ -74,9 +77,15 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
         players: searchData.player,
         tournaments: searchData.tournament,
         countries: searchData.country,
-        surfaces: searchData.surface.filter(s => typeof s.id === 'number') as Array<{ id: number; name: string; value: string }>,
-        rounds: searchData.round.filter(r => typeof r.id === 'number') as Array<{ id: number; name: string; value: string }>,
-        years: searchData.year.filter(y => typeof y.id === 'number') as Array<{ id: number; name: string; value: string }>,
+        surfaces: searchData.surface.filter(
+          (s) => typeof s.id === "number"
+        ) as Array<{ id: number; name: string; value: string }>,
+        rounds: searchData.round.filter(
+          (r) => typeof r.id === "number"
+        ) as Array<{ id: number; name: string; value: string }>,
+        years: searchData.year.filter(
+          (y) => typeof y.id === "number"
+        ) as Array<{ id: number; name: string; value: string }>,
       });
     }
   }, [searchData]);
@@ -90,7 +99,7 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     [key: string]: unknown;
   }> => {
     if (!searchData) return [];
-    
+
     const dataKey = getDataKeyForKeywordType(keyword);
     return searchData[dataKey] || [];
   };

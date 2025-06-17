@@ -1,10 +1,10 @@
 import { db } from "@/db";
-import { 
-  player, 
-  tournament, 
-  country, 
-  surfaceType, 
-  matchRound
+import {
+  player,
+  tournament,
+  country,
+  surfaceType,
+  matchRound,
 } from "@/db/schema";
 import { ilike } from "drizzle-orm";
 import { KeywordFilter, KeywordType } from "./search-parser";
@@ -14,7 +14,7 @@ export interface MappedSearchFilter {
   type: KeywordType;
   field: string;
   value: string | number | number[] | boolean;
-  operator: 'equals' | 'ilike' | 'in' | 'between' | 'regex';
+  operator: "equals" | "ilike" | "in" | "between" | "regex";
   originalValue: string;
 }
 
@@ -25,7 +25,9 @@ export class SearchMapper {
   private static surfaceCache = new Map<string, number>();
   private static roundCache = new Map<string, number>();
 
-  static async mapKeywordFilters(keywords: KeywordFilter[]): Promise<MappedSearchFilter[]> {
+  static async mapKeywordFilters(
+    keywords: KeywordFilter[]
+  ): Promise<MappedSearchFilter[]> {
     const mappedFilters: MappedSearchFilter[] = [];
 
     for (const keyword of keywords) {
@@ -38,48 +40,52 @@ export class SearchMapper {
     return mappedFilters;
   }
 
-  private static async mapSingleKeyword(keyword: KeywordFilter): Promise<MappedSearchFilter | null> {
+  private static async mapSingleKeyword(
+    keyword: KeywordFilter
+  ): Promise<MappedSearchFilter | null> {
     switch (keyword.type) {
-      case 'player':
-      case 'opponent':
+      case "player":
+      case "opponent":
         return await this.mapPlayer(keyword);
-      
-      case 'tournament':
+
+      case "tournament":
         return await this.mapTournament(keyword);
-      
-      case 'country':
+
+      case "country":
         return await this.mapCountry(keyword);
-      
-      case 'surface':
+
+      case "surface":
         return await this.mapSurface(keyword);
-      
-      case 'round':
+
+      case "round":
         return await this.mapRound(keyword);
-      
-      case 'year':
+
+      case "year":
         return this.mapYear(keyword);
-      
-      case 'sex':
+
+      case "sex":
         return this.mapSex(keyword);
-      
-      case 'score':
+
+      case "score":
         return this.mapScore(keyword);
-      
-      case 'has':
+
+      case "has":
         return this.mapHas(keyword);
-      
-      case 'never':
+
+      case "never":
         return this.mapNever(keyword);
-      
-      case 'location':
+
+      case "location":
         return this.mapLocation(keyword);
-      
+
       default:
         return null;
     }
   }
 
-  private static async mapPlayer(keyword: KeywordFilter): Promise<MappedSearchFilter | null> {
+  private static async mapPlayer(
+    keyword: KeywordFilter
+  ): Promise<MappedSearchFilter | null> {
     try {
       // Check cache first
       const cacheKey = keyword.value.toLowerCase();
@@ -87,10 +93,10 @@ export class SearchMapper {
       if (cachedPlayerId !== undefined) {
         return {
           type: keyword.type,
-          field: keyword.type === 'player' ? 'playerAId' : 'playerBId',
+          field: keyword.type === "player" ? "playerAId" : "playerBId",
           value: cachedPlayerId,
-          operator: 'equals',
-          originalValue: keyword.rawValue
+          operator: "equals",
+          originalValue: keyword.rawValue,
         };
       }
 
@@ -100,10 +106,10 @@ export class SearchMapper {
         this.playerCache.set(cacheKey, playerId);
         return {
           type: keyword.type,
-          field: keyword.type === 'player' ? 'playerAId' : 'playerBId',
+          field: keyword.type === "player" ? "playerAId" : "playerBId",
           value: playerId,
-          operator: 'equals',
-          originalValue: keyword.rawValue
+          operator: "equals",
+          originalValue: keyword.rawValue,
         };
       }
 
@@ -113,10 +119,10 @@ export class SearchMapper {
         this.playerCache.set(cacheKey, playerId);
         return {
           type: keyword.type,
-          field: keyword.type === 'player' ? 'playerAId' : 'playerBId',
+          field: keyword.type === "player" ? "playerAId" : "playerBId",
           value: playerId,
-          operator: 'equals',
-          originalValue: keyword.rawValue
+          operator: "equals",
+          originalValue: keyword.rawValue,
         };
       }
 
@@ -132,38 +138,40 @@ export class SearchMapper {
         this.playerCache.set(cacheKey, players[0].id);
         return {
           type: keyword.type,
-          field: keyword.type === 'player' ? 'playerAId' : 'playerBId',
+          field: keyword.type === "player" ? "playerAId" : "playerBId",
           value: players[0].id,
-          operator: 'equals',
-          originalValue: keyword.rawValue
+          operator: "equals",
+          originalValue: keyword.rawValue,
         };
       }
 
       // If no exact match, return ILIKE search on name fields
       return {
         type: keyword.type,
-        field: keyword.type === 'player' ? 'playerAName' : 'playerBName',
+        field: keyword.type === "player" ? "playerAName" : "playerBName",
         value: `%${keyword.value}%`,
-        operator: 'ilike',
-        originalValue: keyword.rawValue
+        operator: "ilike",
+        originalValue: keyword.rawValue,
       };
     } catch (error) {
-      console.error('Error mapping player:', error);
+      console.error("Error mapping player:", error);
       return null;
     }
   }
 
-  private static async mapTournament(keyword: KeywordFilter): Promise<MappedSearchFilter | null> {
+  private static async mapTournament(
+    keyword: KeywordFilter
+  ): Promise<MappedSearchFilter | null> {
     try {
       const cacheKey = keyword.value.toLowerCase();
       const cachedTournamentId = this.tournamentCache.get(cacheKey);
       if (cachedTournamentId !== undefined) {
         return {
           type: keyword.type,
-          field: 'eventName',
+          field: "eventName",
           value: cachedTournamentId,
-          operator: 'equals',
-          originalValue: keyword.rawValue
+          operator: "equals",
+          originalValue: keyword.rawValue,
         };
       }
 
@@ -172,10 +180,10 @@ export class SearchMapper {
         this.tournamentCache.set(cacheKey, tournamentId);
         return {
           type: keyword.type,
-          field: 'eventName',
+          field: "eventName",
           value: tournamentId,
-          operator: 'equals',
-          originalValue: keyword.rawValue
+          operator: "equals",
+          originalValue: keyword.rawValue,
         };
       }
 
@@ -185,10 +193,10 @@ export class SearchMapper {
         this.tournamentCache.set(cacheKey, tournamentId);
         return {
           type: keyword.type,
-          field: 'eventName',
+          field: "eventName",
           value: tournamentId,
-          operator: 'equals',
-          originalValue: keyword.rawValue
+          operator: "equals",
+          originalValue: keyword.rawValue,
         };
       }
 
@@ -203,37 +211,39 @@ export class SearchMapper {
         this.tournamentCache.set(cacheKey, tournaments[0].id);
         return {
           type: keyword.type,
-          field: 'eventName',
+          field: "eventName",
           value: tournaments[0].id,
-          operator: 'equals',
-          originalValue: keyword.rawValue
+          operator: "equals",
+          originalValue: keyword.rawValue,
         };
       }
 
       return {
         type: keyword.type,
-        field: 'eventName',
+        field: "eventName",
         value: `%${keyword.value}%`,
-        operator: 'ilike',
-        originalValue: keyword.rawValue
+        operator: "ilike",
+        originalValue: keyword.rawValue,
       };
     } catch (error) {
-      console.error('Error mapping tournament:', error);
+      console.error("Error mapping tournament:", error);
       return null;
     }
   }
 
-  private static async mapCountry(keyword: KeywordFilter): Promise<MappedSearchFilter | null> {
+  private static async mapCountry(
+    keyword: KeywordFilter
+  ): Promise<MappedSearchFilter | null> {
     try {
       const cacheKey = keyword.value.toLowerCase();
       const cachedCountryId = this.countryCache.get(cacheKey);
       if (cachedCountryId !== undefined) {
         return {
           type: keyword.type,
-          field: 'country_id',
+          field: "country_id",
           value: cachedCountryId,
-          operator: 'equals',
-          originalValue: keyword.rawValue
+          operator: "equals",
+          originalValue: keyword.rawValue,
         };
       }
 
@@ -242,10 +252,10 @@ export class SearchMapper {
         this.countryCache.set(cacheKey, countryId);
         return {
           type: keyword.type,
-          field: 'country_id',
+          field: "country_id",
           value: countryId,
-          operator: 'equals',
-          originalValue: keyword.rawValue
+          operator: "equals",
+          originalValue: keyword.rawValue,
         };
       }
 
@@ -260,37 +270,39 @@ export class SearchMapper {
         this.countryCache.set(cacheKey, countries[0].id);
         return {
           type: keyword.type,
-          field: 'country_id',
+          field: "country_id",
           value: countries[0].id,
-          operator: 'equals',
-          originalValue: keyword.rawValue
+          operator: "equals",
+          originalValue: keyword.rawValue,
         };
       }
 
       return {
         type: keyword.type,
-        field: 'country.country_name',
+        field: "country.country_name",
         value: `%${keyword.value}%`,
-        operator: 'ilike',
-        originalValue: keyword.rawValue
+        operator: "ilike",
+        originalValue: keyword.rawValue,
       };
     } catch (error) {
-      console.error('Error mapping country:', error);
+      console.error("Error mapping country:", error);
       return null;
     }
   }
 
-  private static async mapSurface(keyword: KeywordFilter): Promise<MappedSearchFilter | null> {
+  private static async mapSurface(
+    keyword: KeywordFilter
+  ): Promise<MappedSearchFilter | null> {
     try {
       const cacheKey = keyword.value.toLowerCase();
       const cachedSurfaceId = this.surfaceCache.get(cacheKey);
       if (cachedSurfaceId !== undefined) {
         return {
           type: keyword.type,
-          field: 'surface_type_id',
+          field: "surface_type_id",
           value: cachedSurfaceId,
-          operator: 'equals',
-          originalValue: keyword.rawValue
+          operator: "equals",
+          originalValue: keyword.rawValue,
         };
       }
 
@@ -299,15 +311,18 @@ export class SearchMapper {
         this.surfaceCache.set(cacheKey, surfaceId);
         return {
           type: keyword.type,
-          field: 'surface_type_id',
+          field: "surface_type_id",
           value: surfaceId,
-          operator: 'equals',
-          originalValue: keyword.rawValue
+          operator: "equals",
+          originalValue: keyword.rawValue,
         };
       }
 
       const surfaces = await db
-        .select({ id: surfaceType.surface_type_id, name: surfaceType.surface_type })
+        .select({
+          id: surfaceType.surface_type_id,
+          name: surfaceType.surface_type,
+        })
         .from(surfaceType)
         .where(ilike(surfaceType.surface_type, `%${keyword.value}%`))
         .limit(1)
@@ -317,37 +332,39 @@ export class SearchMapper {
         this.surfaceCache.set(cacheKey, surfaces[0].id);
         return {
           type: keyword.type,
-          field: 'surface_type_id',
+          field: "surface_type_id",
           value: surfaces[0].id,
-          operator: 'equals',
-          originalValue: keyword.rawValue
+          operator: "equals",
+          originalValue: keyword.rawValue,
         };
       }
 
       return {
         type: keyword.type,
-        field: 'surface_type.surface_type',
+        field: "surface_type.surface_type",
         value: `%${keyword.value}%`,
-        operator: 'ilike',
-        originalValue: keyword.rawValue
+        operator: "ilike",
+        originalValue: keyword.rawValue,
       };
     } catch (error) {
-      console.error('Error mapping surface:', error);
+      console.error("Error mapping surface:", error);
       return null;
     }
   }
 
-  private static async mapRound(keyword: KeywordFilter): Promise<MappedSearchFilter | null> {
+  private static async mapRound(
+    keyword: KeywordFilter
+  ): Promise<MappedSearchFilter | null> {
     try {
       const cacheKey = keyword.value.toLowerCase();
       const cachedRoundId = this.roundCache.get(cacheKey);
       if (cachedRoundId !== undefined) {
         return {
           type: keyword.type,
-          field: 'round_id',
+          field: "round_id",
           value: cachedRoundId,
-          operator: 'equals',
-          originalValue: keyword.rawValue
+          operator: "equals",
+          originalValue: keyword.rawValue,
         };
       }
 
@@ -356,10 +373,10 @@ export class SearchMapper {
         this.roundCache.set(cacheKey, roundId);
         return {
           type: keyword.type,
-          field: 'round_id',
+          field: "round_id",
           value: roundId,
-          operator: 'equals',
-          originalValue: keyword.rawValue
+          operator: "equals",
+          originalValue: keyword.rawValue,
         };
       }
 
@@ -374,35 +391,35 @@ export class SearchMapper {
         this.roundCache.set(cacheKey, rounds[0].id);
         return {
           type: keyword.type,
-          field: 'round_id',
+          field: "round_id",
           value: rounds[0].id,
-          operator: 'equals',
-          originalValue: keyword.rawValue
+          operator: "equals",
+          originalValue: keyword.rawValue,
         };
       }
 
       return {
         type: keyword.type,
-        field: 'match_round.round_name',
+        field: "match_round.round_name",
         value: `%${keyword.value}%`,
-        operator: 'ilike',
-        originalValue: keyword.rawValue
+        operator: "ilike",
+        originalValue: keyword.rawValue,
       };
     } catch (error) {
-      console.error('Error mapping round:', error);
+      console.error("Error mapping round:", error);
       return null;
     }
   }
 
   private static mapYear(keyword: KeywordFilter): MappedSearchFilter | null {
-    if (keyword.operator === 'range') {
-      const [startYear, endYear] = keyword.value.split(',').map(Number);
+    if (keyword.operator === "range") {
+      const [startYear, endYear] = keyword.value.split(",").map(Number);
       return {
         type: keyword.type,
-        field: 'year',
+        field: "year",
         value: [startYear, endYear],
-        operator: 'between',
-        originalValue: keyword.rawValue
+        operator: "between",
+        originalValue: keyword.rawValue,
       };
     }
 
@@ -411,111 +428,113 @@ export class SearchMapper {
 
     return {
       type: keyword.type,
-      field: 'year',
+      field: "year",
       value: year,
-      operator: 'equals',
-      originalValue: keyword.rawValue
+      operator: "equals",
+      originalValue: keyword.rawValue,
     };
   }
 
   private static mapSex(keyword: KeywordFilter): MappedSearchFilter | null {
     const sex = keyword.value.toUpperCase();
-    if (sex !== 'M' && sex !== 'F') return null;
+    if (sex !== "M" && sex !== "F") return null;
 
     return {
       type: keyword.type,
-      field: 'sex',
+      field: "sex",
       value: sex,
-      operator: 'equals',
-      originalValue: keyword.rawValue
+      operator: "equals",
+      originalValue: keyword.rawValue,
     };
   }
 
   private static mapScore(keyword: KeywordFilter): MappedSearchFilter | null {
-    if (keyword.operator === 'regex') {
+    if (keyword.operator === "regex") {
       return {
         type: keyword.type,
-        field: 'score',
+        field: "score",
         value: keyword.value,
-        operator: 'regex',
-        originalValue: keyword.rawValue
+        operator: "regex",
+        originalValue: keyword.rawValue,
       };
     }
 
     return {
       type: keyword.type,
-      field: 'score',
+      field: "score",
       value: `%${keyword.value}%`,
-      operator: 'ilike',
-      originalValue: keyword.rawValue
+      operator: "ilike",
+      originalValue: keyword.rawValue,
     };
   }
 
   private static mapHas(keyword: KeywordFilter): MappedSearchFilter | null {
     switch (keyword.value.toLowerCase()) {
-      case 'tiebreak':
+      case "tiebreak":
         return {
           type: keyword.type,
-          field: 'score',
-          value: '%7-6%',
-          operator: 'ilike',
-          originalValue: keyword.rawValue
+          field: "score",
+          value: "%7-6%",
+          operator: "ilike",
+          originalValue: keyword.rawValue,
         };
-      
-      case 'bagel':
+
+      case "bagel":
         return {
           type: keyword.type,
-          field: 'score',
-          value: '%6-0%',
-          operator: 'ilike',
-          originalValue: keyword.rawValue
+          field: "score",
+          value: "%6-0%",
+          operator: "ilike",
+          originalValue: keyword.rawValue,
         };
-      
-      case 'breadstick':
+
+      case "breadstick":
         return {
           type: keyword.type,
-          field: 'score',
-          value: '%6-1%',
-          operator: 'ilike',
-          originalValue: keyword.rawValue
+          field: "score",
+          value: "%6-1%",
+          operator: "ilike",
+          originalValue: keyword.rawValue,
         };
-      
-      case 'double_bagel':
+
+      case "double_bagel":
         return {
           type: keyword.type,
-          field: 'score',
-          value: '%6-0,6-0%',
-          operator: 'ilike',
-          originalValue: keyword.rawValue
+          field: "score",
+          value: "%6-0,6-0%",
+          operator: "ilike",
+          originalValue: keyword.rawValue,
         };
-      
+
       default:
         return null;
     }
   }
 
   private static mapNever(keyword: KeywordFilter): MappedSearchFilter | null {
-    if (keyword.value.toLowerCase() === 'occurred') {
+    if (keyword.value.toLowerCase() === "occurred") {
       // This is handled specially in the search endpoint
       return {
         type: keyword.type,
-        field: 'scorigami',
+        field: "scorigami",
         value: true,
-        operator: 'equals',
-        originalValue: keyword.rawValue
+        operator: "equals",
+        originalValue: keyword.rawValue,
       };
     }
-    
+
     return null;
   }
 
-  private static mapLocation(keyword: KeywordFilter): MappedSearchFilter | null {
+  private static mapLocation(
+    keyword: KeywordFilter
+  ): MappedSearchFilter | null {
     return {
       type: keyword.type,
-      field: 'event.location',
+      field: "event.location",
       value: `%${keyword.value}%`,
-      operator: 'ilike',
-      originalValue: keyword.rawValue
+      operator: "ilike",
+      originalValue: keyword.rawValue,
     };
   }
 

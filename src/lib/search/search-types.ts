@@ -1,20 +1,21 @@
 import { KeywordType } from "./search-parser";
 
 // Map of singular search types to their data key names
-export const SEARCH_TYPE_DATA_KEYS: Record<KeywordType, keyof SearchDataKeys> = {
-  player: "player",
-  opponent: "player", // opponent uses player data
-  tournament: "tournament",
-  country: "country",
-  surface: "surface",
-  round: "round",
-  year: "year",
-  sex: "sex",
-  has: "has",
-  never: "never",
-  score: "score",
-  location: "location",
-};
+export const SEARCH_TYPE_DATA_KEYS: Record<KeywordType, keyof SearchDataKeys> =
+  {
+    player: "player",
+    opponent: "player", // opponent uses player data
+    tournament: "tournament",
+    country: "country",
+    surface: "surface",
+    round: "round",
+    year: "year",
+    sex: "sex",
+    has: "has",
+    never: "never",
+    score: "score",
+    location: "location",
+  };
 
 // Data structure keys (all singular)
 export interface SearchDataKeys {
@@ -50,6 +51,8 @@ export interface SearchDataKeys {
 }
 
 // Helper to get data key from keyword type
-export function getDataKeyForKeywordType(keywordType: KeywordType): keyof SearchDataKeys {
+export function getDataKeyForKeywordType(
+  keywordType: KeywordType
+): keyof SearchDataKeys {
   return SEARCH_TYPE_DATA_KEYS[keywordType];
 }

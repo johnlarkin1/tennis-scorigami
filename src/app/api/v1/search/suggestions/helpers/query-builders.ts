@@ -22,13 +22,13 @@ export function buildSearchQuery<T>({
   additionalConditions = [],
 }: QueryBuilderOptions<T>) {
   const baseCondition = sql`${searchColumn} IS NOT NULL`;
-  
+
   const conditions: SQL[] = [baseCondition, ...additionalConditions];
-  
+
   if (query) {
     conditions.push(ilike(searchColumn, `%${query}%`));
   }
-  
+
   return db
     .select(selectFields)
     .from(table)

@@ -21,7 +21,9 @@ const SigmaGraph = dynamic(
 // Dynamically import SigmaGraphStream for 5-set matches
 const SigmaGraphStream = dynamic(
   () =>
-    import("@/components/graph/sigma-graph-stream").then((mod) => mod.SigmaGraph),
+    import("@/components/graph/sigma-graph-stream").then(
+      (mod) => mod.SigmaGraph
+    ),
   { ssr: false }
 );
 
@@ -31,10 +33,11 @@ const UnfurlSigmaGraph2D: React.FC = () => {
   const [selectedYear] = useAtom(selectedYearAtom);
 
   // Use streaming approach for 5-set matches
-  const GraphComponent =
-    selectedSets === 5 ? SigmaGraphStream : SigmaGraph;
-    
-  console.log(`[UnfurlSigmaGraph2D] selectedSets: ${selectedSets}, using: ${selectedSets === 5 ? 'SigmaGraphStream' : 'SigmaGraph'}`);
+  const GraphComponent = selectedSets === 5 ? SigmaGraphStream : SigmaGraph;
+
+  console.log(
+    `[UnfurlSigmaGraph2D] selectedSets: ${selectedSets}, using: ${selectedSets === 5 ? "SigmaGraphStream" : "SigmaGraph"}`
+  );
 
   return (
     <GraphComponent

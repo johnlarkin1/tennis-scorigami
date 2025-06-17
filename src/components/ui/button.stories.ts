@@ -1,87 +1,94 @@
-import type { Meta, StoryObj } from '@storybook/nextjs'
-import { Button } from './button'
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import { Button } from "./button";
 
 const meta: Meta<typeof Button> = {
-  title: 'UI/Button',
+  title: "UI/Button",
   component: Button,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     variant: {
-      control: { type: 'select' },
-      options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'],
+      control: { type: "select" },
+      options: [
+        "default",
+        "destructive",
+        "outline",
+        "secondary",
+        "ghost",
+        "link",
+      ],
     },
     size: {
-      control: { type: 'select' },
-      options: ['default', 'sm', 'lg', 'icon'],
+      control: { type: "select" },
+      options: ["default", "sm", "lg", "icon"],
     },
   },
   args: { onClick: () => {} },
-}
+};
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
   args: {
-    children: 'Button',
+    children: "Button",
   },
-}
+};
 
 export const Secondary: Story = {
   args: {
-    variant: 'secondary',
-    children: 'Button',
+    variant: "secondary",
+    children: "Button",
   },
-}
+};
 
 export const Destructive: Story = {
   args: {
-    variant: 'destructive',
-    children: 'Delete',
+    variant: "destructive",
+    children: "Delete",
   },
-}
+};
 
 export const Outline: Story = {
   args: {
-    variant: 'outline',
-    children: 'Button',
+    variant: "outline",
+    children: "Button",
   },
-}
+};
 
 export const Ghost: Story = {
   args: {
-    variant: 'ghost',
-    children: 'Button',
+    variant: "ghost",
+    children: "Button",
   },
-}
+};
 
 export const Link: Story = {
   args: {
-    variant: 'link',
-    children: 'Link',
+    variant: "link",
+    children: "Link",
   },
-}
+};
 
 export const Large: Story = {
   args: {
-    size: 'lg',
-    children: 'Button',
+    size: "lg",
+    children: "Button",
   },
-}
+};
 
 export const Small: Story = {
   args: {
-    size: 'sm',
-    children: 'Button',
+    size: "sm",
+    children: "Button",
   },
-}
+};
 
 export const Icon: Story = {
   args: {
-    size: 'icon',
-    children: '🚀',
+    size: "icon",
+    children: "🚀",
   },
-}
+};

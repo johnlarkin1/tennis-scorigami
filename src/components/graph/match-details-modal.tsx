@@ -78,12 +78,17 @@ export function MatchDetailsModal({
       setError(null);
 
       try {
-        const data = await fetchMatchesBySequence(sequenceId, {
-          year: filters.year,
-          sex: filters.sex,
-          tournament: filters.tournament,
-          sets: filters.sets,
-        }, page, limit);
+        const data = await fetchMatchesBySequence(
+          sequenceId,
+          {
+            year: filters.year,
+            sex: filters.sex,
+            tournament: filters.tournament,
+            sets: filters.sets,
+          },
+          page,
+          limit
+        );
         setSequence(data.sequence);
         setTotal(data.total);
 

@@ -17,17 +17,17 @@ export async function getPlayerSuggestions(q: string, limit: number) {
   // Create a CTE to get all distinct player IDs from matches with match counts
   const matchPlayers = db.$with("match_players").as(
     db
-      .select({ 
+      .select({
         player_id: match.player_a_id,
-        match_count: sql<number>`1`.as('match_count')
+        match_count: sql<number>`1`.as("match_count"),
       })
       .from(match)
       .where(sql`${match.player_a_id} IS NOT NULL`)
       .union(
         db
-          .select({ 
+          .select({
             player_id: match.player_b_id,
-            match_count: sql<number>`1`.as('match_count')
+            match_count: sql<number>`1`.as("match_count"),
           })
           .from(match)
           .where(sql`${match.player_b_id} IS NOT NULL`)
@@ -39,7 +39,7 @@ export async function getPlayerSuggestions(q: string, limit: number) {
     db
       .select({
         player_id: matchPlayers.player_id,
-        total_matches: sql<number>`COUNT(*)`.as('total_matches')
+        total_matches: sql<number>`COUNT(*)`.as("total_matches"),
       })
       .from(matchPlayers)
       .groupBy(matchPlayers.player_id)
@@ -70,7 +70,10 @@ export async function getPlayerSuggestions(q: string, limit: number) {
       value: player.full_name,
       country: player.country_id,
       sex: player.sex,
-      suggested: sql<boolean>`CASE WHEN ${playerMatchCounts.total_matches} >= 50 THEN true ELSE false END`.as('suggested'),
+      suggested:
+        sql<boolean>`CASE WHEN ${playerMatchCounts.total_matches} >= 50 THEN true ELSE false END`.as(
+          "suggested"
+        ),
       match_count: playerMatchCounts.total_matches,
     })
     .from(player)
@@ -97,10 +100,22 @@ export async function getPlayerSuggestions(q: string, limit: number) {
 export async function getTournamentSuggestions(q: string, limit: number) {
   // Define Grand Slam and major tournament names for "suggested" status
   const majorTournaments = [
-    'Wimbledon', 'US Open', 'French Open', 'Australian Open', 
-    'Roland Garros', 'ATP Finals', 'WTA Finals', 'Indian Wells',
-    'Miami Open', 'Monte Carlo', 'Madrid', 'Rome', 'Canada',
-    'Cincinnati', 'Shanghai', 'Paris'
+    "Wimbledon",
+    "US Open",
+    "French Open",
+    "Australian Open",
+    "Roland Garros",
+    "ATP Finals",
+    "WTA Finals",
+    "Indian Wells",
+    "Miami Open",
+    "Monte Carlo",
+    "Madrid",
+    "Rome",
+    "Canada",
+    "Cincinnati",
+    "Shanghai",
+    "Paris",
   ];
 
   // Create a CTE to get tournaments with match counts
@@ -108,7 +123,9 @@ export async function getTournamentSuggestions(q: string, limit: number) {
     db
       .select({
         tournament_id: event.tournament_id,
-        total_matches: sql<number>`COUNT(DISTINCT ${match.match_id})`.as('total_matches')
+        total_matches: sql<number>`COUNT(DISTINCT ${match.match_id})`.as(
+          "total_matches"
+        ),
       })
       .from(event)
       .innerJoin(match, sql`${event.event_id} = ${match.event_id}`)
@@ -125,8 +142,8 @@ export async function getTournamentSuggestions(q: string, limit: number) {
 
   // Create case statement for suggested tournaments
   const majorTournamentConditions = majorTournaments
-    .map(name => sql`${tournament.name} ILIKE ${`%${name}%`}`)
-    .reduce((acc, condition, index) => 
+    .map((name) => sql`${tournament.name} ILIKE ${`%${name}%`}`)
+    .reduce((acc, condition, index) =>
       index === 0 ? condition : sql`${acc} OR ${condition}`
     );
 
@@ -145,8 +162,11 @@ export async function getTournamentSuggestions(q: string, limit: number) {
       value: tournament.name,
       surface_type_id: tournament.surface_type_id,
       country_id: tournament.country_id,
-      suggested: suggestedCase.as('suggested'),
-      match_count: sql<number>`COALESCE(${tournamentMatchCounts.total_matches}, 0)`.as('match_count'),
+      suggested: suggestedCase.as("suggested"),
+      match_count:
+        sql<number>`COALESCE(${tournamentMatchCounts.total_matches}, 0)`.as(
+          "match_count"
+        ),
     })
     .from(tournament)
     .leftJoin(

@@ -107,8 +107,13 @@ export const StatsCarousel: React.FC<StatCarouselProps> = ({
                     : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                 }`}
               >
-                <span className="hidden sm:inline">{stat.gender === "men" ? "Men's" : "Women's"} {stat.best_of}-Set</span>
-                <span className="sm:hidden">{stat.gender === "men" ? "M" : "W"} {stat.best_of}</span>
+                <span className="hidden sm:inline">
+                  {stat.gender === "men" ? "Men's" : "Women's"} {stat.best_of}
+                  -Set
+                </span>
+                <span className="sm:hidden">
+                  {stat.gender === "men" ? "M" : "W"} {stat.best_of}
+                </span>
               </button>
             ))}
           </div>

@@ -1,7 +1,10 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ThemeProvider as NextThemesProvider, ThemeProviderProps } from "next-themes";
+import {
+  ThemeProvider as NextThemesProvider,
+  ThemeProviderProps,
+} from "next-themes";
 import { useState } from "react";
 
 type ProvidersProps = Omit<ThemeProviderProps, "children"> & {

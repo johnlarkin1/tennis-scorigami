@@ -370,7 +370,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                               {suggestion.suggested ? (
                                 <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse" />
                               ) : null}
-                              <span className={suggestion.suggested ? "font-medium" : ""}>
+                              <span
+                                className={
+                                  suggestion.suggested ? "font-medium" : ""
+                                }
+                              >
                                 {suggestion.name}
                               </span>
                               {suggestion.suggested ? (
@@ -380,9 +384,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                               ) : null}
                             </div>
                             {suggestion.value !== suggestion.name && (
-                              <span className={`text-xs group-hover:text-gray-400 ${
-                                suggestion.suggested ? "text-gray-300" : "text-gray-500"
-                              }`}>
+                              <span
+                                className={`text-xs group-hover:text-gray-400 ${
+                                  suggestion.suggested
+                                    ? "text-gray-300"
+                                    : "text-gray-500"
+                                }`}
+                              >
                                 {suggestion.value}
                               </span>
                             )}
