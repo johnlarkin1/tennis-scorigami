@@ -53,9 +53,15 @@ export function MatchDetailsModal({
   // Check if this is a rare sequence (less than 5 occurrences)
   const isRareSequence = total > 0 && total < 5;
 
-  // Check if this is an historic sequence (first occurrence is very old)
-  const firstMatchYear =
-    matches.length > 0 ? Math.min(...matches.map((m) => m.event_year)) : null;
+  // Since the API returns matches in descending order (newest first),
+  // the last match in our array is the oldest. However, with pagination,
+  // we only know it's the true first occurrence if we've loaded all matches.
+  const hasLoadedAllMatches = matches.length === total || !hasMore;
+  const firstMatch =
+    hasLoadedAllMatches && matches.length > 0
+      ? matches[matches.length - 1]
+      : null;
+  const firstMatchYear = firstMatch?.event_year ?? null;
   const currentYear = new Date().getFullYear();
   const isHistoricSequence =
     firstMatchYear && currentYear - firstMatchYear > 30;
@@ -176,7 +182,13 @@ export function MatchDetailsModal({
           </div>
         )}
 
-        {!initialLoading && !error && matches.length === 0 && (
+        {initialLoading && !error && (
+          <div className="flex justify-center py-8">
+            <LoadingSpinner size={8} />
+          </div>
+        )}
+
+        {!loading && !error && matches.length === 0 && total === 0 && (
           <div className="bg-gradient-to-br from-red-900/20 to-red-800/30 border border-red-700/50 rounded-md p-6 text-center mb-4">
             <Sparkles className="h-10 w-10 text-red-400 mx-auto mb-2" />
             <p className="text-red-200 text-lg font-medium mb-2">
@@ -192,7 +204,7 @@ export function MatchDetailsModal({
           </div>
         )}
 
-        {matches.length > 0 && (
+        {!initialLoading && matches.length > 0 && (
           <div className="space-y-4">
             <div
               className={`rounded-md p-5 ${
@@ -256,7 +268,7 @@ export function MatchDetailsModal({
                     isRareSequence
                       ? "bg-gradient-to-r from-gray-800 to-amber-900/10 border-amber-900/30"
                       : isHistoricSequence &&
-                          match.event_year === firstMatchYear
+                          match.match_id === firstMatch?.match_id
                         ? "bg-gradient-to-r from-gray-800 to-blue-900/10 border-blue-900/30"
                         : "bg-gray-800 border-gray-700"
                   } border rounded-md p-4 hover:bg-gray-750 transition-colors`}
@@ -267,14 +279,14 @@ export function MatchDetailsModal({
                         isRareSequence
                           ? "text-amber-400"
                           : isHistoricSequence &&
-                              match.event_year === firstMatchYear
+                              match.match_id === firstMatch?.match_id
                             ? "text-blue-400"
                             : "text-green-400"
                       } font-medium`}
                     >
                       {match.event_name}
                       {isHistoricSequence &&
-                        match.event_year === firstMatchYear && (
+                        match.match_id === firstMatch?.match_id && (
                           <span className="ml-2 text-xs bg-blue-900/60 text-blue-200 px-1.5 py-0.5 rounded">
                             First Occurrence
                           </span>
@@ -310,7 +322,7 @@ export function MatchDetailsModal({
                         isRareSequence
                           ? "bg-amber-950"
                           : isHistoricSequence &&
-                              match.event_year === firstMatchYear
+                              match.match_id === firstMatch?.match_id
                             ? "bg-blue-950"
                             : "bg-gray-900"
                       } px-3 py-2 rounded font-mono text-gray-300`}
