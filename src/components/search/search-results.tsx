@@ -14,7 +14,6 @@ import {
 import { useMemo, useState } from "react";
 import {
   CardsView,
-  EmptyState,
   ListView,
   LoadingSkeletons,
   SortOption,
@@ -79,7 +78,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   }
 
   if (!hasResults) {
-    return <EmptyState />;
+    return null;
   }
 
   return (
@@ -97,8 +96,6 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           </h2>
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
             <span>{searchResults.length} matches found</span>
-            <span>•</span>
-            <span>Search completed in 0.12s</span>
             {searchResults.filter((r) => r.match_data?.is_scorigami).length >
               0 && (
               <>

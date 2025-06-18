@@ -2,8 +2,8 @@
 
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
-import { QuickFilters } from "@/components/search/quick-filters";
 import { SearchBar } from "@/components/search/search-bar";
+import { SearchLanding } from "@/components/search/search-landing";
 import { SearchProvider } from "@/components/search/search-provider";
 import { SearchResults } from "@/components/search/search-results";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useQueryParam } from "@/lib/hooks/use-query-param";
 import { SearchResult } from "@/lib/types/search-types";
 import { motion } from "framer-motion";
-import { Search, Sparkles } from "lucide-react";
+import { Search } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 
@@ -79,7 +79,7 @@ function SearchPageContent() {
 
   // Event handlers just write to the URL
   const handleSearchBarChange = (newQuery: string) => setQ(newQuery);
-  const handleQuickFilterSelect = (filterQuery: string) =>
+  const handleQuerySelect = (filterQuery: string) =>
     setQ(filterQuery, { push: true });
   const handleResultSelect = (result: SearchResult) =>
     setSelectedResult(result);
@@ -123,13 +123,6 @@ function SearchPageContent() {
                   Search for Scorigamis
                 </h1>
               </div>
-              <p className="text-sm sm:text-base md:text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed px-4 sm:px-0">
-                Explore our collection of tennis matches, players, and scores.
-                <span className="block mt-2 text-green-400 flex items-center justify-center text-xs sm:text-sm md:text-base">
-                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                  Discover unique scorelines and match histories
-                </span>
-              </p>
             </motion.div>
 
             {/* Search Bar */}
@@ -149,7 +142,7 @@ function SearchPageContent() {
               onResultSelect={handleResultSelect}
             />
 
-            {/* Quick Filters - Show only when no search results */}
+            {/* Search Landing - Show only when no search results */}
             {searchResults.length === 0 && (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -157,8 +150,8 @@ function SearchPageContent() {
                 transition={{ duration: 0.5 }}
                 className="mb-12"
               >
-                <QuickFilters
-                  onFilterSelect={handleQuickFilterSelect}
+                <SearchLanding
+                  onQuerySelect={handleQuerySelect}
                   currentQuery={q}
                 />
               </motion.div>
