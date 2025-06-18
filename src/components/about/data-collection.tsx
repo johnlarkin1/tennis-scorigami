@@ -237,11 +237,19 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0 w-2 h-2 bg-blue-400 rounded-full mt-2"></div>
             <div>
-              <h4 className="text-lg font-semibold text-blue-300 mb-2">Graph Visualization Data</h4>
+              <h4 className="text-lg font-semibold text-blue-300 mb-2">
+                A Note on Data Collection
+              </h4>
               <p className="text-gray-300 leading-relaxed">
-                For our graph visualizations, we only include matches that are completed and exclude matches 
-                with win-by-2-games rules in the fifth set of Grand Slams. This ensures consistency in our 
-                score pattern analysis and provides cleaner visualization of traditional tennis scoring systems.
+                For our graph visualizations, we only include matches that are
+                completed and exclude matches with win-by-2-games rules in the
+                fifth set of Grand Slams. This ensures consistency in our score
+                pattern analysis and provides cleaner visualization of
+                traditional tennis scoring systems.
+              </p>
+              <p className="text-gray-300 leading-relaxed mt-2">
+                As of right now, we&apos;re only including Grand Slam matches
+                and all non-challenger non-future ATP/WTA matches.
               </p>
             </div>
           </div>
