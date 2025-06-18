@@ -22,6 +22,7 @@ function SearchPageContent() {
 
   // Local state only for search results and loading state
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [hasMoreResults, setHasMoreResults] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(
     null
@@ -33,6 +34,7 @@ function SearchPageContent() {
 
     if (!trimmedQuery) {
       setSearchResults([]);
+      setHasMoreResults(false);
       setSelectedResult(null);
       setIsSearching(false);
       return;
@@ -41,6 +43,7 @@ function SearchPageContent() {
     // Only search if query is at least 2 characters
     if (trimmedQuery.length < 2) {
       setSearchResults([]);
+      setHasMoreResults(false);
       setSelectedResult(null);
       setIsSearching(false);
       return;
@@ -60,10 +63,12 @@ function SearchPageContent() {
 
         const data = await response.json();
         setSearchResults(data.items || []);
+        setHasMoreResults(data.hasMore || false);
       } catch (error) {
         if (error instanceof Error && error.name !== "AbortError") {
           console.error("Search error:", error);
           setSearchResults([]);
+          setHasMoreResults(false);
         }
       } finally {
         setIsSearching(false);
@@ -140,6 +145,7 @@ function SearchPageContent() {
               searchResults={searchResults}
               selectedResult={selectedResult}
               onResultSelect={handleResultSelect}
+              hasMore={hasMoreResults}
             />
 
             {/* Search Landing - Show only when no search results */}

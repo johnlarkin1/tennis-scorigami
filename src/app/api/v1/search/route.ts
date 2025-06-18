@@ -10,7 +10,11 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
   const searchParams = new URL(req.url).searchParams;
   const q = searchParams.get("q")?.trim();
-  const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100);
+  const requestedLimit = Math.min(
+    parseInt(searchParams.get("limit") || "100"),
+    100
+  );
+  const fetchLimit = requestedLimit + 1; // Fetch one extra to check if there are more results
 
   if (!q) return bad("q is required");
 
@@ -31,7 +35,7 @@ export async function GET(req: NextRequest) {
     const matchesResult = await searchMatches(
       mappedFilters,
       parsedQuery.plainText,
-      limit
+      fetchLimit
     );
 
     // Check if search returned an error
@@ -39,8 +43,14 @@ export async function GET(req: NextRequest) {
       return matchesResult; // Return the error response
     }
 
+    // Check if there are more results than requested
+    const hasMore = matchesResult.length > requestedLimit;
+    const actualResults = hasMore
+      ? matchesResult.slice(0, requestedLimit)
+      : matchesResult;
+
     // Transform matches to SearchResult format
-    const searchResults = matchesResult.map((match) => ({
+    const searchResults = actualResults.map((match) => ({
       id: match.match_id,
       name: `${match.player_a_name} vs ${match.player_b_name}`,
       slug: `${match.event_name} ${match.year}`,
@@ -51,6 +61,7 @@ export async function GET(req: NextRequest) {
       type: "matches",
       query: q,
       count: searchResults.length,
+      hasMore,
       items: searchResults,
       filters: mappedFilters,
     });
@@ -66,7 +77,7 @@ export async function GET(req: NextRequest) {
 async function searchMatches(
   mappedFilters: unknown[],
   plainText: string,
-  limit: number = 50
+  limit: number = 100
 ) {
   try {
     // Build WHERE conditions from mapped filters

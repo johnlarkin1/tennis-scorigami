@@ -89,6 +89,7 @@ export type SearchResponse = {
   type: string;
   query: string;
   count: number;
+  hasMore: boolean;
   items: SearchResult[];
   filters?: unknown[]; // For debugging
 };

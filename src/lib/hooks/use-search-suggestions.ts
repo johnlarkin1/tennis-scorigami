@@ -29,7 +29,7 @@ export function useSearchSuggestions(
       const params = new URLSearchParams({
         type,
         q: query,
-        limit: "50",
+        limit: "200",
       });
 
       const response = await fetch(`/api/v1/search/suggestions?${params}`);

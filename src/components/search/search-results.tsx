@@ -1,16 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { SearchResult } from "@/lib/types/search-types";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  BookMarked,
-  ChevronDown,
-  Clock,
-  Download,
-  Grid3X3,
-  List,
-} from "lucide-react";
+import { Clock, Download, Grid3X3, List } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   CardsView,
@@ -25,6 +24,7 @@ interface SearchResultsProps {
   searchResults: SearchResult[];
   selectedResult: SearchResult | null;
   onResultSelect: (result: SearchResult) => void;
+  hasMore?: boolean;
   isLoading?: boolean;
 }
 
@@ -32,6 +32,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   searchResults = [],
   selectedResult,
   onResultSelect,
+  hasMore = false,
   isLoading = false,
 }) => {
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
@@ -116,41 +117,28 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
         <div className="flex items-center gap-2">
           {/* Action Buttons */}
           <div className="flex items-center gap-2 mr-4">
-            <Button
-              size="sm"
-              variant="outline"
-              className="bg-gray-800 border-gray-700 hover:bg-gray-700"
-            >
-              <BookMarked className="h-4 w-4 mr-1" />
-              Saved
-            </Button>
-
             {searchResults.length > 0 && (
-              <Button
-                size="sm"
-                variant="outline"
-                className="bg-gray-800 border-gray-700 hover:bg-gray-700"
-              >
-                <Download className="h-4 w-4 mr-1" />
-                Export
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled
+                        className="bg-gray-800 border-gray-700 opacity-50 cursor-not-allowed"
+                      >
+                        <Download className="h-4 w-4 mr-1" />
+                        Export
+                      </Button>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Coming soon</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
-          </div>
-
-          {/* Sort Dropdown */}
-          <div className="relative">
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortOption)}
-              className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-green-500/50 appearance-none pr-8"
-            >
-              <option value="relevance">Relevance</option>
-              <option value="date_desc">Newest First</option>
-              <option value="date_asc">Oldest First</option>
-              <option value="tournament">Tournament</option>
-              <option value="rarity">Rarity</option>
-            </select>
-            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
           </div>
 
           {/* View Mode Buttons */}
@@ -210,19 +198,31 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
       </AnimatePresence>
 
       {/* Pagination */}
-      {searchResults.length > 0 && (
+      {hasMore && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
           className="flex justify-center mt-8"
         >
-          <Button
-            variant="outline"
-            className="bg-gray-800/50 hover:bg-gray-700/50 border-gray-700 hover:border-gray-600"
-          >
-            Load More Results
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <Button
+                    variant="outline"
+                    disabled
+                    className="bg-gray-800/50 border-gray-700 opacity-50 cursor-not-allowed"
+                  >
+                    Pagination coming soon
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Coming soon</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </motion.div>
       )}
     </motion.div>

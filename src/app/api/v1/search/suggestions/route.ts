@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   const searchParams = new URL(req.url).searchParams;
   const type = searchParams.get("type");
   const q = searchParams.get("q")?.trim() || "";
-  const limit = Math.min(parseInt(searchParams.get("limit") || "20"), 100);
+  const limit = Math.min(parseInt(searchParams.get("limit") || "200"), 200);
 
   if (!type) {
     return bad("type parameter is required");

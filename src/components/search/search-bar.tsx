@@ -626,7 +626,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     </div>
                   ) : (
                     <>
-                      {fuzzyResults.slice(0, 20).map((item, idx) => (
+                      {fuzzyResults.slice(0, 200).map((item, idx) => (
                         <div
                           key={item.id}
                           ref={(el) => {
