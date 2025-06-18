@@ -139,7 +139,7 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
                     type="button"
                     variant="outline"
                     size="lg"
-                    className={`w-full justify-between border-gray-600 text-gray-300 hover:bg-green-400/10 hover:border-green-400/50 hover:text-green-400 transition-all duration-300 h-auto p-4 group ${
+                    className={`w-full justify-between border-gray-600 text-gray-300 hover:bg-green-400/10 hover:border-green-400/50 hover:text-green-400 transition-all duration-300 h-auto p-4 group min-h-0 ${
                       normalizedCurrentQuery ===
                       (example.value || example.label)
                         ? "bg-green-400/10 border-green-400/50 text-green-400"
@@ -149,10 +149,10 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
                       onFilterSelect(example.value || example.label)
                     }
                   >
-                    <div className="flex items-center">
-                      <example.icon className="w-4 h-4 mr-3 text-green-400" />
-                      <div className="text-left">
-                        <code className="text-sm bg-gray-800/50 px-2 py-1 rounded font-mono block mb-1">
+                    <div className="flex items-start flex-1 min-w-0">
+                      <example.icon className="w-4 h-4 mr-3 text-green-400 mt-0.5 flex-shrink-0" />
+                      <div className="text-left flex-1 min-w-0">
+                        <code className="text-sm bg-gray-800/50 px-2 py-1 rounded font-mono block mb-1 break-all">
                           {example.label}
                         </code>
                         <span className="text-sm text-gray-400">
@@ -207,7 +207,7 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
                     type="button"
                     variant="outline"
                     size="lg"
-                    className={`w-full justify-start text-left h-auto p-4 border-gray-600 text-gray-300 hover:bg-purple-400/10 hover:border-purple-400/50 hover:text-purple-400 transition-all duration-300 group ${
+                    className={`w-full justify-start text-left h-auto p-4 border-gray-600 text-gray-300 hover:bg-purple-400/10 hover:border-purple-400/50 hover:text-purple-400 transition-all duration-300 group min-h-0 ${
                       normalizedCurrentQuery ===
                       (example.value || example.label)
                         ? "bg-purple-400/10 border-purple-400/50 text-purple-400"
@@ -218,14 +218,14 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
                     }
                   >
                     <div className="w-full">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center">
-                          <example.icon className="w-4 h-4 mr-2 text-purple-400" />
-                          <code className="text-sm bg-gray-800/50 px-2 py-1 rounded font-mono">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-start flex-1 min-w-0">
+                          <example.icon className="w-4 h-4 mr-2 text-purple-400 mt-0.5 flex-shrink-0" />
+                          <code className="text-sm bg-gray-800/50 px-2 py-1 rounded font-mono break-all whitespace-pre-wrap flex-1">
                             {example.label}
                           </code>
                         </div>
-                        <ArrowRight className="w-4 h-4 text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <ArrowRight className="w-4 h-4 text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity ml-2 flex-shrink-0" />
                       </div>
                       <div className="text-sm text-gray-400 ml-6">
                         {example.description}

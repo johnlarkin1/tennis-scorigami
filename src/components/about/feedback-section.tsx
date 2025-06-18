@@ -74,7 +74,9 @@ export const FeedbackSection: React.FC<{ id?: string }> = ({ id: _id }) => {
                   <h3 className="text-xl font-bold mb-3 group-hover:text-green-400 transition-colors">
                     {option.title}
                   </h3>
-                  <p className="text-gray-300 mb-6 flex-grow">{option.description}</p>
+                  <p className="text-gray-300 mb-6 flex-grow">
+                    {option.description}
+                  </p>
                   <Link
                     href={option.href}
                     target={option.external ? "_blank" : undefined}
