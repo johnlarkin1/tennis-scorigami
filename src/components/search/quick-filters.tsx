@@ -63,7 +63,7 @@ const advancedExamples = [
     value:
       "player:#6022:Andy Roddick opponent:#5788:Roger Federer year:2009 tournament:#3:Wimbledon",
     icon: Target,
-    description: "This match still haunts Henry and I in our dreams",
+    description: "This match still haunts Henry and John in their dreams",
   },
   {
     label: "tournament:Cincinnati Masters year:2020-2023",
