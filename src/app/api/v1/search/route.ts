@@ -139,10 +139,10 @@ async function searchMatches(
             and(
               sql`${mvMatchesByScore.score} NOT ILIKE '%RET%'`,
               sql`${mvMatchesByScore.score} NOT ILIKE '%W/O%'`,
-              sql`${mvMatchesByScore.score} ILIKE '%DEF%'`,
-              sql`${mvMatchesByScore.score} ILIKE '%unfinished%'`,
-              sql`${mvMatchesByScore.score} ILIKE '%abandoned%'`,
-              sql`${mvMatchesByScore.score} ILIKE '%walkover%'`
+              sql`${mvMatchesByScore.score} NOT ILIKE '%DEF%'`,
+              sql`${mvMatchesByScore.score} NOT ILIKE '%unfinished%'`,
+              sql`${mvMatchesByScore.score} NOT ILIKE '%abandoned%'`,
+              sql`${mvMatchesByScore.score} NOT ILIKE '%walkover%'`
             )
           );
         } else if (filter.value === "incomplete") {
