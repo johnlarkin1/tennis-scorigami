@@ -6,15 +6,12 @@ export const SEARCH_TYPE_DATA_KEYS: Record<KeywordType, keyof SearchDataKeys> =
     player: "player",
     opponent: "player", // opponent uses player data
     tournament: "tournament",
-    country: "country",
     surface: "surface",
     round: "round",
     year: "year",
     sex: "sex",
-    has: "has",
-    never: "never",
     score: "score",
-    location: "location",
+    status: "status",
   };
 
 // Data structure keys (all singular)
@@ -33,21 +30,12 @@ export interface SearchDataKeys {
     surface_type_id: number;
     country_id: number;
   }>;
-  country: Array<{
-    id: number;
-    name: string;
-    value: string;
-    code: string;
-    continent: string;
-  }>;
   surface: Array<{ id: number | string; name: string; value: string }>;
   round: Array<{ id: number | string; name: string; value: string }>;
   year: Array<{ id: number | string; name: string; value: string }>;
   sex: Array<{ id: string; name: string; value: string }>;
-  has: Array<{ id: string; name: string; value: string }>;
-  never: Array<{ id: string; name: string; value: string }>;
   score?: Array<{ id: number | string; name: string; value: string }>;
-  location?: Array<{ id: number | string; name: string; value: string }>;
+  status?: Array<{ id: string; name: string; value: string }>;
 }
 
 // Helper to get data key from keyword type

@@ -8,6 +8,8 @@ export interface KeywordFilter {
   value: string;
   operator?: "equals" | "range" | "regex" | "contains";
   rawValue: string;
+  id?: string | number; // ID for precise matching when available
+  displayName?: string; // Human-readable name for display
 }
 
 export type KeywordType =
@@ -19,24 +21,18 @@ export type KeywordType =
   | "sex"
   | "surface"
   | "round"
-  | "has"
-  | "never"
-  | "country"
-  | "location";
+  | "status";
 
 export const KEYWORD_PREFIXES: Record<KeywordType, string[]> = {
-  player: ["player:", "p:"],
+  player: ["player:"],
   opponent: ["opponent:", "opp:", "vs:"],
-  score: ["score:", "s:"],
-  tournament: ["tournament:", "tour:", "t:"],
+  score: ["score:"],
+  tournament: ["tournament:", "tour:"],
   year: ["year:", "y:"],
-  sex: ["sex:", "gender:", "g:"],
+  sex: ["sex:", "gender:"],
   surface: ["surface:", "surf:"],
-  round: ["round:", "r:"],
-  has: ["has:", "h:"],
-  never: ["never:", "n:"],
-  country: ["country:", "c:"],
-  location: ["location:", "loc:", "l:"],
+  round: ["round:"],
+  status: ["status:"],
 };
 
 export const SUPPORTED_KEYWORDS = Object.keys(
@@ -45,28 +41,63 @@ export const SUPPORTED_KEYWORDS = Object.keys(
 
 export function parseSearchQuery(query: string): ParsedSearchQuery {
   const keywords: KeywordFilter[] = [];
-  let remainingText = query;
+  const foundMatches: string[] = [];
 
   // Find all keyword patterns
   for (const [keywordType, prefixes] of Object.entries(KEYWORD_PREFIXES)) {
     for (const prefix of prefixes) {
-      const regex = new RegExp(
-        `${escapeRegExp(prefix)}([^\\s:]+(?:\\s+[^\\s:]+)*)`,
+      // First try to match ID format: prefix#id:displayName
+      // Use a simpler approach - match until we hit a space followed by another keyword
+      const idRegex = new RegExp(
+        `${escapeRegExp(prefix)}(#[^:\\s]+:[^\\s]+(?:\\s+[^\\s]+)*?)(?=\\s+\\w+:|$)`,
         "gi"
       );
-      let match;
+      let match: RegExpExecArray | null;
 
-      while ((match = regex.exec(query)) !== null) {
+      // Reset regex lastIndex for each iteration
+      idRegex.lastIndex = 0;
+      while ((match = idRegex.exec(query)) !== null) {
         const rawValue = match[1];
         const keyword = parseKeywordValue(keywordType as KeywordType, rawValue);
 
         if (keyword) {
           keywords.push(keyword);
-          // Remove from remaining text
-          remainingText = remainingText.replace(match[0], "").trim();
+          foundMatches.push(match[0]);
+        }
+      }
+
+      // Then try regular text format for anything that wasn't matched
+      const textRegex = new RegExp(
+        `${escapeRegExp(prefix)}([^\\s#:]+(?:\\s+[^\\s:]+)*?)(?=\\s+\\w+:|$)`,
+        "gi"
+      );
+
+      textRegex.lastIndex = 0;
+      while ((match = textRegex.exec(query)) !== null) {
+        const rawValue = match[1];
+        // Skip if this was already processed as an ID format or already found
+        if (
+          !rawValue.startsWith("#") &&
+          !foundMatches.some((fm) => fm.includes(match![0]))
+        ) {
+          const keyword = parseKeywordValue(
+            keywordType as KeywordType,
+            rawValue
+          );
+
+          if (keyword) {
+            keywords.push(keyword);
+            foundMatches.push(match[0]);
+          }
         }
       }
     }
+  }
+
+  // Remove all found keyword matches from the original query to get remaining text
+  let remainingText = query;
+  for (const match of foundMatches) {
+    remainingText = remainingText.replace(match, "");
   }
 
   return {
@@ -83,6 +114,23 @@ function parseKeywordValue(
 
   // Don't create a keyword if there's no value after the prefix
   if (!trimmedValue || trimmedValue === "") return null;
+
+  // Handle ID format: #id:displayName
+  const idMatch = trimmedValue.match(/^#([^:]+):(.+)$/);
+  if (idMatch) {
+    const idPart = idMatch[1];
+    // Try to parse as number, otherwise keep as string
+    const parsedId = /^\d+$/.test(idPart) ? parseInt(idPart) : idPart;
+
+    return {
+      type,
+      value: idMatch[2], // Display name
+      operator: "equals",
+      rawValue: trimmedValue,
+      id: parsedId, // Parsed ID (number or string)
+      displayName: idMatch[2],
+    };
+  }
 
   // Handle quoted strings
   const quotedMatch = trimmedValue.match(/^"([^"]+)"$/);

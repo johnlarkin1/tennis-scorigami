@@ -7,6 +7,7 @@ import {
   getPlayerSuggestions,
   getRoundSuggestions,
   getSexSuggestions,
+  getStatusSuggestions,
   getSurfaceSuggestions,
   getTournamentSuggestions,
   getYearSuggestions,
@@ -44,6 +45,9 @@ export async function GET(req: NextRequest) {
 
       case "sex":
         return getSexSuggestions();
+
+      case "status":
+        return getStatusSuggestions();
 
       case "has":
         return getHasSuggestions();

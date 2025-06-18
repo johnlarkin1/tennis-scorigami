@@ -1,14 +1,8 @@
 import { db } from "@/db";
-import {
-  player,
-  tournament,
-  country,
-  surfaceType,
-  matchRound,
-} from "@/db/schema";
+import { matchRound, player, surfaceType, tournament } from "@/db/schema";
 import { ilike } from "drizzle-orm";
-import { KeywordFilter, KeywordType } from "./search-parser";
 import { SearchMappingContext } from "./search-context";
+import { KeywordFilter, KeywordType } from "./search-parser";
 
 export interface MappedSearchFilter {
   type: KeywordType;
@@ -21,7 +15,6 @@ export interface MappedSearchFilter {
 export class SearchMapper {
   private static playerCache = new Map<string, number>();
   private static tournamentCache = new Map<string, number>();
-  private static countryCache = new Map<string, number>();
   private static surfaceCache = new Map<string, number>();
   private static roundCache = new Map<string, number>();
 
@@ -30,14 +23,133 @@ export class SearchMapper {
   ): Promise<MappedSearchFilter[]> {
     const mappedFilters: MappedSearchFilter[] = [];
 
-    for (const keyword of keywords) {
-      const mapped = await this.mapSingleKeyword(keyword);
-      if (mapped) {
-        mappedFilters.push(mapped);
+    // Check for player vs opponent combination
+    const playerFilter = keywords.find((k) => k.type === "player");
+    const opponentFilter = keywords.find((k) => k.type === "opponent");
+
+    if (playerFilter && opponentFilter) {
+      // Handle player vs opponent combination specially
+      const combinedFilter = await this.mapPlayerVsOpponent(
+        playerFilter,
+        opponentFilter
+      );
+      if (combinedFilter) {
+        mappedFilters.push(combinedFilter);
+      }
+
+      // Process all other keywords except player and opponent
+      for (const keyword of keywords) {
+        if (keyword.type !== "player" && keyword.type !== "opponent") {
+          const mapped = await this.mapSingleKeyword(keyword);
+          if (mapped) {
+            mappedFilters.push(mapped);
+          }
+        }
+      }
+    } else {
+      // Normal processing when we don't have both player and opponent
+      for (const keyword of keywords) {
+        const mapped = await this.mapSingleKeyword(keyword);
+        if (mapped) {
+          mappedFilters.push(mapped);
+        }
       }
     }
 
     return mappedFilters;
+  }
+
+  private static async mapPlayerVsOpponent(
+    playerFilter: KeywordFilter,
+    opponentFilter: KeywordFilter
+  ): Promise<MappedSearchFilter | null> {
+    try {
+      // Extract player ID
+      let playerId: number | null = null;
+      if (playerFilter.id !== undefined) {
+        playerId =
+          typeof playerFilter.id === "string"
+            ? parseInt(playerFilter.id)
+            : playerFilter.id;
+      } else {
+        // Try to resolve player name to ID
+        const playerMapping = await this.resolvePlayerId(playerFilter);
+        playerId = playerMapping;
+      }
+
+      // Extract opponent ID
+      let opponentId: number | null = null;
+      if (opponentFilter.id !== undefined) {
+        opponentId =
+          typeof opponentFilter.id === "string"
+            ? parseInt(opponentFilter.id)
+            : opponentFilter.id;
+      } else {
+        // Try to resolve opponent name to ID
+        const opponentMapping = await this.resolvePlayerId(opponentFilter);
+        opponentId = opponentMapping;
+      }
+
+      if (playerId && opponentId) {
+        // Both players have IDs - create combined filter
+        return {
+          type: "player" as KeywordType,
+          field: "playerVsOpponent",
+          value: [playerId, opponentId],
+          operator: "equals",
+          originalValue: `${playerFilter.rawValue} ${opponentFilter.rawValue}`,
+        };
+      }
+
+      // If we can't resolve both to IDs, fall back to separate processing
+      console.warn(
+        "Could not resolve both player and opponent to IDs, falling back to separate filters"
+      );
+      return null;
+    } catch (error) {
+      console.error("Error mapping player vs opponent:", error);
+      return null;
+    }
+  }
+
+  private static async resolvePlayerId(
+    playerFilter: KeywordFilter
+  ): Promise<number | null> {
+    // Check cache first
+    const cacheKey = playerFilter.value.toLowerCase();
+    const cachedPlayerId = this.playerCache.get(cacheKey);
+    if (cachedPlayerId !== undefined) {
+      return cachedPlayerId;
+    }
+
+    // If it's a numeric ID, use it directly
+    if (/^\d+$/.test(playerFilter.value)) {
+      const playerId = parseInt(playerFilter.value);
+      this.playerCache.set(cacheKey, playerId);
+      return playerId;
+    }
+
+    // Check search context for name-to-ID mapping
+    const playerId = SearchMappingContext.getPlayerId(playerFilter.value);
+    if (playerId) {
+      this.playerCache.set(cacheKey, playerId);
+      return playerId;
+    }
+
+    // Search by name in database
+    const players = await db
+      .select({ id: player.player_id, name: player.full_name })
+      .from(player)
+      .where(ilike(player.full_name, `%${playerFilter.value}%`))
+      .limit(1)
+      .execute();
+
+    if (players.length > 0) {
+      this.playerCache.set(cacheKey, players[0].id);
+      return players[0].id;
+    }
+
+    return null;
   }
 
   private static async mapSingleKeyword(
@@ -50,9 +162,6 @@ export class SearchMapper {
 
       case "tournament":
         return await this.mapTournament(keyword);
-
-      case "country":
-        return await this.mapCountry(keyword);
 
       case "surface":
         return await this.mapSurface(keyword);
@@ -69,14 +178,8 @@ export class SearchMapper {
       case "score":
         return this.mapScore(keyword);
 
-      case "has":
-        return this.mapHas(keyword);
-
-      case "never":
-        return this.mapNever(keyword);
-
-      case "location":
-        return this.mapLocation(keyword);
+      case "status":
+        return this.mapStatus(keyword);
 
       default:
         return null;
@@ -87,13 +190,26 @@ export class SearchMapper {
     keyword: KeywordFilter
   ): Promise<MappedSearchFilter | null> {
     try {
+      // If we have a parsed ID from the frontend, use it directly (highest priority)
+      if (keyword.id !== undefined) {
+        const playerId =
+          typeof keyword.id === "string" ? parseInt(keyword.id) : keyword.id;
+        return {
+          type: keyword.type,
+          field: keyword.type === "player" ? "playerEitherId" : "playerBId", // Use special field for "either player" search
+          value: playerId,
+          operator: "equals",
+          originalValue: keyword.rawValue,
+        };
+      }
+
       // Check cache first
       const cacheKey = keyword.value.toLowerCase();
       const cachedPlayerId = this.playerCache.get(cacheKey);
       if (cachedPlayerId !== undefined) {
         return {
           type: keyword.type,
-          field: keyword.type === "player" ? "playerAId" : "playerBId",
+          field: keyword.type === "player" ? "playerEitherId" : "playerBId",
           value: cachedPlayerId,
           operator: "equals",
           originalValue: keyword.rawValue,
@@ -106,7 +222,7 @@ export class SearchMapper {
         this.playerCache.set(cacheKey, playerId);
         return {
           type: keyword.type,
-          field: keyword.type === "player" ? "playerAId" : "playerBId",
+          field: keyword.type === "player" ? "playerEitherId" : "playerBId",
           value: playerId,
           operator: "equals",
           originalValue: keyword.rawValue,
@@ -119,7 +235,7 @@ export class SearchMapper {
         this.playerCache.set(cacheKey, playerId);
         return {
           type: keyword.type,
-          field: keyword.type === "player" ? "playerAId" : "playerBId",
+          field: keyword.type === "player" ? "playerEitherId" : "playerBId",
           value: playerId,
           operator: "equals",
           originalValue: keyword.rawValue,
@@ -138,7 +254,7 @@ export class SearchMapper {
         this.playerCache.set(cacheKey, players[0].id);
         return {
           type: keyword.type,
-          field: keyword.type === "player" ? "playerAId" : "playerBId",
+          field: keyword.type === "player" ? "playerEitherId" : "playerBId",
           value: players[0].id,
           operator: "equals",
           originalValue: keyword.rawValue,
@@ -148,7 +264,7 @@ export class SearchMapper {
       // If no exact match, return ILIKE search on name fields
       return {
         type: keyword.type,
-        field: keyword.type === "player" ? "playerAName" : "playerBName",
+        field: keyword.type === "player" ? "playerEitherName" : "playerBName",
         value: `%${keyword.value}%`,
         operator: "ilike",
         originalValue: keyword.rawValue,
@@ -163,12 +279,25 @@ export class SearchMapper {
     keyword: KeywordFilter
   ): Promise<MappedSearchFilter | null> {
     try {
+      // If we have a parsed ID from the frontend, use it directly (highest priority)
+      if (keyword.id !== undefined) {
+        const tournamentId =
+          typeof keyword.id === "string" ? parseInt(keyword.id) : keyword.id;
+        return {
+          type: keyword.type,
+          field: "tournamentId", // Use tournamentId field for exact ID matches
+          value: tournamentId,
+          operator: "equals",
+          originalValue: keyword.rawValue,
+        };
+      }
+
       const cacheKey = keyword.value.toLowerCase();
       const cachedTournamentId = this.tournamentCache.get(cacheKey);
       if (cachedTournamentId !== undefined) {
         return {
           type: keyword.type,
-          field: "eventName",
+          field: "tournamentId",
           value: cachedTournamentId,
           operator: "equals",
           originalValue: keyword.rawValue,
@@ -180,7 +309,7 @@ export class SearchMapper {
         this.tournamentCache.set(cacheKey, tournamentId);
         return {
           type: keyword.type,
-          field: "eventName",
+          field: "tournamentId",
           value: tournamentId,
           operator: "equals",
           originalValue: keyword.rawValue,
@@ -193,7 +322,7 @@ export class SearchMapper {
         this.tournamentCache.set(cacheKey, tournamentId);
         return {
           type: keyword.type,
-          field: "eventName",
+          field: "tournamentId",
           value: tournamentId,
           operator: "equals",
           originalValue: keyword.rawValue,
@@ -211,7 +340,7 @@ export class SearchMapper {
         this.tournamentCache.set(cacheKey, tournaments[0].id);
         return {
           type: keyword.type,
-          field: "eventName",
+          field: "tournamentId",
           value: tournaments[0].id,
           operator: "equals",
           originalValue: keyword.rawValue,
@@ -220,7 +349,7 @@ export class SearchMapper {
 
       return {
         type: keyword.type,
-        field: "eventName",
+        field: "tournamentName",
         value: `%${keyword.value}%`,
         operator: "ilike",
         originalValue: keyword.rawValue,
@@ -231,69 +360,23 @@ export class SearchMapper {
     }
   }
 
-  private static async mapCountry(
-    keyword: KeywordFilter
-  ): Promise<MappedSearchFilter | null> {
-    try {
-      const cacheKey = keyword.value.toLowerCase();
-      const cachedCountryId = this.countryCache.get(cacheKey);
-      if (cachedCountryId !== undefined) {
-        return {
-          type: keyword.type,
-          field: "country_id",
-          value: cachedCountryId,
-          operator: "equals",
-          originalValue: keyword.rawValue,
-        };
-      }
-
-      if (/^\d+$/.test(keyword.value)) {
-        const countryId = parseInt(keyword.value);
-        this.countryCache.set(cacheKey, countryId);
-        return {
-          type: keyword.type,
-          field: "country_id",
-          value: countryId,
-          operator: "equals",
-          originalValue: keyword.rawValue,
-        };
-      }
-
-      const countries = await db
-        .select({ id: country.country_id, name: country.country_name })
-        .from(country)
-        .where(ilike(country.country_name, `%${keyword.value}%`))
-        .limit(1)
-        .execute();
-
-      if (countries.length > 0) {
-        this.countryCache.set(cacheKey, countries[0].id);
-        return {
-          type: keyword.type,
-          field: "country_id",
-          value: countries[0].id,
-          operator: "equals",
-          originalValue: keyword.rawValue,
-        };
-      }
-
-      return {
-        type: keyword.type,
-        field: "country.country_name",
-        value: `%${keyword.value}%`,
-        operator: "ilike",
-        originalValue: keyword.rawValue,
-      };
-    } catch (error) {
-      console.error("Error mapping country:", error);
-      return null;
-    }
-  }
-
   private static async mapSurface(
     keyword: KeywordFilter
   ): Promise<MappedSearchFilter | null> {
     try {
+      // If we have a parsed ID from the frontend, use it directly (highest priority)
+      if (keyword.id !== undefined) {
+        const surfaceId =
+          typeof keyword.id === "string" ? parseInt(keyword.id) : keyword.id;
+        return {
+          type: keyword.type,
+          field: "surface_type_id",
+          value: surfaceId,
+          operator: "equals",
+          originalValue: keyword.rawValue,
+        };
+      }
+
       const cacheKey = keyword.value.toLowerCase();
       const cachedSurfaceId = this.surfaceCache.get(cacheKey);
       if (cachedSurfaceId !== undefined) {
@@ -356,6 +439,19 @@ export class SearchMapper {
     keyword: KeywordFilter
   ): Promise<MappedSearchFilter | null> {
     try {
+      // If we have a parsed ID from the frontend, use it directly (highest priority)
+      if (keyword.id !== undefined) {
+        const roundId =
+          typeof keyword.id === "string" ? parseInt(keyword.id) : keyword.id;
+        return {
+          type: keyword.type,
+          field: "round_id",
+          value: roundId,
+          operator: "equals",
+          originalValue: keyword.rawValue,
+        };
+      }
+
       const cacheKey = keyword.value.toLowerCase();
       const cachedRoundId = this.roundCache.get(cacheKey);
       if (cachedRoundId !== undefined) {
@@ -436,7 +532,25 @@ export class SearchMapper {
   }
 
   private static mapSex(keyword: KeywordFilter): MappedSearchFilter | null {
-    const sex = keyword.value.toUpperCase();
+    let sex: string;
+
+    // If we have a parsed ID from the frontend (e.g., #F:Women's), use the ID
+    if (keyword.id !== undefined) {
+      sex = keyword.id.toString().toUpperCase();
+    } else {
+      // Handle direct value format (e.g., sex:F or sex:Women's)
+      const value = keyword.value.toUpperCase();
+      if (value === "M" || value === "F") {
+        sex = value;
+      } else if (value.includes("MEN") || value.includes("MALE")) {
+        sex = "M";
+      } else if (value.includes("WOMEN") || value.includes("FEMALE")) {
+        sex = "F";
+      } else {
+        return null;
+      }
+    }
+
     if (sex !== "M" && sex !== "F") return null;
 
     return {
@@ -468,56 +582,25 @@ export class SearchMapper {
     };
   }
 
-  private static mapHas(keyword: KeywordFilter): MappedSearchFilter | null {
-    switch (keyword.value.toLowerCase()) {
-      case "tiebreak":
-        return {
-          type: keyword.type,
-          field: "score",
-          value: "%7-6%",
-          operator: "ilike",
-          originalValue: keyword.rawValue,
-        };
+  private static mapStatus(keyword: KeywordFilter): MappedSearchFilter | null {
+    const value = keyword.value.toLowerCase();
 
-      case "bagel":
-        return {
-          type: keyword.type,
-          field: "score",
-          value: "%6-0%",
-          operator: "ilike",
-          originalValue: keyword.rawValue,
-        };
-
-      case "breadstick":
-        return {
-          type: keyword.type,
-          field: "score",
-          value: "%6-1%",
-          operator: "ilike",
-          originalValue: keyword.rawValue,
-        };
-
-      case "double_bagel":
-        return {
-          type: keyword.type,
-          field: "score",
-          value: "%6-0,6-0%",
-          operator: "ilike",
-          originalValue: keyword.rawValue,
-        };
-
-      default:
-        return null;
-    }
-  }
-
-  private static mapNever(keyword: KeywordFilter): MappedSearchFilter | null {
-    if (keyword.value.toLowerCase() === "occurred") {
-      // This is handled specially in the search endpoint
+    // Map status values to boolean backend values
+    if (value === "complete") {
+      // complete = true (exclude RET/W/O)
       return {
         type: keyword.type,
-        field: "scorigami",
-        value: true,
+        field: "status",
+        value: keyword.value,
+        operator: "equals",
+        originalValue: keyword.rawValue,
+      };
+    } else if (value === "incomplete") {
+      // incomplete = false (include only RET/W/O)
+      return {
+        type: keyword.type,
+        field: "status",
+        value: keyword.value,
         operator: "equals",
         originalValue: keyword.rawValue,
       };
@@ -526,22 +609,9 @@ export class SearchMapper {
     return null;
   }
 
-  private static mapLocation(
-    keyword: KeywordFilter
-  ): MappedSearchFilter | null {
-    return {
-      type: keyword.type,
-      field: "event.location",
-      value: `%${keyword.value}%`,
-      operator: "ilike",
-      originalValue: keyword.rawValue,
-    };
-  }
-
   static clearCaches(): void {
     this.playerCache.clear();
     this.tournamentCache.clear();
-    this.countryCache.clear();
     this.surfaceCache.clear();
     this.roundCache.clear();
   }

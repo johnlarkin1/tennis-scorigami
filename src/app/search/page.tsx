@@ -7,57 +7,85 @@ import { SearchBar } from "@/components/search/search-bar";
 import { SearchProvider } from "@/components/search/search-provider";
 import { SearchResults } from "@/components/search/search-results";
 import { Button } from "@/components/ui/button";
-import { SearchResponse, SearchResult } from "@/lib/types/search-types";
+import { useDebounce } from "@/lib/hooks/use-debounce";
+import { useQueryParam } from "@/lib/hooks/use-query-param";
+import { SearchResult } from "@/lib/types/search-types";
 import { motion } from "framer-motion";
 import { Search, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
-export default function SearchPage() {
-  const [query, setQuery] = useState("");
+function SearchPageContent() {
+  // URL is the single source of truth
+  const [q, setQ] = useQueryParam("q");
+  const debouncedQ = useDebounce(q, 500); // Increased debounce for API calls
+
+  // Local state only for search results and loading state
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(
     null
   );
 
-  // Debounced search
+  // Search effect - runs when debounced query changes
   useEffect(() => {
-    if (!query.trim()) {
+    const trimmedQuery = debouncedQ.trim();
+
+    if (!trimmedQuery) {
       setSearchResults([]);
       setSelectedResult(null);
+      setIsSearching(false);
       return;
     }
 
-    setIsSearching(true);
-    const timeoutId = setTimeout(async () => {
+    // Only search if query is at least 2 characters
+    if (trimmedQuery.length < 2) {
+      setSearchResults([]);
+      setSelectedResult(null);
+      setIsSearching(false);
+      return;
+    }
+
+    const abortController = new AbortController();
+
+    const performSearch = async () => {
+      setIsSearching(true);
       try {
         const response = await fetch(
-          `/api/v1/search?q=${encodeURIComponent(query)}`
+          `/api/v1/search?q=${encodeURIComponent(trimmedQuery)}`,
+          { signal: abortController.signal }
         );
-        const data: SearchResponse = await response.json();
-        setSearchResults(data.items);
+
+        if (!response.ok) throw new Error("Search failed");
+
+        const data = await response.json();
+        setSearchResults(data.items || []);
       } catch (error) {
-        console.error("Search error:", error);
-        setSearchResults([]);
+        if (error instanceof Error && error.name !== "AbortError") {
+          console.error("Search error:", error);
+          setSearchResults([]);
+        }
       } finally {
         setIsSearching(false);
       }
-    }, 300);
+    };
 
-    return () => clearTimeout(timeoutId);
-  }, [query]);
+    performSearch();
 
-  const handleResultSelect = (result: SearchResult) => {
+    return () => {
+      abortController.abort();
+    };
+  }, [debouncedQ]);
+
+  // Event handlers just write to the URL
+  const handleSearchBarChange = (newQuery: string) => setQ(newQuery);
+  const handleQuickFilterSelect = (filterQuery: string) =>
+    setQ(filterQuery, { push: true });
+  const handleResultSelect = (result: SearchResult) =>
     setSelectedResult(result);
-  };
 
   const searchPlaceholder =
     "Dynamic keyword search! e.g. try searching for American hero with `player:Roddick`";
-
-  const handleQuickFilter = (filterQuery: string) => {
-    setQuery(filterQuery);
-  };
 
   const isProduction = process.env.NODE_ENV === "production";
 
@@ -174,8 +202,8 @@ export default function SearchPage() {
             {/* Search Bar */}
             <div className="mb-8">
               <SearchBar
-                query={query}
-                setQuery={setQuery}
+                query={q}
+                setQuery={handleSearchBarChange}
                 placeholder={searchPlaceholder}
                 isSearching={isSearching}
               />
@@ -188,8 +216,8 @@ export default function SearchPage() {
               onResultSelect={handleResultSelect}
             />
 
-            {/* Quick Filters - Show when no query */}
-            {!query.trim() && (
+            {/* Quick Filters - Show only when no search results */}
+            {searchResults.length === 0 && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -197,8 +225,8 @@ export default function SearchPage() {
                 className="mb-12"
               >
                 <QuickFilters
-                  onFilterSelect={handleQuickFilter}
-                  currentQuery={query}
+                  onFilterSelect={handleQuickFilterSelect}
+                  currentQuery={q}
                 />
               </motion.div>
             )}
@@ -238,5 +266,24 @@ export default function SearchPage() {
         <Footer />
       </div>
     </SearchProvider>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white flex flex-col">
+        <Header />
+        <main className="relative flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400 mx-auto mb-4"></div>
+            <p className="text-gray-400">Loading search...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    }>
+      <SearchPageContent />
+    </Suspense>
   );
 }

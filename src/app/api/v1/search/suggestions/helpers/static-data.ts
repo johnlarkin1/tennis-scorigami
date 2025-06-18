@@ -44,3 +44,13 @@ export function getNeverSuggestions() {
     ],
   });
 }
+
+export function getStatusSuggestions() {
+  return NextResponse.json({
+    type: "status",
+    items: [
+      { id: "complete", name: "complete", value: "complete" },
+      { id: "incomplete", name: "incomplete", value: "incomplete" },
+    ],
+  });
+}

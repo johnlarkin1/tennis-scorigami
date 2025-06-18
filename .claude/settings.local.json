@@ -26,7 +26,8 @@
       "Bash(cp:*)",
       "Bash(node:*)",
       "Bash(sed:*)",
-      "Bash(npm run lint:*)"
+      "Bash(npm run lint:*)",
+      "Bash(curl:*)"
     ],
     "deny": []
   },

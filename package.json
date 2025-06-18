@@ -59,6 +59,7 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-switch": "^1.1.1",
     "@radix-ui/react-toggle": "^1.1.0",
+    "@radix-ui/react-tooltip": "^1.2.7",
     "@shadcn/ui": "^0.0.4",
     "@sigma/edge-curve": "^3.1.0",
     "@sigma/node-border": "^3.0.0",

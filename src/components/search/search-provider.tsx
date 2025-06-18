@@ -28,13 +28,11 @@ async function fetchAllSuggestions(): Promise<SearchData> {
   const endpoints = [
     { key: "player", type: "player" },
     { key: "tournament", type: "tournament" },
-    { key: "country", type: "country" },
     { key: "surface", type: "surface" },
     { key: "round", type: "round" },
     { key: "year", type: "year" },
     { key: "sex", type: "sex" },
-    { key: "has", type: "has" },
-    { key: "never", type: "never" },
+    { key: "status", type: "status" },
   ];
 
   const results = await Promise.all(
@@ -50,13 +48,11 @@ async function fetchAllSuggestions(): Promise<SearchData> {
   return {
     player: results[0].items || [],
     tournament: results[1].items || [],
-    country: results[2].items || [],
-    surface: results[3].items || [],
-    round: results[4].items || [],
-    year: results[5].items || [],
-    sex: results[6].items || [],
-    has: results[7].items || [],
-    never: results[8].items || [],
+    surface: results[2].items || [],
+    round: results[3].items || [],
+    year: results[4].items || [],
+    sex: results[5].items || [],
+    status: results[6].items || [],
   } as SearchData;
 }
 
@@ -65,8 +61,10 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     queryKey: ["search-data-preload"],
     queryFn: fetchAllSuggestions,
     staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
     refetchOnWindowFocus: false,
     refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 
   // Load mappings when data is available
@@ -76,7 +74,6 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
       SearchMappingContext.loadMappingsFromData({
         players: searchData.player,
         tournaments: searchData.tournament,
-        countries: searchData.country,
         surfaces: searchData.surface.filter(
           (s) => typeof s.id === "number"
         ) as Array<{ id: number; name: string; value: string }>,
@@ -110,13 +107,11 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
         searchData: searchData || {
           player: [],
           tournament: [],
-          country: [],
           surface: [],
           round: [],
           year: [],
           sex: [],
-          has: [],
-          never: [],
+          status: [],
         },
         isLoading,
         getDataForKeyword,

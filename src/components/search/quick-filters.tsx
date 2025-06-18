@@ -18,43 +18,57 @@ interface QuickFiltersProps {
 
 const keywordExamples = [
   {
-    label: "player:Roddick",
+    label: "player:Andy Roddick",
+    value: "player:#6022:Andy Roddick",
     icon: Sparkles,
     description: "Search for specific player",
   },
   {
-    label: "tournament:Wimbledon",
+    label: "tournament:Cincinnati Masters",
+    value: "tournament:#51:Cincinnati Masters",
     icon: Sparkles,
     description: "Find tournament matches",
   },
   {
-    label: "has:tiebreak",
+    label: "surface:clay",
+    value: "surface:#2:clay",
     icon: TrendingUp,
-    description: "Matches with tiebreaks",
+    description: "Matches on clay",
   },
-  { label: "year:2023", icon: TrendingUp, description: "Recent matches" },
+  {
+    label: "year:2023",
+    value: "year:2023",
+    icon: TrendingUp,
+    description: "Recent matches",
+  },
+  {
+    label: "status:complete",
+    value: "status:complete",
+    icon: TrendingUp,
+    description: "Complete matches only",
+  },
 ];
 
 const advancedExamples = [
   {
-    label: "player:Roddick opponent:Federer",
+    label:
+      "player:Andy Roddick opponent:Roger Federer year:2009 tournament:Wimbledon",
+    value:
+      "player:#6022:Andy Roddick opponent:#5788:Roger Federer year:2009 tournament:#3:Wimbledon",
     icon: TrendingUp,
-    description: "Head-to-head matches",
+    description: "this match still haunts Henry and I in our dreams",
   },
   {
-    label: 'tournament:"US Open" year:2020-2023',
+    label: "tournament:Cincinnati Masters year:2020-2023",
+    value: "tournament:#51:Cincinnati Masters year:2020-2023",
     icon: TrendingUp,
-    description: "Tournament + year range",
+    description: "best tournament in the world",
   },
   {
-    label: "surface:clay has:bagel",
+    label: "sex:F round:final year:2022",
+    value: "sex:F round:#1:final year:2022",
     icon: TrendingUp,
-    description: "Surface + score type",
-  },
-  {
-    label: "sex:F round:final",
-    icon: TrendingUp,
-    description: "Women's finals",
+    description: "bet ya see a good amount of Iga",
   },
 ];
 
@@ -76,6 +90,9 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0 },
   };
+
+  // Normalize query for comparison (trim whitespace)
+  const normalizedCurrentQuery = currentQuery.trim();
 
   return (
     <motion.div
@@ -112,14 +129,18 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
               {keywordExamples.map((example) => (
                 <motion.div key={example.label} variants={item}>
                   <Button
+                    type="button"
                     variant="outline"
                     size="sm"
                     className={`w-full justify-between border-gray-600 text-gray-300 hover:bg-blue-400/10 hover:border-blue-400/50 hover:text-blue-400 transition-all duration-300 ${
-                      currentQuery === example.label
+                      normalizedCurrentQuery ===
+                      (example.value || example.label)
                         ? "bg-blue-400/10 border-blue-400/50 text-blue-400"
                         : ""
                     }`}
-                    onClick={() => onFilterSelect(example.label)}
+                    onClick={() =>
+                      onFilterSelect(example.value || example.label)
+                    }
                   >
                     <div className="flex items-center">
                       <example.icon className="w-3 h-3 mr-2" />
@@ -173,14 +194,18 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
               {advancedExamples.map((example) => (
                 <motion.div key={example.label} variants={item}>
                   <Button
+                    type="button"
                     variant="outline"
                     size="sm"
                     className={`w-full justify-start text-left h-auto p-3 border-gray-600 text-gray-300 hover:bg-purple-400/10 hover:border-purple-400/50 hover:text-purple-400 transition-all duration-300 ${
-                      currentQuery === example.label
+                      normalizedCurrentQuery ===
+                      (example.value || example.label)
                         ? "bg-purple-400/10 border-purple-400/50 text-purple-400"
                         : ""
                     }`}
-                    onClick={() => onFilterSelect(example.label)}
+                    onClick={() =>
+                      onFilterSelect(example.value || example.label)
+                    }
                   >
                     <div className="w-full">
                       <div className="flex items-center mb-1">
@@ -200,7 +225,7 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
           </div>
           <div className="pt-4 border-t border-gray-700/50">
             <p className="text-xs text-gray-500 text-center">
-              Combine keywords with spaces • Use quotes for multi-word values
+              Combine keywords with spaces • Use quotes for exact phrases
             </p>
           </div>
         </CardContent>

@@ -69,7 +69,8 @@ export const ProjectOverview: React.FC<{ id?: string }> = ({ id }) => {
             >
               Henry
             </a>{" "}
-            and I
+            and I heard a lot about while sitting on the couch watching Bengals
+            games.
           </p>
           <p className="text-lg text-gray-300 mb-6 leading-relaxed">
             Originated by{" "}
