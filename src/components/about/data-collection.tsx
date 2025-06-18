@@ -227,11 +227,31 @@ export const DataCollection: React.FC<{ id?: string }> = ({ id }) => {
           </div>
         </motion.div>
 
-        {/* Data Features */}
+        {/* Graph Visualization Data Note */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
+          className="bg-blue-900/30 border border-blue-500/30 rounded-2xl p-6 mx-4 sm:mx-0 mb-16"
+        >
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-2 h-2 bg-blue-400 rounded-full mt-2"></div>
+            <div>
+              <h4 className="text-lg font-semibold text-blue-300 mb-2">Graph Visualization Data</h4>
+              <p className="text-gray-300 leading-relaxed">
+                For our graph visualizations, we only include matches that are completed and exclude matches 
+                with win-by-2-games rules in the fifth set of Grand Slams. This ensures consistency in our 
+                score pattern analysis and provides cleaner visualization of traditional tennis scoring systems.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Data Features */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
           className="grid md:grid-cols-3 gap-8 px-4 sm:px-0"
         >
           <FeatureCard

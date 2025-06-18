@@ -35,7 +35,22 @@ const AboutPage: React.FC = () => {
           <ProjectOverview id="project-overview" />
         </Section>
 
-        <Section className="bg-gray-800/50" id="data-collection">
+        <Section className="relative bg-gradient-to-br from-gray-800/70 via-green-900/20 to-blue-900/30 overflow-hidden" id="data-collection">
+          {/* Tennis court background pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 left-1/4 w-0.5 h-full bg-white"></div>
+            <div className="absolute top-0 right-1/4 w-0.5 h-full bg-white"></div>
+            <div className="absolute top-1/2 left-0 w-full h-0.5 bg-white transform -translate-y-1/2"></div>
+            <div className="absolute top-1/4 left-1/4 right-1/4 h-0.5 bg-white"></div>
+            <div className="absolute bottom-1/4 left-1/4 right-1/4 h-0.5 bg-white"></div>
+          </div>
+          {/* Animated floating tennis balls */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-20 left-10 w-4 h-4 bg-yellow-400 rounded-full opacity-30 animate-bounce" style={{animationDelay: '0s', animationDuration: '3s'}}></div>
+            <div className="absolute top-40 right-20 w-3 h-3 bg-yellow-400 rounded-full opacity-20 animate-bounce" style={{animationDelay: '1s', animationDuration: '4s'}}></div>
+            <div className="absolute bottom-32 left-1/3 w-5 h-5 bg-yellow-400 rounded-full opacity-25 animate-bounce" style={{animationDelay: '2s', animationDuration: '3.5s'}}></div>
+            <div className="absolute bottom-20 right-1/4 w-3.5 h-3.5 bg-yellow-400 rounded-full opacity-30 animate-bounce" style={{animationDelay: '0.5s', animationDuration: '2.8s'}}></div>
+          </div>
           <DataCollection id="data-collection" />
         </Section>
 

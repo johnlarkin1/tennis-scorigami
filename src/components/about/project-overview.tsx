@@ -12,8 +12,8 @@ export const ProjectOverview: React.FC<{ id?: string }> = ({ id }) => {
       icon: <Activity className="w-6 h-6" />,
     },
     {
-      label: "Unique Score Slugs Found",
-      value: "15,143",
+      label: "Unique Sequences Found",
+      value: "450k+",
       icon: <Trophy className="w-6 h-6" />,
     },
     {

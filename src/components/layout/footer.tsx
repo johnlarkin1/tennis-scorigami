@@ -134,9 +134,29 @@ export const Footer = () => {
 
           <div>
             <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-green-300 border-b border-gray-700/30 pb-2">
-              Feedback & Requests
+              Get in Touch
             </h3>
             <ul className="space-y-1 sm:space-y-2">
+              <li>
+                <a
+                  href="mailto:support@tennis-scorigami.com"
+                  className="text-gray-300 hover:text-white transition flex items-center group text-sm sm:text-base"
+                >
+                  <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-green-400 transition-colors"></span>
+                  Email Us
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://x.com/TennisScorigami"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-300 hover:text-white transition flex items-center group text-sm sm:text-base"
+                >
+                  <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-green-400 transition-colors"></span>
+                  Tweet @TennisScorigami
+                </a>
+              </li>
               <li>
                 <a
                   href="https://tennis-scorigami.canny.io/"
@@ -157,15 +177,6 @@ export const Footer = () => {
                 >
                   <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-green-400 transition-colors"></span>
                   Join Discord
-                </a>
-              </li>
-              <li>
-                <a
-                  href="mailto:support@tennis-scorigami.com"
-                  className="text-gray-300 hover:text-white transition flex items-center group text-sm sm:text-base"
-                >
-                  <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-green-400 transition-colors"></span>
-                  Contact Us
                 </a>
               </li>
             </ul>
