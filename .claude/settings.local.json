@@ -28,7 +28,8 @@
       "Bash(sed:*)",
       "Bash(npm run lint:*)",
       "Bash(curl:*)",
-      "Bash(npm run format:*)"
+      "Bash(npm run format:*)",
+      "WebFetch(domain:johnlarkin1.github.io)"
     ],
     "deny": []
   },

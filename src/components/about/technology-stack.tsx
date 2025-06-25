@@ -115,7 +115,7 @@ export const TechnologyStack: React.FC<{ id?: string }> = ({ id }) => {
             transition={{ duration: 0.6 }}
             className="inline-block"
           >
-            <ExternalLink href="https://johnlarkin1.github.io">
+            <ExternalLink href="https://johnlarkin1.github.io/2025/tennis-scorigami/">
               <div className="flex items-center gap-2 bg-gray-800 text-md hover:bg-gray-700 px-6 py-3 rounded-lg transition-colors">
                 <BookOpen className="w-5 h-5" />
                 <span>Read the technical deep dive on my blog</span>

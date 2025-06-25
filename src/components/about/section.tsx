@@ -47,7 +47,7 @@ export const SectionHeader: React.FC<{
         {id && (
           <button
             onClick={handleCopyLink}
-            className="opacity-0 group-hover:opacity-100 hover:opacity-100 transition-opacity duration-200 p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-green-400"
+            className="opacity-40 hover:opacity-100 transition-all duration-200 p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-green-400"
             title="Copy link to this section"
           >
             {copied ? (

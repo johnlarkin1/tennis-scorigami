@@ -40,7 +40,7 @@ const AboutPage: React.FC = () => {
           id="data-collection"
         >
           {/* Tennis court background pattern */}
-          <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 opacity-10 pointer-events-none">
             <div className="absolute top-0 left-1/4 w-0.5 h-full bg-white"></div>
             <div className="absolute top-0 right-1/4 w-0.5 h-full bg-white"></div>
             <div className="absolute top-1/2 left-0 w-full h-0.5 bg-white transform -translate-y-1/2"></div>
