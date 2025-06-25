@@ -242,7 +242,7 @@ export default function UnscoredMatchesSection({ className }: Props) {
     return () => {
       if (autoRef.current) window.clearInterval(autoRef.current);
     };
-  }, [stats, currentIndex]);
+  }, [stats.length]); // Only depend on stats.length, not currentIndex
 
   const goPrev = () => {
     if (autoRef.current) window.clearInterval(autoRef.current);

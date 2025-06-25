@@ -8,13 +8,11 @@ type Particle = {
   y: number;
   vx: number;
   vy: number;
-  age?: number;
-  lifetime?: number;
   tx?: number;
   ty?: number;
   origAngle?: number;
   origR?: number;
-  type: "text" | "staticBall" | "debris";
+  type: "text" | "staticBall";
 };
 
 // Ball type removed since we're not using ball animations anymore
@@ -48,7 +46,6 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
     const friction = 0.9;
     const repulseStrength = isMobile ? 15000 : 20000;
     const ballRotationSpeed = 0.004;
-    const gravity = 0.5;
     const staticBallFactor = isMobile ? 0.2 : 0.25; // Smaller ball on mobile
 
     /* grid size - larger on mobile for better performance */
@@ -206,6 +203,10 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
       staticBallCenter = { x: W * 0.75, y: H / 2 };
       staticBallRadius = Math.min(W, H) * staticBallFactor;
 
+      // Clear existing particles before reinitializing to prevent accumulation
+      particles = [];
+      textPts = [];
+
       // Use requestAnimationFrame to avoid setTimeout performance issues
       requestAnimationFrame(() => {
         prepareTextMask();
@@ -223,8 +224,6 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
       const c = staticBallCenter;
 
       particles.forEach((p) => {
-        if (p.type === "debris") return;
-
         // single, unconditional repulsion:
         const dx = p.x - mouse.x,
           dy = p.y - mouse.y;
@@ -256,19 +255,6 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
         p.y += p.vy;
       });
 
-      // debris
-      particles = particles.filter((p) => {
-        if (p.type !== "debris") return true;
-        p.age!++;
-        if (p.age! >= p.lifetime!) return false;
-        p.vy += gravity * 0.2;
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vx *= friction;
-        p.vy *= friction;
-        return true;
-      });
-
       physicsId = requestAnimationFrame(updatePhysics);
     }
 
@@ -296,17 +282,6 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
           ctx.beginPath();
           ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
           ctx.fill();
-        }
-      });
-
-      // debris
-      particles.forEach((p) => {
-        if (p.type === "debris") {
-          ctx.globalAlpha = 1 - p.age! / p.lifetime!;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.globalAlpha = 1;
         }
       });
 
@@ -410,6 +385,10 @@ export const ParticleCanvas: React.FC<{ className?: string }> = ({
       }
 
       window.removeEventListener("resize", resize);
+
+      // Clear all references to prevent memory leaks
+      particles = [];
+      textPts = [];
     };
   }, []);
 
