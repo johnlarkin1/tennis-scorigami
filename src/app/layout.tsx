@@ -1,12 +1,12 @@
 import { Providers } from "@/providers";
 import "@/styles";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import localFont from "next/font/local";
 import { headers } from "next/headers";
 import { getPlatformSpecificImage, isIMessageUserAgent } from "./metadata";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const roboto = Roboto({
   weight: "400",
@@ -79,12 +79,9 @@ export async function generateMetadata(): Promise<Metadata> {
       title: "Tennis Scorigami",
       description:
         "Explore never-played tennis scores and unique match progressions",
-      images: [
-        userAgent.includes("Twitterbot")
-          ? "https://tennis-scorigami.com/unfurls/hero-section-static.png"
-          : image.url,
-      ],
+      images: ["https://tennis-scorigami.com/unfurls/hero-section-static.png"],
       creator: "@tennisscorigami",
+      site: "@tennisscorigami",
     },
     other: {
       // iMessage specific - use MP4 for autoplay
@@ -147,8 +144,22 @@ export default function RootLayout({
         <link rel="manifest" href="/favicon/site.webmanifest" />
 
         {/* Additional meta tags for better social sharing */}
-        <meta name="twitter:creator" content="@tennisscorigami" />
+        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@tennisscorigami" />
+        <meta name="twitter:creator" content="@tennisscorigami" />
+        <meta name="twitter:title" content="Tennis Scorigami" />
+        <meta
+          name="twitter:description"
+          content="Explore never-played tennis scores and unique match progressions"
+        />
+        <meta
+          name="twitter:image"
+          content="https://tennis-scorigami.com/unfurls/hero-section-static.png"
+        />
+        <meta
+          name="twitter:image:alt"
+          content="Tennis Scorigami - Explore never-played tennis scores"
+        />
       </head>
       <body
         className={`${roboto.className} ${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}

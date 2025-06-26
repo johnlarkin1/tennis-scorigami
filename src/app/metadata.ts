@@ -135,6 +135,7 @@ export function getPlatformSpecificImage(
     // Platforms that don't support GIFs - use static image
     else if (
       ua.includes("twitterbot") ||
+      ua.includes("twitter") ||
       ua.includes("facebookexternalhit") ||
       ua.includes("whatsapp")
     ) {
