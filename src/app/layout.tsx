@@ -32,7 +32,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const isIMessage = isIMessageUserAgent(userAgent);
 
   return {
-    metadataBase: new URL("https://tennis-scorigami.com"),
+    metadataBase: new URL("https://www.tennis-scorigami.com"),
     title: "Tennis Scorigami",
     description:
       "Have we converged on all possible tennis scores? Explore never-played tennis scores and unique match progressions.",

@@ -38,7 +38,8 @@
       "Bash(python:*)",
       "Bash(PYTHONPATH=/Users/johnlarkin/Documents/coding/tennis-scorigami/backend/batch-ingestion python scripts/debug_player_matches.py)",
       "Bash(poetry run:*)",
-      "WebFetch(domain:cards-dev.twitter.com)"
+      "WebFetch(domain:cards-dev.twitter.com)",
+      "WebFetch(domain:tennis-scorigami.com)"
     ],
     "deny": []
   },

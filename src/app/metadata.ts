@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export function generateMetadata(): Metadata {
-  const baseUrl = "https://tennis-scorigami.com";
+  const baseUrl = "https://www.tennis-scorigami.com";
 
   return {
     metadataBase: new URL(baseUrl),
