@@ -13,7 +13,7 @@ export const TeamSection: React.FC<{ id?: string }> = ({ id }) => {
       email: "jeb.henryhead@gmail.com",
       github: "https://github.com/henryhead",
       twitter: "https://x.com/jebhenryhead",
-      bio: "World reknown Cincinnati doubles expert. Made his claim to fame in 2013 with a deep run to high school state dubs. Some of the silkiest volleys you'll probably never see.",
+      bio: "World-renowned Cincinnati doubles expert. Made his claim to fame in 2013 with a deep run at high school state dubs. Some of the silkiest volleys you'll probably never see.",
       // skills: ["React", "TypeScript", "UI/UX", "Product Design"],
     },
     {

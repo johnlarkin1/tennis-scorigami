@@ -29,7 +29,15 @@
       "Bash(npm run lint:*)",
       "Bash(curl:*)",
       "Bash(npm run format:*)",
-      "WebFetch(domain:johnlarkin1.github.io)"
+      "WebFetch(domain:johnlarkin1.github.io)",
+      "mcp__neon__get_database_tables",
+      "mcp__neon__list_projects",
+      "mcp__neon__describe_table_schema",
+      "mcp__neon__run_sql",
+      "Bash(chmod:*)",
+      "Bash(python:*)",
+      "Bash(PYTHONPATH=/Users/johnlarkin/Documents/coding/tennis-scorigami/backend/batch-ingestion python scripts/debug_player_matches.py)",
+      "Bash(poetry run:*)"
     ],
     "deny": []
   },
