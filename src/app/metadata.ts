@@ -101,7 +101,7 @@ export function getPlatformSpecificImage(
   userAgent?: string,
   imageType: "hero" | "2d-graph" = "hero"
 ): { url: string; type: string } {
-  const baseUrl = "https://tennis-scorigami.com";
+  const baseUrl = "https://www.tennis-scorigami.com";
 
   // Determine base image names
   const images = {

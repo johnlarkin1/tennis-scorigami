@@ -60,7 +60,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title: "Tennis Scorigami",
       description:
         "Explore never-played tennis scores and unique match progressions",
-      url: "https://tennis-scorigami.com",
+      url: "https://www.tennis-scorigami.com",
       siteName: "Tennis Scorigami",
       images: [
         {
@@ -79,7 +79,9 @@ export async function generateMetadata(): Promise<Metadata> {
       title: "Tennis Scorigami",
       description:
         "Explore never-played tennis scores and unique match progressions",
-      images: ["https://tennis-scorigami.com/unfurls/hero-section-static.png"],
+      images: [
+        "https://www.tennis-scorigami.com/unfurls/hero-section-static.png",
+      ],
       creator: "@tennisscorigami",
       site: "@tennisscorigami",
     },
@@ -142,24 +144,6 @@ export default function RootLayout({
           href="/favicon/apple-touch-icon.png"
         />
         <link rel="manifest" href="/favicon/site.webmanifest" />
-
-        {/* Additional meta tags for better social sharing */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@tennisscorigami" />
-        <meta name="twitter:creator" content="@tennisscorigami" />
-        <meta name="twitter:title" content="Tennis Scorigami" />
-        <meta
-          name="twitter:description"
-          content="Explore never-played tennis scores and unique match progressions"
-        />
-        <meta
-          name="twitter:image"
-          content="https://tennis-scorigami.com/unfurls/hero-section-static.png"
-        />
-        <meta
-          name="twitter:image:alt"
-          content="Tennis Scorigami - Explore never-played tennis scores"
-        />
       </head>
       <body
         className={`${roboto.className} ${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
