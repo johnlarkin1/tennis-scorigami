@@ -20,7 +20,7 @@ export const TeamSection: React.FC<{ id?: string }> = ({ id }) => {
       name: "John Larkin",
       role: "Software Engineer",
       image: "/john.jpeg",
-      linkedin: "https://www.linkedin.com/in/johnlarkin/",
+      linkedin: "https://www.linkedin.com/in/johnlarkin1/",
       email: "john@tennisscorigami.com",
       github: "https://github.com/johnlarkin1",
       website: "https://johnlarkin1.github.io/",
