@@ -20,6 +20,7 @@ export const MobileNavigation = () => {
     { href: "/explore", label: "Explore" },
     { href: "/search", label: "Search" },
     { href: "/about", label: "About" },
+    // TODO(@larkin): Re-add theory page once it's written by a human
   ];
 
   const feedbackItems = [

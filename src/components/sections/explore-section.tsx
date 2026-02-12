@@ -52,7 +52,7 @@ export const ExploreSection = () => {
                     className="bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-6 text-lg"
                     asChild
                   >
-                    <Link href="/visualization">Explore Now</Link>
+                    <Link href="/explore">Explore Now</Link>
                   </Button>
                 </div>
               </div>

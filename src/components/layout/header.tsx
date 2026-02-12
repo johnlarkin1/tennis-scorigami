@@ -38,6 +38,7 @@ export const Header = () => (
           { href: "/explore", label: "Explore" },
           { href: "/search", label: "Search" },
           { href: "/about", label: "About" },
+          // TODO(@larkin): Re-add theory page once it's written by a human
         ].map(({ href, label }) => (
           <Button
             key={href}

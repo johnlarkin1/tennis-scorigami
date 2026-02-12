@@ -94,6 +94,7 @@ export const Footer = () => {
                   Search
                 </Link>
               </li>
+              {/* TODO(@larkin): Re-add theory page once it's written by a human */}
             </ul>
           </div>
 
