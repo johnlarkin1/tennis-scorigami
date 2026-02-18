@@ -88,16 +88,10 @@ export async function GET(req: NextRequest) {
   const nodesView = useRollup ? allNodes[key] : detNodes[key];
   const edgesView = useRollup ? allEdges[key] : detEdges[key];
 
-  console.log(
-    `params: sets=${sets}, sex=${sex}, year=${yearRaw}, tourn=${tournRaw}`
-  );
-  console.log(
-    `views: nodes=${nodesView}, edges=${edgesView} (${useRollup ? "global" : "detailed"})`
-  );
-
   /* 3) fetch nodes */
   let rawNodes;
   if (useRollup) {
+    // View names come from hardcoded Record maps above, not user input — safe to use sql.raw()
     rawNodes = await db
       .select({
         id: sql<number>`id`,
@@ -106,43 +100,51 @@ export async function GET(req: NextRequest) {
         played: sql<boolean>`played`,
         occurrences: sql<number>`occurrences`,
       })
-      .from(sql.raw(`${allNodes[key]}`))
+      .from(sql.raw(allNodes[key]))
       .orderBy(sql`depth`)
       .execute();
   } else {
-    // detailed: inline the LEFT JOIN of aggregated stats
-    rawNodes = await db
-      .select({
-        id: sql<number>`b.id`,
-        slug: sql<string>`b.slug`,
-        depth: sql<number>`b.depth`,
-        played: sql<boolean>`COALESCE(f.played, FALSE)`,
-        occurrences: sql<number>`COALESCE(f.occurrences, 0)`,
-      })
-      .from(
-        sql.raw(`
-        ${allNodes[key]} AS b
-        LEFT JOIN (
-          SELECT
-            d.id,
-            BOOL_OR(d.played)   AS played,
-            SUM(d.occurrences)  AS occurrences
-          FROM ${detNodes[key]} AS d
-          INNER JOIN event AS e
-            ON d.event_id = e.event_id
-          WHERE
-            ${year !== null ? `e.event_year = ${year}::int` : `TRUE`}
-            AND ${tournament !== null ? `e.tournament_id = ${tournament}::int` : `TRUE`}
-          GROUP BY d.id
-        ) AS f
-          ON f.id = b.id
-      `)
-      )
-      .orderBy(sql`b.depth`)
-      .execute();
-  }
+    // View names are safe (hardcoded Record maps), but year/tournament are user
+    // input — use Drizzle's sql tagged template for parameterized execution.
+    const yearCondition =
+      year !== null ? sql`e.event_year = ${year}::int` : sql`TRUE`;
+    const tournCondition =
+      tournament !== null
+        ? sql`e.tournament_id = ${tournament}::int`
+        : sql`TRUE`;
 
-  console.log(`Fetched ${rawNodes.length} nodes`);
+    rawNodes = await db
+      .execute(
+        sql`SELECT
+              b.id,
+              b.slug,
+              b.depth,
+              COALESCE(f.played, FALSE) AS played,
+              COALESCE(f.occurrences, 0) AS occurrences
+            FROM ${sql.raw(allNodes[key])} AS b
+            LEFT JOIN (
+              SELECT
+                d.id,
+                BOOL_OR(d.played)   AS played,
+                SUM(d.occurrences)  AS occurrences
+              FROM ${sql.raw(detNodes[key])} AS d
+              INNER JOIN event AS e
+                ON d.event_id = e.event_id
+              WHERE ${yearCondition} AND ${tournCondition}
+              GROUP BY d.id
+            ) AS f ON f.id = b.id
+            ORDER BY b.depth`
+      )
+      .then((r) =>
+        r.rows.map((row) => ({
+          id: row.id as number,
+          slug: row.slug as string,
+          depth: row.depth as number,
+          played: row.played as boolean,
+          occurrences: Number(row.occurrences),
+        }))
+      );
+  }
 
   /* 4) normalize */
   const maxOcc = rawNodes.reduce((m, n) => Math.max(m, n.occurrences), 1);
@@ -157,6 +159,7 @@ export async function GET(req: NextRequest) {
     .map((n) => ({ frm: ROOT_ID, to: n.id }));
 
   /* 6) fetch + assemble edges */
+  // View name comes from hardcoded Record map, not user input — safe to use sql.raw()
   const rawEdges = await db
     .selectDistinct({
       frm: sql<number>`frm`,
