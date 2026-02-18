@@ -34,25 +34,9 @@
   "prettier.requireConfig": true,
   "prettier.useEditorConfig": false,
 
-  // Deno configuration (unchanged but scoped to supabase/functions)
-  "deno.enablePaths": ["supabase/functions"],
+  // Deno configuration
   "deno.lint": true,
-  "deno.unstable": [
-    "bare-node-builtins",
-    "byonm",
-    "sloppy-imports",
-    "unsafe-proto",
-    "webgpu",
-    "broadcast-channel",
-    "worker-options",
-    "cron",
-    "kv",
-    "ffi",
-    "fs",
-    "http",
-    "net"
-  ],
-  "deno.enable": true,
+  "deno.enable": false,
 
   // Ruff
   "ruff.fixAll": true,

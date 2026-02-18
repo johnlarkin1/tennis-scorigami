@@ -47,7 +47,7 @@ export default [
   //     "src/app/layout.tsx",
   //     "src/app/page.tsx",
   //     "src/components/ui/**",
-  //     "src/services/supabase/database.types.ts",
+  //
   //   ],
   //   rules: {
   //     "import/no-unused-modules": "error",
@@ -60,7 +60,6 @@ export default [
       "src/app/layout.tsx",
       "src/app/page.tsx",
       "src/components/ui/**",
-      "src/services/supabase/database.types.ts",
     ],
     rules: {
       "@typescript-eslint/no-explicit-any": "off", // Allow `any` in API files

@@ -54,16 +54,9 @@ export const TechnologyStack: React.FC<{ id?: string }> = ({ id }) => {
             title="PostgreSQL"
             description={
               <>
-                Big fan of{" "}
+                Hosted on{" "}
                 <ExternalLink href="https://neon.com/">Neon</ExternalLink>{" "}
-                (started with{" "}
-                <ExternalLink href="https://supabase.com/">
-                  Supabase
-                </ExternalLink>
-                , then{" "}
-                <ExternalLink href="https://aiven.io/">Aiven</ExternalLink>,
-                then finally{" "}
-                <ExternalLink href="https://neon.com/">Neon</ExternalLink>)
+                with Drizzle ORM for type-safe queries
               </>
             }
           />
