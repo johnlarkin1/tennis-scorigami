@@ -1,2 +1,1 @@
-#!/bin/sh
-# Commitlint disabled - you can use any commit message format
+npx --no -- commitlint --edit "$1"
