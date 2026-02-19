@@ -1,8 +1,3 @@
-export const YEARS = Array.from({ length: 20 }, (_, i) => ({
-  value: (2023 - i).toString(),
-  label: (2023 - i).toString(),
-}));
-
 export const POSSIBLE_SCORES = [
   "6-0",
   "6-1",

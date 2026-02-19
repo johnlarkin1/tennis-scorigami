@@ -13,9 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { YEARS } from "@/constants";
+import { fetchYears } from "@/lib/api-client";
 import { selectedTournamentAtom } from "@/store/tournament";
 import { SexType } from "@/types/tree-control-types";
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { atom, useAtom } from "jotai";
 import {
@@ -68,6 +69,12 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
   const [selectedSex, setSelectedSex] = useAtom(selectedSexAtom);
   const [selectedSets, setSelectedSets] = useAtom(selectedSetsAtom);
   const [selectedTournament] = useAtom(selectedTournamentAtom);
+
+  // Fetch available years from database
+  const { data: years = [], isLoading: isLoadingYears } = useQuery<number[]>({
+    queryKey: ["available-years"],
+    queryFn: fetchYears,
+  });
 
   // When gender changes, ensure women can only have 3 sets
   useEffect(() => {
@@ -312,7 +319,7 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
             <label className="block text-xs sm:text-sm font-bold text-white mb-2 border-l-2 border-gray-600 pl-2">
               Year
             </label>
-            <Select onValueChange={setSelectedYear} value={selectedYear}>
+            <Select onValueChange={setSelectedYear} value={selectedYear} disabled={isLoadingYears}>
               <SelectTrigger className={dropdownTriggerClass}>
                 <Calendar className="mr-2 h-4 w-4 text-green-400" />
                 <SelectValue
@@ -324,13 +331,13 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
                 <SelectItem value="All Years" className={dropdownItemClass}>
                   All Years
                 </SelectItem>
-                {YEARS.map((year) => (
+                {years.map((year) => (
                   <SelectItem
-                    key={year.value}
-                    value={year.value}
+                    key={year}
+                    value={year.toString()}
                     className={dropdownItemClass}
                   >
-                    {year.label}
+                    {year}
                   </SelectItem>
                 ))}
               </SelectContent>

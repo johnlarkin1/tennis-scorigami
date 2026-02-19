@@ -235,6 +235,20 @@ export async function fetchScoreMatches(
   return response.json();
 }
 
+// ===== FILTER API ENDPOINTS =====
+
+/**
+ * Fetch available years from the database
+ */
+export async function fetchYears(): Promise<number[]> {
+  const response = await fetch("/api/v1/filters");
+  if (!response.ok) {
+    throw new Error("Failed to fetch filters");
+  }
+  const data = await response.json();
+  return data.years;
+}
+
 // ===== TOURNAMENT API ENDPOINTS =====
 
 /**

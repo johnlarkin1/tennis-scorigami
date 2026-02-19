@@ -1,7 +1,7 @@
 // src/app/api/v1/filters/route.ts
 import { db } from "@/db";
 import { event, tournament } from "@/db/schema";
-import { sql } from "drizzle-orm";
+import { desc } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -11,7 +11,7 @@ export async function GET() {
       .select({ y: event.event_year })
       .from(event)
       .groupBy(event.event_year)
-      .orderBy(sql`y desc`)
+      .orderBy(desc(event.event_year))
       .execute(),
   ]);
 
