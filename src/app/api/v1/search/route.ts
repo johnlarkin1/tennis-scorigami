@@ -213,9 +213,9 @@ async function searchMatches(
           break;
 
         case "regex":
-          conditions.push(sql`${fieldRef as any} ~ ${filter.value}`);
+          conditions.push(sql`${fieldRef as any} ~* ${filter.value}`);
           console.log(
-            `Added regex condition: ${filter.field} ~ ${filter.value}`
+            `Added regex condition: ${filter.field} ~* ${filter.value}`
           );
           break;
 

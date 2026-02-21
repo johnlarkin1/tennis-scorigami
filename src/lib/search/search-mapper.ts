@@ -573,11 +573,39 @@ export class SearchMapper {
       };
     }
 
+    // Quoted values (e.g. score:"7-6(1),7-6(0),2-6,6-1") use exact match
+    if (keyword.operator === "equals") {
+      return {
+        type: keyword.type,
+        field: "score",
+        value: keyword.value,
+        operator: "equals",
+        originalValue: keyword.rawValue,
+      };
+    }
+
+    // Build a regex that allows optional tiebreak notation after 7-6/6-7 sets
+    // while keeping commas as literal separators.
+    // "7-6,7-6,2-6,6-1" → "7-6(\(\d+\))?,7-6(\(\d+\))?,2-6,6-1"
+    // This matches "7-6(1),7-6(0),2-6,6-1" but NOT "7-6(3),7-6(5),3-6,2-6,6-1"
+    const sets = keyword.value.split(",");
+    const regexParts = sets.map((s) => {
+      const trimmed = s.trim();
+      if (trimmed === "7-6" || trimmed === "6-7") {
+        return `${trimmed}(\\(\\d+\\))?`;
+      }
+      // Escape parentheses in case user typed tiebreak details
+      return trimmed.replace(/[()]/g, "\\$&");
+    });
+    let pattern = regexParts.join(",");
+    // Convert LIKE wildcards (from * in user input) to regex
+    pattern = pattern.replace(/%/g, ".*");
+
     return {
       type: keyword.type,
       field: "score",
-      value: `%${keyword.value}%`,
-      operator: "ilike",
+      value: pattern,
+      operator: "regex",
       originalValue: keyword.rawValue,
     };
   }
