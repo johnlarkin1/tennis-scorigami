@@ -19,17 +19,13 @@ export async function GET(req: NextRequest) {
   if (!q) return bad("q is required");
 
   try {
-    console.log("Search query:", q);
-
     // Parse the search query for keywords
     const parsedQuery = parseSearchQuery(q);
-    console.log("Parsed query:", parsedQuery);
 
     // Map keywords to database filters
     const mappedFilters = await SearchMapper.mapKeywordFilters(
       parsedQuery.keywords
     );
-    console.log("Mapped filters:", mappedFilters);
 
     // Search for matches using the filters
     const matchesResult = await searchMatches(
@@ -101,9 +97,6 @@ async function searchMatches(
             )
           )
         );
-        console.log(
-          `Added player vs opponent condition: (player_a_id = ${playerId} AND player_b_id = ${opponentId}) OR (player_a_id = ${opponentId} AND player_b_id = ${playerId})`
-        );
         continue;
       }
 
@@ -115,9 +108,6 @@ async function searchMatches(
             eq(mvMatchesByScore.playerBId, filter.value)
           )
         );
-        console.log(
-          `Added either player ID condition: (player_a_id = ${filter.value} OR player_b_id = ${filter.value})`
-        );
         continue;
       }
 
@@ -128,18 +118,12 @@ async function searchMatches(
             ilike(mvMatchesByScore.playerBName, filter.value)
           )
         );
-        console.log(
-          `Added either player name condition: (player_a_name ILIKE ${filter.value} OR player_b_name ILIKE ${filter.value})`
-        );
         continue;
       }
 
-      // Handle scorigami search (never occurred scores)
+      // Handle scorigami search (never occurred scores) - not yet implemented
       if (filter.field === "scorigami") {
-        console.warn(
-          "Scorigami search ('never:occurred') is not yet implemented - requires complex query against score sequences"
-        );
-        continue; // Skip this filter for now
+        continue;
       }
 
       // Handle status filter (boolean: true=complete, false=incomplete)
@@ -169,58 +153,38 @@ async function searchMatches(
             )
           );
         }
-        console.log(`Added status condition: ${filter.value}`);
         continue;
       }
 
       const fieldRef = getFieldReference(filter.field);
       if (fieldRef === undefined || fieldRef === null) {
-        console.warn(`Skipping filter with unknown field: ${filter.field}`);
         continue;
       }
 
       switch (filter.operator) {
         case "equals":
           conditions.push(eq(fieldRef as any, filter.value));
-          console.log(
-            `Added equals condition: ${filter.field} = ${filter.value}`
-          );
           break;
 
         case "ilike":
           conditions.push(ilike(fieldRef as any, filter.value));
-          console.log(
-            `Added ilike condition: ${filter.field} ILIKE ${filter.value}`
-          );
           break;
 
         case "between":
           conditions.push(
             between(fieldRef as any, filter.value[0], filter.value[1])
           );
-          console.log(
-            `Added between condition: ${filter.field} BETWEEN ${filter.value[0]} AND ${filter.value[1]}`
-          );
           break;
 
         case "in":
           if (Array.isArray(filter.value)) {
             conditions.push(inArray(fieldRef as any, filter.value));
-            console.log(
-              `Added in condition: ${filter.field} IN [${filter.value.join(", ")}]`
-            );
           }
           break;
 
         case "regex":
           conditions.push(sql`${fieldRef as any} ~* ${filter.value}`);
-          console.log(
-            `Added regex condition: ${filter.field} ~* ${filter.value}`
-          );
           break;
-
-        default:
-          console.warn(`Unknown operator: ${filter.operator}`);
       }
     }
 
@@ -303,16 +267,8 @@ async function searchMatches(
       .where(conditions.length > 0 ? and(...conditions) : sql`1=1`)
       .limit(limit);
 
-    // Log the final query for debugging
-    console.log("Final query SQL:", query.toSQL());
-    console.log("Number of conditions:", conditions.length);
-
     // Execute query
     const matches = await query.execute();
-    console.log(
-      "first raw matches from database:",
-      matches[0] || "No matches found"
-    );
 
     // Return raw matches - transformation happens in main function
     return matches;
@@ -378,10 +334,5 @@ function getFieldReference(fieldPath: string) {
     "surface_type.surface_type": mvMatchesByScore.surfaceType,
   };
 
-  const field = fieldMap[fieldPath];
-  if (field === undefined) {
-    console.warn(`Unknown field path: ${fieldPath}`);
-  }
-
-  return field;
+  return fieldMap[fieldPath];
 }

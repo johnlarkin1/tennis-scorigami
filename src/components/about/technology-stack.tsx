@@ -55,8 +55,8 @@ export const TechnologyStack: React.FC<{ id?: string }> = ({ id }) => {
             description={
               <>
                 Hosted on{" "}
-                <ExternalLink href="https://neon.com/">Neon</ExternalLink>{" "}
-                with Drizzle ORM for type-safe queries
+                <ExternalLink href="https://neon.com/">Neon</ExternalLink> with
+                Drizzle ORM for type-safe queries
               </>
             }
           />

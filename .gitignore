@@ -66,4 +66,8 @@ storybook-static
 
 captures*
 
+# Large JSON data files
+leagues.json
+sr-tennis-openapi.json
+
 .claude/settings.local.json

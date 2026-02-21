@@ -46,8 +46,6 @@ export async function GET(req: NextRequest) {
     tournament = t;
   }
 
-  console.log(`[Graph Stream] Processing graph data with potential filtering`);
-
   if (![3, 5].includes(sets)) return bad("sets must be 3 or 5");
   if (!["men", "women", "all"].includes(sex))
     return bad("gender must be men|women|all");
@@ -95,19 +93,8 @@ export async function GET(req: NextRequest) {
   const nodesView = useRollup ? allNodesViews[key] : detNodes[key];
   const edgesView = useRollup ? allEdgesViews[key] : detEdges[key];
 
-  // Log which views we're using
-  console.log(`[Graph Stream] Using views: ${nodesView}, ${edgesView}`);
-  console.log(
-    `[Graph Stream] Parameters: sets=${sets}, sex=${sex}, year=${yearRaw}, tournament=${tournRaw}, useRollup=${useRollup}`
-  );
-
   try {
-    console.log(`[Graph Stream] Starting query for ${sets}-set ${sex} matches`);
-    const startTime = Date.now();
-
     // Fetch nodes
-    console.log(`[Graph Stream] Fetching nodes from ${nodesView}`);
-    const nodeStartTime = Date.now();
 
     let rawNodes;
     if (useRollup) {
@@ -155,10 +142,6 @@ export async function GET(req: NextRequest) {
         .execute();
     }
 
-    console.log(
-      `[Graph Stream] Nodes fetched in ${Date.now() - nodeStartTime}ms, count: ${rawNodes.length}`
-    );
-
     // Normalize nodes
     const maxOcc = rawNodes.reduce((m, n) => Math.max(m, n.occurrences), 1);
     const nodes: NodeDTO[] = rawNodes.map((n) => ({
@@ -170,8 +153,6 @@ export async function GET(req: NextRequest) {
     nodes.unshift(rootNode);
 
     // Fetch edges with filtering
-    console.log(`[Graph Stream] Fetching edges from ${edgesView}`);
-    const edgeStartTime = Date.now();
 
     let rawEdges;
     if (useRollup) {
@@ -204,38 +185,12 @@ export async function GET(req: NextRequest) {
         .execute();
     }
 
-    console.log(
-      `[Graph Stream] Raw edges fetched in ${Date.now() - edgeStartTime}ms, count: ${rawEdges.length}`
-    );
-
-    if (rawEdges.length < 1000) {
-      console.log(
-        `[Graph Stream] WARNING: Very few edges found (${rawEdges.length}), this seems wrong for 125k nodes`
-      );
-    }
-
     // Add root edges
     const rootEdges: EdgeDTO[] = nodes
       .filter((n) => n.depth === 1)
       .map((n) => ({ frm: ROOT_ID, to: n.id }));
 
     const allEdges: EdgeDTO[] = [...rootEdges, ...rawEdges];
-
-    // Skip positioning computation - let frontend handle it for now
-    console.log(
-      `[Graph Stream] Skipping backend positioning - using frontend layout`
-    );
-
-    // Just pass through nodes without positions
-    const nodesWithPositions = nodes;
-
-    console.log(
-      `[Graph Stream] Using ${allEdges.length} edges (${rawEdges.length} from DB + ${rootEdges.length} root edges) ${useRollup ? "from materialized view" : "with filtering and deduplication"}`
-    );
-
-    console.log(
-      `[Graph Stream] Total processing time: ${Date.now() - startTime}ms`
-    );
 
     // Stream the data
     const encoder = new TextEncoder();
@@ -247,8 +202,8 @@ export async function GET(req: NextRequest) {
             encoder.encode(
               JSON.stringify({
                 type: "meta",
-                totalItems: nodesWithPositions.length + allEdges.length,
-                totalNodes: nodesWithPositions.length,
+                totalItems: nodes.length + allEdges.length,
+                totalNodes: nodes.length,
                 totalEdges: allEdges.length,
               }) + "\n"
             )
@@ -256,8 +211,8 @@ export async function GET(req: NextRequest) {
 
           // Send nodes with positions in larger batches for better performance
           const nodeBatchSize = 500; // Increased from 100 to 500
-          for (let i = 0; i < nodesWithPositions.length; i += nodeBatchSize) {
-            const batch = nodesWithPositions.slice(i, i + nodeBatchSize);
+          for (let i = 0; i < nodes.length; i += nodeBatchSize) {
+            const batch = nodes.slice(i, i + nodeBatchSize);
             controller.enqueue(
               encoder.encode(
                 JSON.stringify({
