@@ -319,7 +319,11 @@ export const GraphControls: React.FC<ForceGraphControlsProps> = ({
             <label className="block text-xs sm:text-sm font-bold text-white mb-2 border-l-2 border-gray-600 pl-2">
               Year
             </label>
-            <Select onValueChange={setSelectedYear} value={selectedYear} disabled={isLoadingYears}>
+            <Select
+              onValueChange={setSelectedYear}
+              value={selectedYear}
+              disabled={isLoadingYears}
+            >
               <SelectTrigger className={dropdownTriggerClass}>
                 <Calendar className="mr-2 h-4 w-4 text-green-400" />
                 <SelectValue
