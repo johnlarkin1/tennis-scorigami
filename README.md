@@ -60,8 +60,8 @@ Historical match data comes primarily from [Jeff Sackmann's open-source tennis d
 
 ## Contributing
 
-Contributions are welcome! Please open an issue first to discuss what you'd like to change. Run `npm run lint && npm run typecheck` before submitting a PR.
+Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
 ## License
 
-MIT
+All Rights Reserved. See [LICENSE](./LICENSE) for details.
