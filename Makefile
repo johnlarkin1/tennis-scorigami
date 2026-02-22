@@ -106,6 +106,11 @@ sync-public:
 	git clone $(INTERNAL_REMOTE) $(TEMP_DIR)
 	@echo "==> Stripping excluded paths from history..."
 	cd $(TEMP_DIR) && git filter-repo $(EXCLUDED_PATHS) --invert-paths
+	@echo "==> Adding backend/ placeholder..."
+	mkdir -p $(TEMP_DIR)/backend
+	touch $(TEMP_DIR)/backend/.gitkeep
+	@printf '# Backend\n\nThe data ingestion pipeline for Tennis Scorigami is not included in this public repository.\n\nIt handles ETL processing of tennis match data from multiple sources (Sackmann datasets, SportRadar API) into our PostgreSQL database. This code is kept private to protect the intellectual property behind the project.\n\nIf you have questions about the data pipeline or are interested in collaborating, feel free to open an issue.\n' > $(TEMP_DIR)/backend/README.md
+	cd $(TEMP_DIR) && git add backend/ && git commit -m "Add backend/ placeholder for public repo"
 	@echo "==> Pushing to public remote..."
 	cd $(TEMP_DIR) && git remote add public $(PUBLIC_REMOTE) && git push public main --force
 	@echo "==> Cleaning up..."
