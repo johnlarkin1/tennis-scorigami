@@ -4,6 +4,11 @@ Explore unique and never-before-seen scorelines in professional tennis history. 
 
 Inspired by [Jon Bois' NFL Scorigami](https://nflscorigami.com/), this project applies the same concept to tennis — where the branching nature of game/set/match scoring creates an enormous tree of possible outcomes.
 
+> [!IMPORTANT]
+> The database schema (`src/db/`) and data ingestion pipeline (`backend/`) are excluded
+> from this public repository. Stub files are provided in their place so the project
+> compiles. See [`backend/README.md`](./backend/README.md) for details.
+
 ## Features
 
 - **Interactive 2D Graph** — SigmaJS-powered visualization of the tennis score tree with pan, zoom, and click-to-explore
